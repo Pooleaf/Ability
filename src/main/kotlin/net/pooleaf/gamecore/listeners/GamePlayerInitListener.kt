@@ -16,11 +16,6 @@ class GamePlayerInitListener: Listener {
     fun onJoin(event: PlayerJoinEvent) {
         if (!GameCore.playerManager.exists(event.player.uniqueId)) {
             val gamePlayer = GameCore.playerManager.create(event.player.uniqueId)
-
-            // 게임 중일 경우 관전모드로 전환
-            if (GameCore.game.gameStarted) {
-                // TODO 관전모드
-            }
         }
     }
 

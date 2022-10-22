@@ -94,6 +94,8 @@ abstract class Game {
 
                 player?.health = player.maxHealth
                 player?.gameMode = GameMode.ADVENTURE
+                player.level = 0
+                player.exp = 0F
                 player?.inventory!!.clear()
                 player?.updateInventory()
             }
