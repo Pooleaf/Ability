@@ -1,0 +1,81 @@
+~~ Flow ~~
+
+게임 시작
+- 접속 시 스폰으로 이동
+- 일정 인원 모이면 게임 시작
+
+게임 진행
+- 팀 모두 탈락 시 우승처리
+- 나갔다 들어오면 재접속
+
+관전 모드
+- 관전 퀵바
+- 죽을만큼 데미지 받으면 죽지않고 탈락 & 관전 처리
+- 게임 중 입장 시 관전모드
+
+게임 종료
+- 게임 종료 시 초기화 후 스폰으로 이동 (관전 모두 해제)
+
+
+게임 최대 시간
+-3시간 동안 안끝나면 강제 종료
+
+
+
+~~ Util ~~
+
+게임
+리플레이
+이벤트 API
+
+팀
+
+스폰
+투표
+
+맵
+페이즈
+경계선
+
+관전
+
+
+
+~~ Command ~~
+
+/game start
+/game stop
+/game observer
+
+
+
+~~ DB ~~
+
+games
+game_id VARCHAR(36) PRIMARY KEY, game_type_id INT, channel_name VARCHAR(50), start_time DATETIME, end_time DATETIME, cancel_yn VARCHAR(1)
+
+game_types
+game_type_id INT PRIMARY KEY, type_name VARCHAR(20)
+
+game_participants
+game_id VARCHAR(36), player_uuid VARCHAR(36), PRIMARY KEY(game_id, player_uuid)
+
+game_kills
+game_id VARCHAR(36), killer_player_uuid VARCHAR(36), dead_player_uuid VARCHAR(36), kill_time DATETIME
+
+game_winners
+game_id VARCHAR(36), winner_player_uuid VARCHAR(36), PRIMARY KEY(game_id, winner_player_uuid)
+
+game_player_stats
+player_uuid VARCHAR(36), game_type_id INT, kill INT, death INT, assist INT, win INT, PRIMARY KEY(player_uuid, game_type_id)
+
+
+-- 진행 중인 게임 (끝난 시간이 없거나 3시간 안지난 게임)
+SELECT game_id FROM games WHERE end_time IS NULL OR end_time >= DATE_SUB(NOW(), INTERVAL 60 * 60 * 3 SECOND)
+
+-- 플레이어가 참여 중인 게임 ID
+SELECT *
+FROM game, game_participants participant
+WHERE (game.end_time IS NULL OR game.end_time >= DATE_SUB(NOW(), INTERVAL 60 * 60 * 3 SECOND)
+AND game.game_id = participant.game_id
+AND participant.player_uuid = #{playerUuid}
