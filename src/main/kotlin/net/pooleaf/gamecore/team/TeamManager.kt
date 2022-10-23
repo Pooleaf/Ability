@@ -27,10 +27,10 @@ class TeamManager {
     }
 
     /**
-     * [GamePlayer]가 탈락하지 않은 [Team]의 [List]를 반환합니다.
+     * [GamePlayer]가 탈락하지 않고 온라인 상태인 [Team]의 [List]를 반환합니다.
      */
-    fun getNotDefeatedTeams(): List<Team> {
-        return teams.filter { it.players.filterNot { it.defeated }.count() > 0 }
+    fun getNotDefeatedOnlineTeams(): List<Team> {
+        return teams.filter { it.players.filter { it.isOnline && it.joined && !it.defeated && !it.observer }.isNotEmpty() }
             .toList()
     }
 

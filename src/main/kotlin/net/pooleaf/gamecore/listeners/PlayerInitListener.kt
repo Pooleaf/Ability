@@ -7,7 +7,7 @@ import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 
-class GamePlayerInitListener: Listener {
+class PlayerInitListener: Listener {
 
     /**
      * [GamePlayer] 등록
@@ -16,6 +16,10 @@ class GamePlayerInitListener: Listener {
     fun onJoin(event: PlayerJoinEvent) {
         if (!GameCore.playerManager.exists(event.player.uniqueId)) {
             val gamePlayer = GameCore.playerManager.create(event.player.uniqueId)
+
+            if (!GameCore.game.gameStarted) {
+                gamePlayer.joined = true
+            }
         }
     }
 
@@ -24,7 +28,7 @@ class GamePlayerInitListener: Listener {
      */
     @EventHandler(priority = EventPriority.HIGH)
     fun onQuit(event: PlayerQuitEvent) {
-        if (!GameCore.game.countingStarted) {
+        if (!GameCore.game.gameStarted) {
             GameCore.playerManager.remove(event.player.uniqueId)
         }
     }

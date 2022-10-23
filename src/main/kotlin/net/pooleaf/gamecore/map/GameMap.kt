@@ -22,6 +22,10 @@ class GameMap {
     @ConfigName("이름")
     var name: String? = null
 
+    @ConfigName("표기 이름")
+    var displayName: String? = null
+    get() = field ?: name
+
     @ConfigName("중앙 위치.world")
     var centerWorldName: String? = null
 
@@ -41,7 +45,7 @@ class GameMap {
     var centerPitch = 0f
 
     @ConfigName("경계선 범위")
-    val worldBorderSize: Int? = null // 맵 범위
+    var worldBorderSize: Int? = null // 맵 범위
 
 
     @ConfigExclude
@@ -94,8 +98,9 @@ class GameMap {
         val centerLocation = getCenterLocation()
         Preconditions.checkNotNull(centerLocation)
         Preconditions.checkNotNull(worldBorderSize)
+
         return (Math.abs(centerLocation.x - location.x) <= worldBorderSize!!
-                && Math.abs(centerLocation.z - location.z) <= worldBorderSize)
+                && Math.abs(centerLocation.z - location.z) <= worldBorderSize!!)
     }
 
     /**
@@ -108,7 +113,7 @@ class GameMap {
 
         // 랜덤 x, z
         val x = (centerLocation.x + Math.random() * (worldBorderSize!! / 2)).toInt()
-        val z = (centerLocation.z + Math.random() * (worldBorderSize / 2)).toInt()
+        val z = (centerLocation.z + Math.random() * (worldBorderSize!! / 2)).toInt()
 
 
         // 랜덤 위치에서 제일 높은 블럭 찾기

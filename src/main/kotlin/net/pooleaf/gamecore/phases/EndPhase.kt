@@ -14,21 +14,21 @@ import org.bukkit.entity.EntityType
 import org.bukkit.entity.Firework
 import org.bukkit.entity.Player
 
-class EndPhase: Phase() {
+open class EndPhase: Phase() {
 
     override fun onStart() {
         GameCore.game.end()
 
         // 우승자
-        val winners = GameCore.teamManager.getNotDefeatedTeams()[0].players
+        val winners = GameCore.teamManager.getNotDefeatedOnlineTeams()[0].players
 
         // 우승 타이틀 띄우기
         val winnerNames: String = winners.joinToString(", ") { it.displayName }
 
         Broadcaster.broadcastTitle(
             DefaultTitleBuilder()
-                .title("§e§l우승")
-                .subtitle("§f§l$winnerNames")
+                .title("§e우승")
+                .subtitle("§f$winnerNames")
                 .stay(20 * 10)
                 .build()
         )
@@ -49,9 +49,9 @@ class EndPhase: Phase() {
         when (val counter = 15 - count) {
             in 4..10 -> {
                 Broadcaster.broadcastActionBar("§e${counter}§c초 후 게임이 다시 시작됩니다.")
-                Broadcaster.broadcastSound(XSound.UI_BUTTON_CLICK, 0.3f, 0.7f)
             }
             in 1..3 -> {
+                Broadcaster.broadcastActionBar("§e${counter}§c초 후 게임이 다시 시작됩니다.")
                 Broadcaster.broadcastSound(XSound.UI_BUTTON_CLICK, 0.3f, 0.7f)
             }
             0 -> {
@@ -62,7 +62,7 @@ class EndPhase: Phase() {
 
     override fun onEnd() {
         Broadcaster.removeActionBar()
-        GameCore.game.end()
+        GameCore.game.endReset()
     }
 
 

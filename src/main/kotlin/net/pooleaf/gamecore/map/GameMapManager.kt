@@ -60,6 +60,8 @@ abstract class GameMapManager<T: GameMap>: AbstractManager<String, T>() {
             .filter{ it.canUse() }
             .toList()
 
+        if (maps.isEmpty()) return null
+
         return maps[Math.random().toInt() * maps.size] as T
     }
 

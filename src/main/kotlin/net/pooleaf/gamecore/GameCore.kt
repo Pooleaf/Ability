@@ -1,6 +1,8 @@
 package net.pooleaf.gamecore
 
-import net.pooleaf.gamecore.configs.GameConfig
+import net.pooleaf.gamecore.configs.AutoGameConfig
+import net.pooleaf.gamecore.configs.QuickBarConfig
+import net.pooleaf.gamecore.configs.SpawnConfig
 import net.pooleaf.gamecore.game.Game
 import net.pooleaf.gamecore.map.DefaultGameMapManager
 import net.pooleaf.gamecore.map.GameMap
@@ -22,8 +24,16 @@ object GameCore {
 
     val teamManager: TeamManager = TeamManager()
 
-    val gameConfig: GameConfig by lazy {
-        GameConfig(File(gamePlugin.dataFolder, "game-config.yml"))
+    val autoGameConfig: AutoGameConfig by lazy {
+        AutoGameConfig(File(gamePlugin.dataFolder, "game-config.yml"))
+    }
+
+    val spawnConfig: SpawnConfig by lazy {
+        SpawnConfig(File(gamePlugin.dataFolder, "spawn-config.yml"))
+    }
+
+    val quickBarConfig: QuickBarConfig by lazy {
+        QuickBarConfig(File(gamePlugin.dataFolder, "quickbar-config.yml"))
     }
 
 
@@ -38,6 +48,19 @@ object GameCore {
 
         this.playerManager = playerManager
         this.mapManager = mapManager
+    }
+
+    fun loadConfig() {
+        autoGameConfig.load()
+        autoGameConfig.save()
+
+        spawnConfig.load()
+        spawnConfig.save()
+
+        quickBarConfig.load()
+        quickBarConfig.save()
+
+        mapManager.loadAllConfig()
     }
 
 }

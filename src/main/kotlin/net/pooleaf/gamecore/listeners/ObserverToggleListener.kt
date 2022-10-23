@@ -14,7 +14,7 @@ class ObserverToggleListener: Listener {
     @EventHandler
     fun onJoin(event: PlayerJoinEvent) {
         GameCore.playerManager.get(event.player.uniqueId).let {
-            if (GameCore.game.gameStarted && (!it.joined || it.defeated)) {
+            if (GameCore.game.gameStarted && (!it.joined || it.defeated) || GameCore.game.ended) {
                 it.toggleObserver(true)
             }
         }
