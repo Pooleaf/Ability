@@ -18,6 +18,7 @@ class PlayerInitListener: Listener {
             val gamePlayer = GameCore.playerManager.create(event.player.uniqueId)
 
             if (!GameCore.game.gameStarted) {
+                gamePlayer.init()
                 gamePlayer.joined = true
             }
         }

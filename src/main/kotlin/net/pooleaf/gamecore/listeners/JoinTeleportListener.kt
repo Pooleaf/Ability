@@ -14,13 +14,14 @@ class JoinTeleportListener: Listener {
     @EventHandler
     fun onJoin(event: PlayerJoinEvent) {
         val player = event.player
+        val gamePlayer = GameCore.playerManager.get(player.uniqueId)
 
         when {
             // 대기 중 스폰
-            !GameCore.game.gameStarted && GameCore.spawnConfig.spawnLocation != null -> TeleportUtil.teleport(player, GameCore.spawnConfig.spawnLocation)
+            !GameCore.game.mapTeleported && GameCore.spawnConfig.spawnLocation != null -> TeleportUtil.teleport(player, GameCore.spawnConfig.spawnLocation)
 
-            // 게임 시작 후엔 맵으로
-            GameCore.game.gameStarted -> TeleportUtil.teleport(player, GameCore.game.map!!.getCenterLocation())
+            // 관전자 게임 시작 후엔 맵으로
+            GameCore.game.mapTeleported && !gamePlayer.joined -> TeleportUtil.teleport(player, GameCore.game.map!!.getCenterLocation())
         }
     }
 

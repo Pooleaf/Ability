@@ -8,6 +8,7 @@ import net.pooleaf.gamecore.phases.EndPhase
 import net.pooleaf.gamecore.phases.GamePhase
 import net.pooleaf.gamecore.phases.MapTeleportCountPhase
 import net.pooleaf.gamecore.phases.StartCountPhase
+import org.bukkit.GameMode
 
 class AbilityGame: Game(100) {
 
@@ -15,7 +16,10 @@ class AbilityGame: Game(100) {
         return PhasePipeline()
             .addPhase(StartCountPhase())
             .addPhase(MapTeleportCountPhase())
-            .addPhase(RunnablePhase() { GameCore.game.pvpStarted = true})
+            .addPhase(RunnablePhase() {
+                GameCore.game.currentGameMode = GameMode.SURVIVAL
+                GameCore.game.pvpStarted = true
+            })
             .addPhase(GamePhase())
             .addPhase(EndPhase())
     }

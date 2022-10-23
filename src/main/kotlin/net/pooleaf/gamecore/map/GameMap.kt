@@ -4,11 +4,11 @@ import com.google.common.base.Preconditions
 import com.grinderwolf.swm.api.SlimePlugin
 import com.grinderwolf.swm.api.world.properties.SlimeProperties
 import com.grinderwolf.swm.api.world.properties.SlimePropertyMap
-import net.pooleaf.ability.AbilityPlugin
 import net.pooleaf.core.modules.annoconfig.AnnoConfigModule
 import net.pooleaf.core.modules.annoconfig.common.anno.ConfigExclude
 import net.pooleaf.core.modules.annoconfig.common.anno.ConfigName
 import net.pooleaf.core.modules.support.bukkit.util.TeleportUtil
+import net.pooleaf.core.modules.support.common.logger.Logger
 import net.pooleaf.gamecore.GameCore
 import org.bukkit.Bukkit
 import org.bukkit.Location
@@ -99,8 +99,9 @@ class GameMap {
         Preconditions.checkNotNull(centerLocation)
         Preconditions.checkNotNull(worldBorderSize)
 
-        return (Math.abs(centerLocation.x - location.x) <= worldBorderSize!!
-                && Math.abs(centerLocation.z - location.z) <= worldBorderSize!!)
+        return location.world.equals(centerLocation.world)
+                && Math.abs(centerLocation.x - location.x) <= worldBorderSize!! / 2
+                && Math.abs(centerLocation.z - location.z) <= worldBorderSize!! / 2
     }
 
     /**
@@ -240,16 +241,22 @@ class GameMap {
     /**
      * SWM에서 맵 월드를 언로드합니다.
      */
-    fun unload() {
-        if (Bukkit.getPluginManager().getPlugin("SlimeWorldManager") == null) return
+    fun unload(): Boolean {
+        if (Bukkit.getPluginManager().getPlugin("SlimeWorldManager") == null) return true
 
         // 기본 월드 제외
-        if (centerWorldName == "world") return
+        if (centerWorldName == "world") return true
 
         // 로딩 안되어 있으면 안 함
-        if (!isLoaded()) return
+        if (!isLoaded()) return true
 
-        Bukkit.unloadWorld(centerWorldName, false)
+        if (Bukkit.unloadWorld(centerWorldName, false)) {
+            Logger.log("$centerWorldName 월드가 언로드 되었습니다.")
+            return true
+        } else {
+            Logger.warning("$centerWorldName 월드 언로드에 실패했습니다.")
+            return false
+        }
     }
 
 }

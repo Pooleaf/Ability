@@ -1,10 +1,12 @@
 package net.pooleaf.gamecore.listeners.control
 
+import net.pooleaf.core.modules.eventsupport.bukkit.events.damage.EntityDamageByPlayerEvent
 import net.pooleaf.core.modules.eventsupport.bukkit.events.damage.PlayerDamageByPlayerEvent
 import net.pooleaf.core.modules.eventsupport.bukkit.events.damage.PlayerDamageEvent
 import net.pooleaf.gamecore.GameCore
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
+import org.bukkit.event.Listener
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.block.BlockPlaceEvent
 import org.bukkit.event.entity.PlayerDeathEvent
@@ -13,7 +15,7 @@ import org.bukkit.event.player.*
 /**
  * 관전 모드 플레이어를 컨트롤하는 Listener
  */
-class ObserverControlListener {
+class ObserverControlListener: Listener {
 
     private fun isObserver(player: Player): Boolean {
         val gamePlayer = GameCore.playerManager.get(player.uniqueId)
@@ -21,7 +23,7 @@ class ObserverControlListener {
     }
 
     private fun isWaiting(): Boolean {
-        return !GameCore.game.gameStarted
+        return !GameCore.game.mapTeleported
     }
 
 
@@ -61,8 +63,15 @@ class ObserverControlListener {
     }
 
     @EventHandler
+    fun onHit(event: EntityDamageByPlayerEvent) {
+        if (isObserver(event.damager)) {
+            event.isCancelled = true
+        }
+    }
+
+    @EventHandler
     fun onPvp(event: PlayerDamageByPlayerEvent) {
-        if (isObserver(event.player)) {
+        if (isObserver(event.player) || isObserver(event.damager)) {
             event.isCancelled = true
         }
     }
@@ -101,6 +110,14 @@ class ObserverControlListener {
         if (isObserver(event.player) && isWaiting() && !event.player.isOp) {
             event.player.isFlying = false
             event.isCancelled = true
+        }
+    }
+
+    @EventHandler
+    fun onWorldChange(event: PlayerChangedWorldEvent) {
+        if (isObserver(event.player) && !isWaiting()) {
+            event.player.allowFlight = true
+            event.player.isFlying = true
         }
     }
 

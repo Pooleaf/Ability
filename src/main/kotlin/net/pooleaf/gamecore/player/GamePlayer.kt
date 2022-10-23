@@ -3,7 +3,6 @@ package net.pooleaf.gamecore.player
 import com.google.common.base.Preconditions
 import net.pooleaf.core.modules.gui.GuiModule
 import net.pooleaf.core.modules.gui.bukkit.title.Title
-import net.pooleaf.core.modules.support.common.logger.Logger
 import net.pooleaf.core.modules.support.common.player.AbstractPlayer
 import net.pooleaf.gamecore.DefaultTitleBuilder
 import net.pooleaf.gamecore.GameCore
@@ -36,6 +35,7 @@ open class GamePlayer(uuid: UUID, var team: Team) : AbstractPlayer<Player>(uuid)
                 player.inventory!!.clear()
                 player.updateInventory()
 
+                player.gameMode = GameCore.game.currentGameMode
                 player.allowFlight = false
                 player.isFlying = false
                 player.spigot().collidesWithEntities = true
@@ -76,48 +76,51 @@ open class GamePlayer(uuid: UUID, var team: Team) : AbstractPlayer<Player>(uuid)
         )
     }
 
+    /**
+     * 관전 모드로 전환하거나 해제합니다.
+     * Primary Thread에서 실행됩니다.
+     */
     fun toggleObserver(toggle: Boolean) {
-        Preconditions.checkArgument(player.isOnline, "Player가 접속 중이 아닙니다.")
+        if (Bukkit.isPrimaryThread()) {
+            Preconditions.checkArgument(isOnline, "Player가 접속 중이 아닙니다.")
 
-        Bukkit.getScheduler().runTask(GameCore.gamePlugin) {
             player.health = player.maxHealth
             player.level = 0
             player.exp = 0F
             player.inventory!!.clear()
             player.updateInventory()
-        }
 
-        if (toggle) {
-            Bukkit.getScheduler().runTask(GameCore.gamePlugin) {
+            if (toggle) {
                 player.gameMode = GameMode.ADVENTURE
                 player.allowFlight = true
-                player.isFlying = true
+                // 맵으로 이동했을 때만 날기 가능
+                if (GameCore.game.mapTeleported) {
+                    player.isFlying = true
+                }
                 player.spigot().collidesWithEntities = false
                 player.addPotionEffect(PotionEffect(PotionEffectType.INVISIBILITY, 100000, 0, true))
                 // TODO hide player
 
                 ObserverQuickBar().setTo(player)
-            }
 
-            observer = true
-        } else {
-            Bukkit.getScheduler().runTask(GameCore.gamePlugin) {
-                if (GameCore.game.gameStarted) {
-                    player.gameMode = GameMode.SURVIVAL
-                } else {
-                    player.gameMode = GameMode.ADVENTURE
-                }
+                observer = true
+            } else {
+                player.gameMode = GameCore.game.currentGameMode
 
                 player.allowFlight = false
                 player.isFlying = false
                 player.spigot().collidesWithEntities = true
-                PotionEffectType.values().forEach { player.removePotionEffect(it) }
+                player.activePotionEffects.forEach { player.removePotionEffect(it.type) }
                 // TODO hide player 해제
 
                 GuiModule.getQuickBarManager().removeTo(player)
-            }
 
-            observer = false
+                observer = false
+            }
+        } else {
+            Bukkit.getScheduler().runTask(GameCore.gamePlugin) {
+                toggleObserver(toggle)
+            }
         }
     }
 
