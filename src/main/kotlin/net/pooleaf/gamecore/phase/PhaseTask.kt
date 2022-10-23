@@ -1,6 +1,5 @@
 package net.pooleaf.gamecore.phase
 
-import net.pooleaf.core.modules.support.common.debugger.Debugger
 import net.pooleaf.gamecore.GameCore
 import org.bukkit.Bukkit
 import org.bukkit.plugin.java.JavaPlugin
@@ -17,8 +16,6 @@ class PhaseTask(
         if (bukkitTask == null) {
             bukkitTask = Bukkit.getScheduler().runTaskTimerAsynchronously(GameCore.gamePlugin as JavaPlugin, Runnable {
                 val currentPhase = phasePipeline.getCurrentPhase()
-
-                Debugger.log("current phase: ${currentPhase!!.javaClass.name}, count: ${currentPhase!!.count}")
 
                 // 현재 Phase 없으면 중단
                 if (currentPhase == null) {
