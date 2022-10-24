@@ -28,7 +28,7 @@ class JoinMessageListener: Listener {
             !GameCore.game.countingStarted -> {
                 Broadcaster.broadcastWaitingActionBar()
 
-                "§f${gamePlayer.displayName} §e님께서 접속했습니다. §f(${GameCore.playerManager.getOnlinePlayingPlayers().size}/${GameCore.autoGameConfig.startTeamCount})"
+                "§f${gamePlayer.displayName} §e님께서 접속했습니다. §f(${GameCore.playerManager.getOnlinePlayingPlayers().size}/${GameCore.autoGameConfig.startPlayerCount})"
             }
 
             // 기본
@@ -46,9 +46,9 @@ class JoinMessageListener: Listener {
 
             // 대기 중 퇴장
             !GameCore.game.countingStarted -> {
-                Broadcaster.broadcastWaitingActionBar(GameCore.teamManager.getNotDefeatedOnlineTeams().size - 1)
+                Broadcaster.broadcastWaitingActionBar(GameCore.playerManager.getOnlinePlayingPlayers().size - 1)
 
-                "§f${gamePlayer.displayName} §e님께서 퇴장했습니다. §f(${GameCore.playerManager.getOnlinePlayingPlayers().size - 1}/${GameCore.autoGameConfig.startTeamCount})"
+                "§f${gamePlayer.displayName} §e님께서 퇴장했습니다. §f(${GameCore.playerManager.getOnlinePlayingPlayers().size - 1}/${GameCore.autoGameConfig.startPlayerCount})"
             }
 
             // 기본

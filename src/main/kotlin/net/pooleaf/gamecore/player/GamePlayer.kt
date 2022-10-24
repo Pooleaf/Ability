@@ -15,17 +15,24 @@ import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
 import java.util.*
 
-open class GamePlayer(uuid: UUID, var team: Team) : AbstractPlayer<Player>(uuid) {
+open class GamePlayer : AbstractPlayer<Player> {
 
     var joined = false // 게임 참여 여부
     var defeated = false // 패배 여부
     var observer = false // 관전 모드
+
+    var team: Team? = null // 팀
+
+
+    internal constructor(uuid: UUID) : super(uuid)
 
 
     open fun init() {
         joined = false
         defeated = false
         observer = false
+
+        team?.removePlayer(this)
 
         Bukkit.getScheduler().runTask(GameCore.gamePlugin) {
             if (player != null) {

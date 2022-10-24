@@ -64,7 +64,7 @@ class GameCommand {
     )
     fun game_observer(player: CommonPlayer<Player>, result: CommandResult?) {
         // 대기 중에만 사용 가능. 단 관리자는 아무 때나 사용할 수 있음
-        if (GameCore.game.countingStarted && !player.platformSender.isOp) {
+        if (GameCore.game.gameStarted && !player.platformSender.isOp) {
             player.nwarning("게임 중에는 사용할 수 없습니다.")
             return
         }

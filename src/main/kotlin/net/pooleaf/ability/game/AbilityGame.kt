@@ -14,7 +14,7 @@ class AbilityGame: Game(100) {
 
     override fun createPhasePipeline(): PhasePipeline {
         return PhasePipeline()
-            .addPhase(StartCountPhase())
+            .addPhase(StartCountPhase(false))
             .addPhase(MapTeleportCountPhase())
             .addPhase(RunnablePhase() {
                 GameCore.game.currentGameMode = GameMode.SURVIVAL

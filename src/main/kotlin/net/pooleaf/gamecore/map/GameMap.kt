@@ -10,6 +10,7 @@ import net.pooleaf.core.modules.annoconfig.common.anno.ConfigName
 import net.pooleaf.core.modules.support.bukkit.util.TeleportUtil
 import net.pooleaf.core.modules.support.common.logger.Logger
 import net.pooleaf.gamecore.GameCore
+import net.pooleaf.gamecore.team.Team
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Material
@@ -50,6 +51,9 @@ class GameMap {
 
     @ConfigExclude
     var currentWorldBorderSize: Int? = null // 현재 맵 범위 (경계선 줄일 때 사용)
+
+
+    internal constructor()
 
 
     /**
@@ -107,7 +111,7 @@ class GameMap {
     /**
      * 맵 내의 랜덤 위치를 불러옵니다.
      */
-    fun getRandomLocation(): Location? {
+    fun getRandomLocation(): Location {
         val centerLocation = getCenterLocation()
         Preconditions.checkNotNull(centerLocation)
         Preconditions.checkNotNull(worldBorderSize)
@@ -130,14 +134,29 @@ class GameMap {
     }
 
     /**
-     * 플레이어를 랜덤 위치로 텔레포트 시킵니다.
+     * [player]를 랜덤 위치로 텔레포트 시킵니다.
      */
-    fun teleportToRandomLocation(player: Player?) {
+    fun teleportToRandomLocation(player: Player) {
         if (!Bukkit.isPrimaryThread()) {
             Bukkit.getScheduler().runTask(GameCore.gamePlugin as JavaPlugin) { teleportToRandomLocation(player) }
             return
         }
+
         TeleportUtil.teleport(player, getRandomLocation())
+    }
+
+    /**
+     * [team]의 모든 [GamePlayer]들을 랜덤 위치로 텔레포트 시킵니다.
+     */
+    fun teleportToRandomLocation(team: Team) {
+        if (!Bukkit.isPrimaryThread()) {
+            Bukkit.getScheduler().runTask(GameCore.gamePlugin as JavaPlugin) { teleportToRandomLocation(team) }
+            return
+        }
+
+        val location = getRandomLocation()
+        team.players.filter { it.isOnline }
+            .forEach { TeleportUtil.teleport(it.player, location) }
     }
 
     /**

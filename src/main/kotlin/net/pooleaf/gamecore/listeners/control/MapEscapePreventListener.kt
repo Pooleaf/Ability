@@ -46,7 +46,7 @@ class MapEscapePreventListener: Listener {
 
     @EventHandler
     fun onTeleport(event: PlayerTeleportEvent) {
-        if (isTeleportedToMap() && !isInMap(event.to)) {
+        if (event.from != null && isTeleportedToMap() && !isInMap(event.to)) {
             // 원래 위치가 맵 안이라면 원래 위치로
             if (isInMap(event.from)) {
                 event.to = event.from

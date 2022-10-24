@@ -14,7 +14,9 @@ class ObserverToggleListener: Listener {
     @EventHandler
     fun onJoin(event: PlayerJoinEvent) {
         GameCore.playerManager.get(event.player.uniqueId).let {
-            if (GameCore.game.gameStarted && (!it.joined || it.defeated) || GameCore.game.ended) {
+            if (GameCore.game.gameStarted && (!it.joined || it.defeated) // 게임 중에 들어오거나
+                || GameCore.game.ended // 게임이 종료되고 들어오거나
+                || GameCore.teamConfig.playerCountPerTeam * GameCore.teamConfig.maxTeamCount < GameCore.playerManager.getPlayingPlayers().size) { // (팀당 플레이어수 * 최대 팀 수)보다 참여자가 많으면
                 it.toggleObserver(true)
             }
         }

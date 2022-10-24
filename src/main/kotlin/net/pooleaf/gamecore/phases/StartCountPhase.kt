@@ -7,7 +7,7 @@ import net.pooleaf.gamecore.events.game.GameStartedEvent
 import net.pooleaf.gamecore.phase.Phase
 import org.bukkit.Bukkit
 
-open class StartCountPhase: Phase() {
+open class StartCountPhase(val teleportToMap: Boolean): Phase() {
 
     override fun onStart() {
         GameCore.game.countingStarted = true
@@ -33,8 +33,17 @@ open class StartCountPhase: Phase() {
     }
 
     override fun onEnd() {
+        // 팀 매칭
+        GameCore.teamManager.matchingAndCreateTeams()
+
+        // 게임 시작
         GameCore.game.gameStarted = true
         Bukkit.getPluginManager().callEvent(GameStartedEvent())
+
+        // 맵으로 텔레포트
+        if (teleportToMap) {
+            GameCore.game.teleportToMap()
+        }
     }
 
 }

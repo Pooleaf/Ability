@@ -35,7 +35,7 @@ class AutoGameListener: Listener {
                 GameCore.game.end()
             }
             // 우승 불가능하고 한 팀만 남으면 게임 중단
-            else if (GameCore.game.countingStarted && !GameCore.game.ended && GameCore.teamManager.getNotDefeatedOnlineTeams().size == 1) {
+            else if (GameCore.game.countingStarted && !GameCore.game.ended && GameCore.teamManager.getNotDefeatedOnlineTeams().size < 1) {
                 GameCore.game.cancel()
 
                 Broadcaster.broadcastTitle(

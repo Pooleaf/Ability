@@ -6,13 +6,13 @@ import java.io.File
 
 class AutoGameConfig(file: File?) : SimpleAnnoConfig(file) {
 
-    @ConfigName("게임 시작 팀 수")
-    var startTeamCount = 2
+    @ConfigName("게임 시작 플레이어 수")
+    var startPlayerCount: Int = 2
 
     @ConfigName("재접속 허용 시간(초)")
-    var reconnectAllowTime = 180
+    var reconnectAllowTime: Int = 180
 
     @ConfigName("우승 허용 시간(초)")
-    var winAllowTime = 30
+    var winAllowTime: Int = 30
 
 }

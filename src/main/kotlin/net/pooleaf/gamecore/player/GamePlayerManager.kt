@@ -7,13 +7,13 @@ import java.util.UUID
 abstract class GamePlayerManager<T: GamePlayer>: AbstractManager<UUID, T>() {
 
     /**
-     * [T]를 생성하고 캐싱한 뒤 반환합니다.
+     * [T]를 생성하고 반환합니다.
      */
     abstract fun create(uuid: UUID): T
 
     override fun remove(key: UUID?) {
         get(key).let {
-            it.team.removePlayer(it)
+            it.team?.removePlayer(it)
             super.remove(key)
         }
     }

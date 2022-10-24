@@ -13,6 +13,9 @@ abstract class GameMapManager<T: GameMap>: AbstractManager<String, T>() {
     }
 
 
+    /**
+     * [T]를 생성하고 반환합니다.
+     */
     abstract fun create(): T
 
 

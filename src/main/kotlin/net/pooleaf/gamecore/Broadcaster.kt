@@ -56,10 +56,10 @@ class Broadcaster {
         }
 
         fun broadcastWaitingActionBar(
-            currentTeamCount: Int = GameCore.teamManager.getNotDefeatedOnlineTeams().size,
-            startTeamCount: Int = GameCore.autoGameConfig.startTeamCount
+            currentPlayingPlayerCount: Int = GameCore.playerManager.getPlayingPlayers().size,
+            startPlayerCount: Int = GameCore.autoGameConfig.startPlayerCount
         ) {
-            Broadcaster.broadcastActionBarForever("§e다른 플레이어를 기다리는 중입니다. §f($currentTeamCount/$startTeamCount)")
+            Broadcaster.broadcastActionBarForever("§e다른 플레이어를 기다리는 중입니다. §f($currentPlayingPlayerCount/$startPlayerCount)")
         }
 
         fun removeActionBar() {

@@ -1,10 +1,9 @@
 package net.pooleaf.ability.player
 
 import net.pooleaf.gamecore.player.GamePlayer
-import net.pooleaf.gamecore.team.Team
 import java.util.*
 
-class AbilityPlayer(uuid: UUID, team: Team) : GamePlayer(uuid, team) {
+class AbilityPlayer(uuid: UUID) : GamePlayer(uuid) {
 
     var abilityDrew: Boolean = false // 능력 추첨 여부
     var redrawCount: Int = 0 // 능력을 재추첨한 횟수

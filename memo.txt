@@ -45,6 +45,8 @@ o? 테스트 필요
 
 킷
 
+사망 메시지
+
 KnownGameType
 
 

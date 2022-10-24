@@ -16,6 +16,7 @@ class PlayerInitListener: Listener {
     fun onJoin(event: PlayerJoinEvent) {
         if (!GameCore.playerManager.exists(event.player.uniqueId)) {
             val gamePlayer = GameCore.playerManager.create(event.player.uniqueId)
+            GameCore.playerManager.set(gamePlayer.uuid, gamePlayer)
 
             if (!GameCore.game.gameStarted) {
                 gamePlayer.init()

@@ -6,7 +6,7 @@ import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
 
-class GameModeChangeListener: Listener {
+class JoinGameModeChangeListener: Listener {
 
     /**
      * 게임 접속 시 상황에 맞는 게임 모드 강제 적용

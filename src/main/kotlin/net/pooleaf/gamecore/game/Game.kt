@@ -151,7 +151,7 @@ abstract class Game {
     open fun canStart(): Boolean {
         return initialized
                 && !GameCore.game.countingStarted
-                && GameCore.teamManager.getNotDefeatedOnlineTeams().size >= GameCore.autoGameConfig.startTeamCount
+                && GameCore.playerManager.getOnlinePlayingPlayers().size >= GameCore.autoGameConfig.startPlayerCount
     }
 
     /**
@@ -304,10 +304,18 @@ abstract class Game {
         else {
             val map = GameCore.game.map!!
 
-            // 맵으로 텔레포트
-            for (onlinePlayer in Bukkit.getOnlinePlayers()) {
-                map.teleportToRandomLocation(onlinePlayer)
+            // 관전자 맵으로 텔레포트
+            GameCore.playerManager.getObservers().forEach { TeleportUtil.teleport(it.player, map.getCenterLocation()) }
+
+            // 팀끼리 맵으로 텔레포트
+            Bukkit.getScheduler().runTask(GameCore.gamePlugin) {
+                GameCore.teamManager.teams.forEach {team ->
+                    val location = map.getRandomLocation()
+                    team.spawnLocation = location
+                    team.teleport(location)
+                }
             }
+
             Broadcaster.broadcastActionBar(map.displayName + " §e맵으로 이동되었습니다.")
 
             mapTeleported = true

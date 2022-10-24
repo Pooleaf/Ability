@@ -1,6 +1,7 @@
 package net.pooleaf.gamecore.listeners
 
 import net.pooleaf.core.modules.support.bukkit.util.TeleportUtil
+import net.pooleaf.core.modules.support.common.logger.Logger
 import net.pooleaf.gamecore.GameCore
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -21,7 +22,12 @@ class JoinTeleportListener: Listener {
             !GameCore.game.mapTeleported && GameCore.spawnConfig.spawnLocation != null -> TeleportUtil.teleport(player, GameCore.spawnConfig.spawnLocation)
 
             // 관전자 게임 시작 후엔 맵으로
-            GameCore.game.mapTeleported && !gamePlayer.joined -> TeleportUtil.teleport(player, GameCore.game.map!!.getCenterLocation())
+            GameCore.game.mapTeleported && gamePlayer.observer -> TeleportUtil.teleport(player, GameCore.game.map!!.getCenterLocation())
+
+            // 게임 중인 플레이어 텔레포트 안됐으면 팀 스폰으로
+            GameCore.game.mapTeleported && gamePlayer.isPlaying() && !GameCore.game.map!!.isInRadius(player.location) -> {
+                TeleportUtil.teleport(player, gamePlayer.team?.spawnLocation)
+            }
         }
     }
 
