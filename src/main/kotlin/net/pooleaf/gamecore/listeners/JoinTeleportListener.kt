@@ -1,7 +1,6 @@
 package net.pooleaf.gamecore.listeners
 
 import net.pooleaf.core.modules.support.bukkit.util.TeleportUtil
-import net.pooleaf.core.modules.support.common.logger.Logger
 import net.pooleaf.gamecore.GameCore
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
@@ -17,8 +16,6 @@ class JoinTeleportListener: Listener {
     fun onJoin(event: PlayerJoinEvent) {
         val player = event.player
         val gamePlayer = GameCore.playerManager.get(player.uniqueId)
-
-        Logger.log("${GameCore.game.mapTeleported} / ${gamePlayer.observer}")
 
         when {
             // 대기 중 스폰
