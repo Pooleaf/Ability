@@ -5,11 +5,17 @@ import net.pooleaf.core.modules.support.common.logger.Logger
 import net.pooleaf.core.modules.support.common.manager.AbstractManager
 import net.pooleaf.gamecore.GameCore
 import java.io.File
+import java.util.concurrent.ConcurrentHashMap
 
 abstract class GameMapManager<T: GameMap>: AbstractManager<String, T>() {
 
     val mapFolder: File by lazy {
         File(GameCore.gamePlugin.dataFolder, "map")
+    }
+
+
+    init {
+        datas = ConcurrentHashMap()
     }
 
 

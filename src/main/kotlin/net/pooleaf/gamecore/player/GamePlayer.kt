@@ -35,7 +35,7 @@ open class GamePlayer : AbstractPlayer<Player> {
         team?.removePlayer(this)
 
         Bukkit.getScheduler().runTask(GameCore.gamePlugin) {
-            if (player != null) {
+            if (isOnline) {
                 player.health = player.maxHealth
                 player.level = 0
                 player.exp = 0F

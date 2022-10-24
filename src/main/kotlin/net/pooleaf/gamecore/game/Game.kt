@@ -102,7 +102,7 @@ abstract class Game {
         phaseTask = PhaseTask(createPhasePipeline())
 
         // 플레이어 초기화
-        GameCore.playerManager.getOnlinePlayers().forEach {
+        GameCore.playerManager.values().forEach {
             it.init()
             it.joined = true
 

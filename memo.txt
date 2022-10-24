@@ -49,6 +49,7 @@ o? 테스트 필요
 
 KnownGameType
 
+멀티쓰레드
 
 
 ~~ Command ~~
@@ -56,6 +57,9 @@ KnownGameType
 /game start o
 /game stop o
 /game observer o
+
+/game teamList
+/game playerList
 
 
 

@@ -56,7 +56,7 @@ class Broadcaster {
         }
 
         fun broadcastWaitingActionBar(
-            currentPlayingPlayerCount: Int = GameCore.playerManager.getPlayingPlayers().size,
+            currentPlayingPlayerCount: Int = GameCore.playerManager.getOnlinePlayingPlayers().size,
             startPlayerCount: Int = GameCore.autoGameConfig.startPlayerCount
         ) {
             Broadcaster.broadcastActionBarForever("§e다른 플레이어를 기다리는 중입니다. §f($currentPlayingPlayerCount/$startPlayerCount)")

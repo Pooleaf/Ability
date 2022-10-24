@@ -1,10 +1,14 @@
 package net.pooleaf.gamecore.player
 
 import net.pooleaf.core.modules.support.common.manager.AbstractManager
-import net.pooleaf.gamecore.GameCore
-import java.util.UUID
+import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 
 abstract class GamePlayerManager<T: GamePlayer>: AbstractManager<UUID, T>() {
+
+    init {
+        datas = ConcurrentHashMap()
+    }
 
     /**
      * [T]를 생성하고 반환합니다.
