@@ -9,9 +9,9 @@ plugins {
 repositories {
     mavenCentral()
 
-    maven("https://repo.s8u.kr/repository/maven-minecraft/")
-    maven("https://repo.s8u.kr/repository/maven-pooleaf/")
-    maven("https://repo.glaremasters.me/repository/concuncan/")
+    maven("https://repo.s8u.kr/repository/maven-minecraft/") // Bukkit
+    maven("https://repo.s8u.kr/repository/maven-pooleaf/") // Core
+    maven("https://repo.glaremasters.me/repository/concuncan/") // SWM
 }
 
 dependencies {
