@@ -43,6 +43,13 @@ open class Team {
     }
 
     /**
+     * 탈락한 팀인지 반환합니다.
+     */
+    fun isDefeated(): Boolean {
+        return players.size == players.filter { !it.isPlaying() }.size
+    }
+
+    /**
      * 팀원 수를 반환합니다.
      */
     fun size(): Int {

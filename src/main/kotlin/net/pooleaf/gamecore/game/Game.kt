@@ -286,6 +286,35 @@ abstract class Game {
         return true
     }
 
+    fun onPlayerJoin() {
+        if (GameCore.game.canStart()) {
+            GameCore.game.start(null)
+        }
+    }
+
+    fun onPlayerLeft() {
+        // 우승 가능한 시간이 지나야만 우승
+        if (GameCore.game.canEnd()) {
+            GameCore.game.end()
+        }
+        // 우승 불가능하고 한 팀만 남으면 게임 중단
+        else if (GameCore.game.countingStarted && !GameCore.game.ended
+            && ((GameCore.game.gameStarted && GameCore.teamManager.getNotDefeatedOnlineTeams().size <= 1)
+                    || (!GameCore.game.gameStarted && GameCore.playerManager.getOnlinePlayingPlayers().size <= 1))) {
+            GameCore.game.cancel()
+
+            Broadcaster.broadcastTitle(
+                DefaultTitleBuilder()
+                    .title("§c게임 중단")
+                    .subtitle("§c게임 조건이 충족되지 않아 게임이 중단되었습니다.")
+                    .stay(5 * 20)
+                    .build()
+            )
+            Broadcaster.broadcastSound(XSound.ENTITY_ITEM_BREAK, 1F, 1F)
+        }
+        // 게임 중에 한 팀 빼고 퇴장하면 종료
+    }
+
     fun teleportToMap() {
         // 맵이 없을 경우 게임 중단
         if (map == null) {

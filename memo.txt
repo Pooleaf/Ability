@@ -20,7 +20,6 @@ o? 테스트 필요
 게임 종료
 - 게임 종료 시 초기화 후 스폰으로 이동 (관전 모두 해제) o
 
-
 게임 최대 시간
 - 3시간 동안 안끝나면 강제 종료
 
@@ -45,6 +44,8 @@ o? 테스트 필요
 
 킷
 
+퇴장 후 5분 뒤 자동 탈락
+죽을 만큼 데미지 받으면 캔슬 후 사망 처리
 사망 메시지
 
 KnownGameType
@@ -58,8 +59,7 @@ KnownGameType
 /game stop o
 /game observer o
 
-/game teamList
-/game playerList
+/game playerList o
 
 
 

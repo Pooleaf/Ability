@@ -88,7 +88,11 @@ open class GamePlayer : AbstractPlayer<Player> {
      * Primary Thread에서 실행됩니다.
      */
     fun toggleObserver(toggle: Boolean) {
-        if (Bukkit.isPrimaryThread()) {
+        if (!Bukkit.isPrimaryThread()) {
+            Bukkit.getScheduler().runTask(GameCore.gamePlugin) {
+                toggleObserver(toggle)
+            }
+        } else {
             Preconditions.checkArgument(isOnline, "Player가 접속 중이 아닙니다.")
 
             player.health = player.maxHealth
@@ -123,10 +127,6 @@ open class GamePlayer : AbstractPlayer<Player> {
                 GuiModule.getQuickBarManager().removeTo(player)
 
                 observer = false
-            }
-        } else {
-            Bukkit.getScheduler().runTask(GameCore.gamePlugin) {
-                toggleObserver(toggle)
             }
         }
     }

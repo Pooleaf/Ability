@@ -10,6 +10,7 @@ import net.pooleaf.gamecore.Broadcaster
 import net.pooleaf.gamecore.GameCore
 import net.pooleaf.gamecore.GameCorePermission
 import net.pooleaf.gamecore.player.GamePlayer
+import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 
@@ -61,7 +62,8 @@ class GameCommand {
     @Command(
         parent = ["", "게임"],
         name = ["관전", "rhkswjs", "observer"],
-        description = "관전 모드로 전환하거나 해제합니다."
+        description = "관전 모드로 전환하거나 해제합니다.",
+        async = false
     )
     fun game_observer(player: CommonPlayer<Player>, result: CommandResult?) {
         // 대기 중에만 사용 가능. 단 관리자는 아무 때나 사용할 수 있음
@@ -74,9 +76,17 @@ class GameCommand {
 
         // 관전 모드로 전환
         if (!gamePlayer.observer) {
+            // 게임 카운팅 중 인원이 적으면 관전 전환 불가
+            if (GameCore.game.countingStarted && GameCore.playerManager.getOnlinePlayingPlayers().size <= 2 && !player.platformSender.isOp) {
+                player.nwarning("인원이 적어 관전 모드로 전환할 수 없습니다.")
+                return
+            }
+
             gamePlayer.toggleObserver(true)
             gamePlayer.joined = false
             Broadcaster.broadcast("§f${gamePlayer.displayName} §b님께서 관전을 시작했습니다.")
+
+            GameCore.game.onPlayerLeft()
         }
         // 관전 모드 해제
         else {
@@ -90,16 +100,15 @@ class GameCommand {
             gamePlayer.joined = true
             Broadcaster.broadcast("§f${gamePlayer.displayName} §b님께서 관전을 종료했습니다.")
 
-            // 게임을 끝낼 수 있으면 끝냄
-            if (GameCore.game.gameStarted && GameCore.game.canEnd()) {
-                GameCore.game.end()
-            }
+            GameCore.game.onPlayerJoin()
         }
 
         // 대기 중일 경우 대기 액션바 업데이트
-        if (!GameCore.game.countingStarted) {
-            Broadcaster.broadcastWaitingActionBar()
-        }
+        Bukkit.getScheduler().runTaskLater(GameCore.gamePlugin, {
+            if (!GameCore.game.countingStarted) {
+                Broadcaster.broadcastWaitingActionBar()
+            }
+        }, 1L)
     }
 
     @Command(
@@ -108,20 +117,51 @@ class GameCommand {
         description = "게임에 참여 중인 플레이어 목록을 확인합니다."
     )
     fun game_playerList(sender: CommonCommandSender<CommandSender>, result: CommandResult) {
+        sender.nmessage("")
+
+        // 참여자
         var players = when {
-            // 게임 중
-            GameCore.game.gameStarted -> GameCore.playerManager.getOnlinePlayingPlayers().map { it.displayName }.joinToString(", ")
             // 대기 중
-            else -> GameCore.teamManager.teams.map {
-                val teamPlayers = it.players.map { if (it.isOnline) it.displayName else "§7${it.displayName}" }.joinToString(", ")
-                if (GameCore.teamConfig.playerCountPerTeam == 1) teamPlayers else "($teamPlayers)"
+            !GameCore.game.gameStarted -> GameCore.playerManager.getOnlinePlayingPlayers().map { it.displayName }.joinToString(", ")
+            // 게임 중
+            else -> GameCore.teamManager.teams.map { team ->
+                val teamPlayers = team.players.map { gamePlayer ->
+                    var name = gamePlayer.displayName
+
+                    // 오프라인일 경우 회색
+                    if (!gamePlayer.isOnline) {
+                        name = "§7${gamePlayer.displayName}"
+                    }
+
+                    // 탈락 표시
+                    if (gamePlayer.defeated) {
+                        name = "§7${gamePlayer.displayName}(탈락)"
+                    }
+
+                    name
+                }.joinToString(", ")
+
+                // 팀이 여러명일 경우 괄호로 묶어줌
+                if (GameCore.teamConfig.playerCountPerTeam == 1) {
+                    teamPlayers
+                } else {
+                    // 탈락한 팀은 회색
+                    if (team.isDefeated()) {
+                        "§7($teamPlayers)"
+                    } else {
+                        "($teamPlayers)"
+                    }
+                }
             }.joinToString(", ")
         }
         var playerCount = GameCore.playerManager.getOnlinePlayingPlayers().size
-
         sender.nmessage("§c참여자($playerCount): §f$players")
+
+        // 관전자
         if (!GameCore.playerManager.getObservers().isEmpty()) {
-            sender.nmessage("§b관전자(${GameCore.playerManager.getObservers().size}): §f${GameCore.playerManager.getObservers().map { it.displayName }.joinToString(", ")}")
+            val observerPlayers = GameCore.playerManager.getObservers().map { it.displayName }.joinToString(", ")
+            val observerCount = GameCore.playerManager.getObservers().size
+            sender.nmessage("§b관전자($observerCount): §f${observerPlayers}")
         }
     }
 
