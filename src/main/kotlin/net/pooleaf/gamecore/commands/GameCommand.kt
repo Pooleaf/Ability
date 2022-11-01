@@ -9,6 +9,7 @@ import net.pooleaf.core.modules.support.common.CommonChatColor
 import net.pooleaf.gamecore.Broadcaster
 import net.pooleaf.gamecore.GameCore
 import net.pooleaf.gamecore.GameCorePermission
+import net.pooleaf.gamecore.player.GamePlayer
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 
@@ -98,6 +99,29 @@ class GameCommand {
         // 대기 중일 경우 대기 액션바 업데이트
         if (!GameCore.game.countingStarted) {
             Broadcaster.broadcastWaitingActionBar()
+        }
+    }
+
+    @Command(
+        parent = ["", "게임"],
+        name = ["플레이어목록", "playerList", "list"],
+        description = "게임에 참여 중인 플레이어 목록을 확인합니다."
+    )
+    fun game_playerList(sender: CommonCommandSender<CommandSender>, result: CommandResult) {
+        var players = when {
+            // 게임 중
+            GameCore.game.gameStarted -> GameCore.playerManager.getOnlinePlayingPlayers().map { it.displayName }.joinToString(", ")
+            // 대기 중
+            else -> GameCore.teamManager.teams.map {
+                val teamPlayers = it.players.map { if (it.isOnline) it.displayName else "§7${it.displayName}" }.joinToString(", ")
+                if (GameCore.teamConfig.playerCountPerTeam == 1) teamPlayers else "($teamPlayers)"
+            }.joinToString(", ")
+        }
+        var playerCount = GameCore.playerManager.getOnlinePlayingPlayers().size
+
+        sender.nmessage("§c참여자($playerCount): §f$players")
+        if (!GameCore.playerManager.getObservers().isEmpty()) {
+            sender.nmessage("§b관전자(${GameCore.playerManager.getObservers().size}): §f${GameCore.playerManager.getObservers().map { it.displayName }.joinToString(", ")}")
         }
     }
 
