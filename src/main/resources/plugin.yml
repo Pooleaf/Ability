@@ -3,4 +3,3 @@ version: $version
 main: $main
 depend:
   - Core
-  - Kotlin

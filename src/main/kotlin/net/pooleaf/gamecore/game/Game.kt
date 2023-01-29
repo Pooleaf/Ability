@@ -1,6 +1,11 @@
 package net.pooleaf.gamecore.game
 
 import com.cryptomorin.xseries.XSound
+import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import net.pooleaf.core.modules.coroutine.bukkit.BukkitAsyncScope
+import net.pooleaf.core.modules.coroutine.bukkit.BukkitSyncScope
 import net.pooleaf.core.modules.support.bukkit.util.TeleportUtil
 import net.pooleaf.gamecore.Broadcaster
 import net.pooleaf.gamecore.DefaultTitleBuilder
@@ -55,7 +60,7 @@ abstract class Game {
     /**
      * 게임을 초기화시킵니다.
      */
-    open fun init() {
+    open suspend fun init() {
         initialized = false
 
         gameId = null
@@ -71,33 +76,36 @@ abstract class Game {
         currentGameMode = GameMode.ADVENTURE
 
         // 스폰으로 텔레포트
-        GameCore.spawnConfig.spawnLocation.let {
-            Bukkit.getOnlinePlayers().forEach { TeleportUtil.teleport(it, GameCore.spawnConfig.spawnLocation) }
-        }
-
-        // 플레이어 텔레포트를 Primary Thread에서 진행하기 때문에 1 Tick 늦게 언로드
-        Bukkit.getScheduler().runTaskLater(GameCore.gamePlugin, {
-            if (!map!!.unload()) {
-                // 맵 언로드 실패 시 서버 재부팅
-                Broadcaster.broadcastTitle(
-                    DefaultTitleBuilder()
-                        .title("§c오류")
-                        .subtitle("§c게임 초기화에 실패하여 서버가 재부팅됩니다.")
-                        .stay(10 * 20)
-                        .build()
-                )
-                cancel()
-                initialized = false
-
-                // 10초 후 서버 종료
-                Bukkit.getScheduler().runTaskLaterAsynchronously(GameCore.gamePlugin, {
-                    // TODO 로비로 텔레포트
-                    Bukkit.shutdown()
-                }, 10 * 20L)
+        BukkitSyncScope.async {
+            GameCore.spawnConfig.spawnLocation.let {
+                Bukkit.getOnlinePlayers().forEach {
+                    TeleportUtil.teleport(it, GameCore.spawnConfig.spawnLocation)
+                }
             }
-            map = null
-        }, 1L)
+        }.await()
 
+        // 맵 언로드
+        if (map != null && !map!!.unload()) {
+            // 맵 언로드 실패 시 서버 재부팅
+            Broadcaster.broadcastTitle(
+                DefaultTitleBuilder()
+                    .title("§c오류")
+                    .subtitle("§c게임 초기화에 실패하여 서버가 재부팅됩니다.")
+                    .stay(10 * 20)
+                    .build()
+            )
+            initialized = false
+
+            // 10초 후 서버 종료
+            BukkitAsyncScope.launch {
+                delay(10_000L)
+                // TODO 로비로 텔레포트
+                Bukkit.shutdown()
+            }
+        }
+        map = null
+
+        // Phase 초기화
         phaseTask.cancel()
         phaseTask = PhaseTask(createPhasePipeline())
 
@@ -116,6 +124,9 @@ abstract class Game {
     }
 
 
+    /**
+     * 이 [Game]의 [Phase] 순서대로 나열된 [PhasePipeline]을 생성합니다.
+     */
     abstract fun createPhasePipeline(): PhasePipeline
 
 
@@ -241,7 +252,7 @@ abstract class Game {
     /**
      * 게임이 종료되고 나서 게임을 리셋 시킵니다.
      */
-    fun endReset(): Boolean {
+    suspend fun endReset(): Boolean {
         if (!ended) return false
 
         // 이벤트
@@ -255,12 +266,13 @@ abstract class Game {
         Broadcaster.broadcastWaitingActionBar()
 
         // 게임 시작 조건에 충족할 경우 1초 뒤 재시작
-        // + 맵 언로드를 Primary Thread에서 진행하기 때문에 딜레이
-        Bukkit.getScheduler().runTaskLater(GameCore.gamePlugin, {
+        BukkitSyncScope.launch {
+            delay(1000L)
+
             if (canStart()) {
                 start(null)
             }
-        }, 20L)
+        }
 
         return true
     }
@@ -268,7 +280,7 @@ abstract class Game {
     /**
      * 게임을 중단시킵니다.
      */
-    fun cancel(): Boolean {
+    suspend fun cancel(): Boolean {
         if (!countingStarted) return false
 
         // 이벤트
@@ -301,33 +313,37 @@ abstract class Game {
         else if (GameCore.game.countingStarted && !GameCore.game.ended
             && ((GameCore.game.gameStarted && GameCore.teamManager.getNotDefeatedOnlineTeams().size <= 1)
                     || (!GameCore.game.gameStarted && GameCore.playerManager.getOnlinePlayingPlayers().size <= 1))) {
-            GameCore.game.cancel()
+            BukkitAsyncScope.launch {
+                GameCore.game.cancel()
 
-            Broadcaster.broadcastTitle(
-                DefaultTitleBuilder()
-                    .title("§c게임 중단")
-                    .subtitle("§c게임 조건이 충족되지 않아 게임이 중단되었습니다.")
-                    .stay(5 * 20)
-                    .build()
-            )
-            Broadcaster.broadcastSound(XSound.ENTITY_ITEM_BREAK, 1F, 1F)
+                Broadcaster.broadcastTitle(
+                    DefaultTitleBuilder()
+                        .title("§c게임 중단")
+                        .subtitle("§c게임 조건이 충족되지 않아 게임이 중단되었습니다.")
+                        .stay(5 * 20)
+                        .build()
+                )
+                Broadcaster.broadcastSound(XSound.ENTITY_ITEM_BREAK, 1F, 1F)
+            }
         }
         // 게임 중에 한 팀 빼고 퇴장하면 종료
     }
 
-    fun teleportToMap() {
+    suspend fun teleportToMap() {
         // 맵이 없을 경우 게임 중단
         if (map == null) {
-            Broadcaster.broadcastTitle(
-                DefaultTitleBuilder()
-                    .title("§c시작 실패")
-                    .subtitle("§c맵이 설정되지 않아 게임이 중단되었습니다.")
-                    .stay(5 * 20)
-                    .build()
-            )
-            Broadcaster.broadcastSound(XSound.ENTITY_ITEM_BREAK, 1F, 1F)
+            BukkitAsyncScope.launch {
+                Broadcaster.broadcastTitle(
+                    DefaultTitleBuilder()
+                        .title("§c시작 실패")
+                        .subtitle("§c맵이 설정되지 않아 게임이 중단되었습니다.")
+                        .stay(5 * 20)
+                        .build()
+                )
+                Broadcaster.broadcastSound(XSound.ENTITY_ITEM_BREAK, 1F, 1F)
 
-            GameCore.game.cancel()
+                GameCore.game.cancel()
+            }
         }
         // 맵으로 이동
         else {
@@ -337,13 +353,13 @@ abstract class Game {
             GameCore.playerManager.getObservers().forEach { TeleportUtil.teleport(it.player, map.getCenterLocation()) }
 
             // 팀끼리 맵으로 텔레포트
-            Bukkit.getScheduler().runTask(GameCore.gamePlugin) {
+            BukkitSyncScope.async {
                 GameCore.teamManager.teams.forEach {team ->
                     val location = map.getRandomLocation()
                     team.spawnLocation = location
                     team.teleport(location)
                 }
-            }
+            }.await()
 
             Broadcaster.broadcastActionBar(map.displayName + " §e맵으로 이동되었습니다.")
 

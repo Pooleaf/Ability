@@ -31,19 +31,19 @@ class GameMap {
     var centerWorldName: String? = null
 
     @ConfigName("중앙 위치.x")
-    var centerX = 0.0
+    var centerX: Double = 0.0
 
     @ConfigName("중앙 위치.y")
-    var centerY = 0.0
+    var centerY: Double = 0.0
 
     @ConfigName("중앙 위치.z")
-    var centerZ = 0.0
+    var centerZ: Double = 0.0
 
     @ConfigName("중앙 위치.yaw")
-    var centerYaw = 0f
+    var centerYaw: Float = 0f
 
     @ConfigName("중앙 위치.pitch")
-    var centerPitch = 0f
+    var centerPitch: Float = 0f
 
     @ConfigName("경계선 범위")
     var worldBorderSize: Int? = null // 맵 범위

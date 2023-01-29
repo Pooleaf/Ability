@@ -16,15 +16,13 @@ repositories {
 
 dependencies {
     compileOnly("io.papermc:paper:1.8.8")
-    compileOnly("net.pooleaf:core:0.0.25")
+    compileOnly("net.pooleaf:core:0.0.28")
 
     compileOnly("Xeon:VisualAbility:2.0-s8u") // 비트 능력자
     compileOnly("Physical:Fighters:1.0.0") // 염료 능력자
 //    compileOnly("daybreak:abilitywar:2.1.6.8") // AbilityWar
 
     compileOnly("com.grinderwolf:slimeworldmanager-api:2.2.1")
-
-    testImplementation(kotlin("test"))
 }
 
 tasks {

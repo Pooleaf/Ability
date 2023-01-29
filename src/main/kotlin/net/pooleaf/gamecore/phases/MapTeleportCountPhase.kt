@@ -1,6 +1,8 @@
 package net.pooleaf.gamecore.phases
 
 import com.cryptomorin.xseries.XSound
+import kotlinx.coroutines.launch
+import net.pooleaf.core.modules.coroutine.bukkit.BukkitSyncScope
 import net.pooleaf.gamecore.Broadcaster
 import net.pooleaf.gamecore.GameCore
 import net.pooleaf.gamecore.phase.Phase
@@ -29,7 +31,9 @@ open class MapTeleportCountPhase: Phase() {
     }
 
     override fun onEnd() {
-       GameCore.game.teleportToMap()
+       BukkitSyncScope.launch {
+           GameCore.game.teleportToMap()
+       }
     }
 
 }

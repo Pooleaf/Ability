@@ -1,10 +1,13 @@
 package net.pooleaf.gamecore.commands
 
+import kotlinx.coroutines.launch
 import net.pooleaf.core.modules.annocommand.common.Command
 import net.pooleaf.core.modules.annocommand.common.CommandResult
 import net.pooleaf.core.modules.annocommand.common.HelpCommandResult
 import net.pooleaf.core.modules.commonsender.common.CommonCommandSender
 import net.pooleaf.core.modules.commonsender.common.CommonPlayer
+import net.pooleaf.core.modules.coroutine.bukkit.BukkitAsyncScope
+import net.pooleaf.core.modules.coroutine.bukkit.BukkitSyncScope
 import net.pooleaf.core.modules.support.common.CommonChatColor
 import net.pooleaf.gamecore.Broadcaster
 import net.pooleaf.gamecore.GameCore
@@ -55,8 +58,10 @@ class GameCommand {
             return
         }
 
-        GameCore.game.cancel()
-        Broadcaster.broadcast("${sender.displayName} §b님께서 게임을 중단시켰습니다.")
+        BukkitAsyncScope.launch {
+            GameCore.game.cancel()
+            Broadcaster.broadcast("${sender.displayName} §b님께서 게임을 중단시켰습니다.")
+        }
     }
 
     @Command(
@@ -74,41 +79,43 @@ class GameCommand {
 
         val gamePlayer = GameCore.playerManager.get(player.uuid)
 
-        // 관전 모드로 전환
-        if (!gamePlayer.observer) {
-            // 게임 카운팅 중 인원이 적으면 관전 전환 불가
-            if (GameCore.game.countingStarted && GameCore.playerManager.getOnlinePlayingPlayers().size <= 2 && !player.platformSender.isOp) {
-                player.nwarning("인원이 적어 관전 모드로 전환할 수 없습니다.")
-                return
+        BukkitAsyncScope.launch {
+            // 관전 모드로 전환
+            if (!gamePlayer.observer) {
+                // 게임 카운팅 중 인원이 적으면 관전 전환 불가
+                if (GameCore.game.countingStarted && GameCore.playerManager.getOnlinePlayingPlayers().size <= 2 && !player.platformSender.isOp) {
+                    player.nwarning("인원이 적어 관전 모드로 전환할 수 없습니다.")
+                    return@launch
+                }
+
+                gamePlayer.toggleObserver(true)
+                gamePlayer.joined = false
+                Broadcaster.broadcast("§f${gamePlayer.displayName} §b님께서 관전을 시작했습니다.")
+
+                GameCore.game.onPlayerLeft()
+            }
+            // 관전 모드 해제
+            else {
+                // 관리자는 게임 중에도 관전을 해제할 수 있으나, 게임 종료 후에는 불가능
+                if (GameCore.game.ended) {
+                    player.nwarning("게임이 종료되어 관전을 해제할 수 없습니다.")
+                    return@launch
+                }
+
+                gamePlayer.toggleObserver(false)
+                gamePlayer.joined = true
+                Broadcaster.broadcast("§f${gamePlayer.displayName} §b님께서 관전을 종료했습니다.")
+
+                GameCore.game.onPlayerJoin()
             }
 
-            gamePlayer.toggleObserver(true)
-            gamePlayer.joined = false
-            Broadcaster.broadcast("§f${gamePlayer.displayName} §b님께서 관전을 시작했습니다.")
-
-            GameCore.game.onPlayerLeft()
+            // 대기 중일 경우 대기 액션바 업데이트
+            BukkitSyncScope.launch {
+                if (!GameCore.game.countingStarted) {
+                    Broadcaster.broadcastWaitingActionBar()
+                }
+            }
         }
-        // 관전 모드 해제
-        else {
-            // 관리자는 게임 중에도 관전을 해제할 수 있으나, 게임 종료 후에는 불가능
-            if (GameCore.game.ended) {
-                player.nwarning("게임이 종료되어 관전을 해제할 수 없습니다.")
-                return
-            }
-
-            gamePlayer.toggleObserver(false)
-            gamePlayer.joined = true
-            Broadcaster.broadcast("§f${gamePlayer.displayName} §b님께서 관전을 종료했습니다.")
-
-            GameCore.game.onPlayerJoin()
-        }
-
-        // 대기 중일 경우 대기 액션바 업데이트
-        Bukkit.getScheduler().runTaskLater(GameCore.gamePlugin, {
-            if (!GameCore.game.countingStarted) {
-                Broadcaster.broadcastWaitingActionBar()
-            }
-        }, 1L)
     }
 
     @Command(

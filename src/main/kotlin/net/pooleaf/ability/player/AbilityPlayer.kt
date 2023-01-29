@@ -9,7 +9,7 @@ class AbilityPlayer(uuid: UUID) : GamePlayer(uuid) {
     var redrawCount: Int = 0 // 능력을 재추첨한 횟수
 
 
-    override fun init() {
+    override suspend fun init() {
         super.init()
 
         abilityDrew = false

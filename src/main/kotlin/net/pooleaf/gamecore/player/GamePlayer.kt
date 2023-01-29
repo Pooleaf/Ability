@@ -1,6 +1,9 @@
 package net.pooleaf.gamecore.player
 
 import com.google.common.base.Preconditions
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
+import net.pooleaf.core.modules.coroutine.bukkit.BukkitSyncScope
 import net.pooleaf.core.modules.gui.GuiModule
 import net.pooleaf.core.modules.gui.bukkit.title.Title
 import net.pooleaf.core.modules.support.common.player.AbstractPlayer
@@ -10,6 +13,7 @@ import net.pooleaf.gamecore.quickbars.ObserverQuickBar
 import net.pooleaf.gamecore.team.Team
 import org.bukkit.Bukkit
 import org.bukkit.GameMode
+import org.bukkit.OfflinePlayer
 import org.bukkit.entity.Player
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
@@ -26,15 +30,14 @@ open class GamePlayer : AbstractPlayer<Player> {
 
     internal constructor(uuid: UUID) : super(uuid)
 
-
-    open fun init() {
+    open suspend fun init() {
         joined = false
         defeated = false
         observer = false
 
         team?.removePlayer(this)
 
-        Bukkit.getScheduler().runTask(GameCore.gamePlugin) {
+        BukkitSyncScope.launch {
             if (isOnline) {
                 player.health = player.maxHealth
                 player.level = 0
@@ -62,37 +65,12 @@ open class GamePlayer : AbstractPlayer<Player> {
         return joined && !defeated && !observer
     }
 
-    fun sendTitle(title: Title) {
-        title.send(player)
-    }
-
-    fun sendTitle(title: String?) {
-        sendTitle(
-            DefaultTitleBuilder()
-                .title(title)
-                .build()
-        )
-    }
-
-    fun sendTitle(title: String?, subtitle: String?) {
-        sendTitle(
-            DefaultTitleBuilder()
-                .title(title)
-                .subtitle(subtitle)
-                .build()
-        )
-    }
-
     /**
      * 관전 모드로 전환하거나 해제합니다.
      * Primary Thread에서 실행됩니다.
      */
-    fun toggleObserver(toggle: Boolean) {
-        if (!Bukkit.isPrimaryThread()) {
-            Bukkit.getScheduler().runTask(GameCore.gamePlugin) {
-                toggleObserver(toggle)
-            }
-        } else {
+    suspend fun toggleObserver(toggle: Boolean) {
+        BukkitSyncScope.async {
             Preconditions.checkArgument(isOnline, "Player가 접속 중이 아닙니다.")
 
             player.health = player.maxHealth
@@ -128,7 +106,28 @@ open class GamePlayer : AbstractPlayer<Player> {
 
                 observer = false
             }
-        }
+        }.await()
+    }
+
+    fun sendTitle(title: Title) {
+        title.send(player)
+    }
+
+    fun sendTitle(title: String?) {
+        sendTitle(
+            DefaultTitleBuilder()
+                .title(title)
+                .build()
+        )
+    }
+
+    fun sendTitle(title: String?, subtitle: String?) {
+        sendTitle(
+            DefaultTitleBuilder()
+                .title(title)
+                .subtitle(subtitle)
+                .build()
+        )
     }
 
 }

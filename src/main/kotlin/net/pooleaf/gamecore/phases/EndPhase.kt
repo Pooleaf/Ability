@@ -1,7 +1,9 @@
 package net.pooleaf.gamecore.phases
 
 import com.cryptomorin.xseries.XSound
+import kotlinx.coroutines.launch
 import net.pooleaf.core.modules.commonscheduler.CommonSchedulerModule
+import net.pooleaf.core.modules.coroutine.bukkit.BukkitAsyncScope
 import net.pooleaf.core.plugin.CorePlugin
 import net.pooleaf.gamecore.Broadcaster
 import net.pooleaf.gamecore.DefaultTitleBuilder
@@ -62,7 +64,10 @@ open class EndPhase: Phase() {
 
     override fun onEnd() {
         Broadcaster.removeActionBar()
-        GameCore.game.endReset()
+
+        BukkitAsyncScope.launch {
+            GameCore.game.endReset()
+        }
     }
 
 

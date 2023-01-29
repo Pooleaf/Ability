@@ -1,5 +1,7 @@
 package net.pooleaf.gamecore.listeners
 
+import kotlinx.coroutines.launch
+import net.pooleaf.core.modules.coroutine.bukkit.BukkitSyncScope
 import net.pooleaf.gamecore.GameCore
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
@@ -19,8 +21,10 @@ class PlayerInitListener: Listener {
             GameCore.playerManager.set(gamePlayer.uuid, gamePlayer)
 
             if (!GameCore.game.gameStarted) {
-                gamePlayer.init()
-                gamePlayer.joined = true
+                BukkitSyncScope.launch {
+                    gamePlayer.init()
+                    gamePlayer.joined = true
+                }
             }
         }
     }
