@@ -12,6 +12,9 @@ import org.bukkit.GameMode
 
 class AbilityGame: Game(100) {
 
+    var abilityDrawing: Boolean = false
+
+
     override fun createPhasePipeline(): PhasePipeline {
         return PhasePipeline()
             .addPhase(StartCountPhase(true))

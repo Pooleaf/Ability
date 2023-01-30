@@ -1,4 +1,4 @@
-package net.pooleaf.ability.command
+package net.pooleaf.ability.commands
 
 import com.cryptomorin.xseries.XMaterial
 import com.cryptomorin.xseries.XSound
