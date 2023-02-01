@@ -1,5 +1,7 @@
 package net.pooleaf.ability.ability
 
+import net.pooleaf.ability.AbilityApi
+import net.pooleaf.ability.player.AbilityPlayer
 import net.pooleaf.core.modules.support.common.util.ReflectionUtil
 import net.pooleaf.core.plugin.CorePlugin
 import java.util.Random
@@ -13,6 +15,8 @@ class AbilityManager {
      * [ability]를 등록합니다.
      */
     fun registerAbility(ability: Ability) {
+        if (!ability.isInitialized) return
+
         abilities.add(ability)
     }
 
@@ -40,10 +44,31 @@ class AbilityManager {
     }
 
     /**
+     * 플레이어에게 할당된 [Ability]들을 반환합니다.
+     */
+    fun getAssignedAbilities(): List<Ability> {
+        return AbilityApi.playerManager.getJoinedPlayers()
+            .filter { it.ability != null }
+            .map { it.ability!! }
+            .toList()
+    }
+
+    /**
      * 랜덤 [Ability]를 반환합니다.
      */
     fun getRandomAbility(): Ability {
         return abilities.filter { !it.ban }[Random().nextInt(abilities.size)]
+    }
+
+    /**
+     * 아무도 할당받지 않은 랜덤 [Ability]를 반환합니다.
+     */
+    fun getRandomAbilityNoDuplicated(): Ability? {
+        val assignedAbilityFullNames = getAssignedAbilities().map { it.fullName }
+
+        return abilities.filter { !assignedAbilityFullNames.contains(it.fullName) }
+            .toList()
+            .random()
     }
 
     /**

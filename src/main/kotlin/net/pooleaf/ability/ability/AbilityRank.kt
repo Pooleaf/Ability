@@ -1,18 +1,19 @@
 package net.pooleaf.ability.ability
 
+import net.pooleaf.core.modules.support.bukkit.util.ItemBuilder
 import net.pooleaf.core.modules.support.common.CommonChatColor
 import org.bukkit.Material
+import org.bukkit.inventory.ItemStack
 
 enum class AbilityRank(
     val color: CommonChatColor,
-    val block: Material
+    val displayItem: ItemStack
 ) {
 
-    S(CommonChatColor.GREEN, Material.EMERALD_BLOCK),
-    A(CommonChatColor.AQUA, Material.DIAMOND_BLOCK),
-    B(CommonChatColor.YELLOW, Material.GOLD_BLOCK),
-    C(CommonChatColor.WHITE, Material.IRON_BLOCK),
-    D(CommonChatColor.GRAY, Material.COAL_BLOCK),
-    F(CommonChatColor.RED, Material.DIRT);
+    SS(CommonChatColor.DARK_PURPLE, ItemStack(Material.OBSIDIAN)),
+    S(CommonChatColor.AQUA, ItemStack(Material.DIAMOND_BLOCK)),
+    A(CommonChatColor.YELLOW, ItemStack(Material.GOLD_BLOCK)),
+    B(CommonChatColor.GREEN, ItemBuilder("159:5").build()), // 연두색 점토
+    C(CommonChatColor.GRAY, ItemBuilder("159:8").build()), // 밝은 회색 점토
 
 }

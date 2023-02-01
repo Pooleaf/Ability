@@ -25,7 +25,7 @@ class AbilityPlayer(uuid: UUID) : GamePlayer(uuid) {
     override suspend fun init() {
         super.init()
 
-        ability
+        resignAbility()
         abilityDrawComplete = false
         redrawCount = 0
     }

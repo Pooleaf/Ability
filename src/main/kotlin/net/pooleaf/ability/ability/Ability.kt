@@ -1,6 +1,12 @@
 package net.pooleaf.ability.ability
 
+import net.pooleaf.ability.AbilityPlugin
 import net.pooleaf.ability.player.AbilityPlayer
+import net.pooleaf.core.modules.support.bukkit.util.BukkitReflectionUtil
+import org.bukkit.Bukkit
+import org.bukkit.entity.Player
+import org.bukkit.event.Listener
+import java.text.DecimalFormat
 
 open class Ability(): Cloneable {
 
@@ -25,7 +31,7 @@ open class Ability(): Cloneable {
         protected set
 
     // 사용법
-    lateinit var description: ArrayList<String>
+    lateinit var description: List<String>
         protected set
 
     // 할당 받은 플레이어
@@ -34,6 +40,10 @@ open class Ability(): Cloneable {
     // 능력 밴 여부
     open var ban: Boolean = false
 
+
+    // 능력 초기화 여부
+    val isInitialized
+        get() = ::pluginName.isInitialized && ::name.isInitialized && ::rank.isInitialized && ::type.isInitialized && ::description.isInitialized
 
     /**
      * 능력 할당 시 호출됩니다.
@@ -57,6 +67,10 @@ open class Ability(): Cloneable {
         onAssign()
 
         this.player = player
+
+        if (this is Listener) {
+            Bukkit.getPluginManager().registerEvents(this, AbilityPlugin.instance)
+        }
     }
 
     /**
@@ -68,16 +82,46 @@ open class Ability(): Cloneable {
         onResign()
 
         // 쿨타임 종료
-        if (this is Cooldownable) {
+        if (this is Cooldownable && cooldownTimer.isRunning) {
             cooldownTimer.cancel()
         }
 
         // 지속시간 종료
-        if (this is Durationable) {
+        if (this is Durationable && durationTimer.isRunning) {
             durationTimer.cancel()
         }
 
         this.player = null
+
+        if (this is Listener) {
+            BukkitReflectionUtil.unregisterListener(this)
+        }
+    }
+
+    fun sendManual(player: Player) {
+        player?.sendMessage("")
+        player?.sendMessage("§e§l${name} §e(${rank.color}${rank.name} §e등급)")
+
+        // 설명
+        player?.sendMessage("")
+        player?.sendMessage("§a사용법")
+        description.forEach { player?.sendMessage(it) }
+
+        if (this is Cooldownable || this is Durationable) {
+            player?.sendMessage("")
+        }
+
+        // 쿨타임
+        if (this is Cooldownable) {
+            val cooldown = DecimalFormat("#.##").format(cooldownMillis.toFloat() / 1000)
+            player?.sendMessage("§e쿨타임: §f${cooldown}§e초")
+        }
+
+        // 지속시간
+        if (this is Durationable) {
+            val durationTime = DecimalFormat("#.##").format(durationMillis.toFloat() / 1000)
+            player?.sendMessage("§e지속시간: §f${durationTime}§e초")
+        }
     }
 
 }

@@ -4,12 +4,14 @@ import net.pooleaf.ability.ability.Cooldownable
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
 
-interface AbilityCastByItemHandler: Cooldownable {
+interface CastByItemHandler: Cooldownable {
 
     /**
      * 능력 캐스팅에 필요한 아이템
      */
-    val castItem: ArrayList<ItemStack>
+    val castItem: List<ItemStack>
+
+    fun isCastItem(item: ItemStack) = castItem.any { item.isSimilar(it) }
 
     /**
      * [castItem] 아이템으로 능력을 캐스팅할 경우 호출됩니다.

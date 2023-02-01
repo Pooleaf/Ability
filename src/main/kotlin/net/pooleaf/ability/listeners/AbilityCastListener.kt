@@ -1,7 +1,7 @@
 package net.pooleaf.ability.listeners
 
 import net.pooleaf.ability.AbilityApi
-import net.pooleaf.ability.ability.cast.AbilityCastByItemHandler
+import net.pooleaf.ability.ability.cast.CastByItemHandler
 import org.bukkit.Material
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -20,8 +20,8 @@ class AbilityCastListener: Listener {
 
         // 클릭 타입 계산
         val clickType = when (event.action) {
-            LEFT_CLICK_AIR, LEFT_CLICK_BLOCK -> AbilityCastByItemHandler.ClickType.LEFT
-            RIGHT_CLICK_AIR, RIGHT_CLICK_BLOCK -> AbilityCastByItemHandler.ClickType.RIGHT
+            LEFT_CLICK_AIR, LEFT_CLICK_BLOCK -> CastByItemHandler.ClickType.LEFT
+            RIGHT_CLICK_AIR, RIGHT_CLICK_BLOCK -> CastByItemHandler.ClickType.RIGHT
             else -> return
         }
 
@@ -29,7 +29,7 @@ class AbilityCastListener: Listener {
         val ability = abilityPlayer?.ability ?: return
 
         // 아이템으로 캐스팅하는 능력일 경우
-        if (ability is AbilityCastByItemHandler) {
+        if (ability is CastByItemHandler) {
             // 쿨타임 체크
             if (ability.remainingCooldownMillis > 0) return
 
