@@ -28,8 +28,11 @@ abstract class Game {
 
     var initialized: Boolean = true
 
+    // 게임 시작 카운트 시작 여부
     var countingStarted: Boolean = false
+    // 게임 시작 여부
     var gameStarted: Boolean = false
+
     var mapTeleported: Boolean = false
     var pvpStarted: Boolean = false
     var ended: Boolean = false

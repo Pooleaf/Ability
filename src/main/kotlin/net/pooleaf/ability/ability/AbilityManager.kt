@@ -54,6 +54,16 @@ class AbilityManager {
     }
 
     /**
+     * 플레이어에게 임시로 할당된 [Ability]들을 반환합니다.
+     */
+    fun getTempAssignedAbilities(): List<Ability> {
+        return AbilityApi.playerManager.getJoinedPlayers()
+            .filter { it.tempAbility != null }
+            .map { it.tempAbility!! }
+            .toList()
+    }
+
+    /**
      * 랜덤 [Ability]를 반환합니다.
      */
     fun getRandomAbility(): Ability {
@@ -70,6 +80,18 @@ class AbilityManager {
             .toList()
             .random()
     }
+
+    /**
+     * 아무도 임시로 할당받지 않은 랜덤 [Ability]를 반환합니다.
+     */
+    fun getRandomAbilityNoDuplicatedInTemp(): Ability? {
+        val assignedAbilityFullNames = getTempAssignedAbilities().map { it.fullName }
+
+        return abilities.filter { !assignedAbilityFullNames.contains(it.fullName) }
+            .toList()
+            .random()
+    }
+
 
     /**
      * [abilityName] 이름을 가진 [Ability]를 반환합니다.
