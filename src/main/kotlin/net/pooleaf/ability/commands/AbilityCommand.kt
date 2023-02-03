@@ -25,7 +25,7 @@ class AbilityCommand {
 
     @Command(
         parent = ["", "능력자"],
-        name = ["능력확인", "확인", "smdfur", "ability", "help"],
+        name = ["능력확인", "능력", "smdfur", "ability", "help"],
         description = "보유 중인 능력을 확인합니다."
     )
     fun ability_help(player: Player, result: CommandResult) {
@@ -35,6 +35,7 @@ class AbilityCommand {
             return
         }
 
+        player.sendMessage("")
         abilityPlayer.ability!!.sendManual(player)
     }
 
@@ -68,6 +69,7 @@ class AbilityCommand {
 
         player.sendMessage("")
         player.sendMessage("${abilityPlayer.ability!!.name} §e능력을 확정했습니다.")
+        player.sendMessage("/능력 §e명령어를 사용하여 능력을 다시 확인할 수 있습니다.")
         XSound.ENTITY_PLAYER_LEVELUP.play(player, 1F, 1F)
     }
 
