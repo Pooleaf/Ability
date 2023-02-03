@@ -9,6 +9,7 @@ import net.pooleaf.core.modules.annocommand.common.CommandResult
 import net.pooleaf.core.modules.annocommand.common.HelpCommandResult
 import net.pooleaf.core.modules.coroutine.bukkit.BukkitAsyncScope
 import net.pooleaf.core.modules.support.bukkit.util.TeleportUtil
+import net.pooleaf.gamecore.DefaultTitleBuilder
 import net.pooleaf.gamecore.GameCore
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
@@ -54,7 +55,7 @@ class AbilityCommand {
         }
 
         if (abilityPlayer.tempAbility == null) {
-            player.sendMessage("§c능력을 추첨된 능력이 없습니다.")
+            player.sendMessage("§c추첨된 능력이 없습니다.")
             return
         }
 
@@ -70,6 +71,13 @@ class AbilityCommand {
         player.sendMessage("")
         player.sendMessage("${abilityPlayer.ability!!.name} §e능력을 확정했습니다.")
         player.sendMessage("/능력 §e명령어를 사용하여 능력을 다시 확인할 수 있습니다.")
+
+        DefaultTitleBuilder()
+            .title("§e${abilityPlayer.ability!!.name}")
+            .subtitle("§f능력을 확정했습니다.")
+            .build()
+            .send(player);
+
         XSound.ENTITY_PLAYER_LEVELUP.play(player, 1F, 1F)
     }
 
@@ -109,6 +117,14 @@ class AbilityCommand {
             abilityPlayer.ability?.let { ability ->
                 player.sendMessage("")
                 player.sendMessage("${ability.name} §e능력을 확정했습니다.")
+                player.sendMessage("/능력 §e명령어를 사용하여 능력을 다시 확인할 수 있습니다.")
+
+                DefaultTitleBuilder()
+                    .title("§e${ability.name}")
+                    .subtitle("§f능력을 확정했습니다.")
+                    .build()
+                    .send(player);
+
                 XSound.ENTITY_PLAYER_LEVELUP.play(player, 1F, 1F)
             }
         }

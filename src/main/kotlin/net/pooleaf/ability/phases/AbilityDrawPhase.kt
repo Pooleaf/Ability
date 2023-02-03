@@ -11,7 +11,7 @@ import net.pooleaf.gamecore.phase.Phase
 class AbilityDrawPhase: Phase() {
 
     override fun onStart() {
-        Broadcaster.broadcastActionBar("§c잠시 후 능력 추첨이 시작됩니다.")
+        Broadcaster.broadcastActionBar("§e잠시 후 능력 추첨이 시작됩니다.")
         Broadcaster.broadcastSound(XSound.UI_BUTTON_CLICK, 0.3f, 0.7f)
     }
 
