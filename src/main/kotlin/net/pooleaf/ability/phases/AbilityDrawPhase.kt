@@ -46,9 +46,9 @@ class AbilityDrawPhase: Phase() {
         Broadcaster.broadcastSound(XSound.ENTITY_PLAYER_LEVELUP, 1F, 1F)
 
         Logger.nlog("§e[ 플레이어 능력 ]")
-        for (joinedPlayer in AbilityApi.playerManager.getJoinedPlayers()) {
-            val abilityName = joinedPlayer.ability?.name ?: "없음"
-            Logger.nlog("§e${joinedPlayer.name}: §f${abilityName}")
+        AbilityApi.playerManager.getJoinedPlayers().forEach {abilityPlayer ->
+            val abilityName = abilityPlayer.ability?.name ?: "없음"
+            Logger.nlog("§e${abilityPlayer.name}(${abilityPlayer.uuid}): §f${abilityName}")
         }
     }
 

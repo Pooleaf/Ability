@@ -10,6 +10,7 @@ import net.pooleaf.core.modules.coroutine.bukkit.BukkitAsyncScope
 import net.pooleaf.core.modules.gui.bukkit.title.Title
 import net.pooleaf.core.modules.gui.bukkit.title.TitleBuilder
 import net.pooleaf.core.modules.support.common.component.SimpleComponentBuilder
+import net.pooleaf.gamecore.DefaultTitleBuilder
 import org.bukkit.entity.Player
 
 class AbilityDrawer(
@@ -138,10 +139,6 @@ class AbilityDrawer(
                 }
 
                 if (ability != null) {
-                    player.sendMessage("")
-
-                    delay(1000L)
-
                     // 재추첨 횟수가 남지 않았을 경우 능력 확정
                     if (abilityPlayer.redrawCount >= abilityPlayer.maxRedrawCount) {
                         abilityPlayer.abilityDrawComplete = true
@@ -151,6 +148,10 @@ class AbilityDrawer(
                     }
 
                     // 능력 확정 버튼 메시지 보내기
+                    player.sendMessage("")
+
+                    delay(1000L)
+
                     AbilityApi.abilityDrawer.sendYesNoMessage(abilityPlayer)
                     XSound.ENTITY_GENERIC_EAT.play(player, 0.5F, 1F)
                 }
@@ -160,12 +161,14 @@ class AbilityDrawer(
         }.await()
     }
 
-    private fun createAbilityTitle(ability: Ability, bold: Boolean = false): Title {
+    private fun createAbilityTitle(ability: Ability?, bold: Boolean = false): Title {
         val boldText = if (bold) "§l" else ""
-        val abilityName = if (ability != null) "${ability.rank.color}${boldText}${ability.name}" else "${boldText}?"
+        val abilityName = ability?.let { "${ability.rank.color}${boldText}${ability.name}" } ?: "${boldText}?"
+        val abilityRank = ability?.let { "${ability.rank.color}${boldText}${ability.rank.name} 등급" } ?: "${boldText}?"
 
         return TitleBuilder()
             .title(abilityName)
+            .subtitle(abilityRank)
             .stay(1 * 20)
             .fadeOut(1 * 20)
             .build()

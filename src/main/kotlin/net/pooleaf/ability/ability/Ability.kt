@@ -99,29 +99,40 @@ open class Ability(): Cloneable {
     }
 
     fun sendManual(player: Player) {
+        player?.sendMessage("§e§l====================================================")
+
+        // 이름
         player?.sendMessage("")
-        player?.sendMessage("§e§l${name} §e(${rank.color}${rank.name} §e등급)")
+        player?.sendMessage("§f§l${name}")
+
+        // 등급
+        player?.sendMessage("")
+        player?.sendMessage("§e§l등급")
+        player?.sendMessage("${rank.color}${rank.name}")
 
         // 설명
         player?.sendMessage("")
-        player?.sendMessage("§a사용법")
+        player?.sendMessage("§b§l설명")
         description.forEach { player?.sendMessage(it) }
-
-        if (this is Cooldownable || this is Durationable) {
-            player?.sendMessage("")
-        }
 
         // 쿨타임
         if (this is Cooldownable) {
             val cooldown = DecimalFormat("#.##").format(cooldownMillis.toFloat() / 1000)
-            player?.sendMessage("§e쿨타임: §f${cooldown}§e초")
+            player?.sendMessage("")
+            player?.sendMessage("§a§l쿨타임")
+            player?.sendMessage("§f${cooldown}§a초")
         }
 
         // 지속시간
         if (this is Durationable) {
             val durationTime = DecimalFormat("#.##").format(durationMillis.toFloat() / 1000)
-            player?.sendMessage("§e지속시간: §f${durationTime}§e초")
+            player?.sendMessage("")
+            player?.sendMessage("§a§l지속시간")
+            player?.sendMessage("§f${durationTime}§a초")
         }
+
+        player?.sendMessage("")
+        player?.sendMessage("§e§l====================================================")
     }
 
 }

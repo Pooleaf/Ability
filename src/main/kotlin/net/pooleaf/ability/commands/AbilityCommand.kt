@@ -66,6 +66,7 @@ class AbilityCommand {
         abilityPlayer.assignAbility(abilityPlayer.tempAbility!!.javaClass)
         abilityPlayer.tempAbility = null
 
+        player.sendMessage("")
         player.sendMessage("${abilityPlayer.ability!!.name} §e능력을 확정했습니다.")
         XSound.ENTITY_PLAYER_LEVELUP.play(player, 1F, 1F)
     }
@@ -79,7 +80,7 @@ class AbilityCommand {
         val abilityPlayer = AbilityApi.playerManager.get(player.uniqueId) ?: error("gamePlayer cannot be null")
 
         val currentPhase = AbilityApi.game.phaseTask.phasePipeline.getCurrentPhase()
-        if (!(currentPhase is AbilityDrawPhase)) {
+        if (currentPhase !is AbilityDrawPhase) {
             player.sendMessage("§c능력 추첨 중이 아닙니다.")
             return
         }
@@ -94,11 +95,20 @@ class AbilityCommand {
             return
         }
 
+        for (i in 1..20) {
+            player.sendMessage("")
+        }
+
         abilityPlayer.redrawCount++
 
         BukkitAsyncScope.launch {
             val tempAbility = AbilityApi.abilityManager.getRandomAbilityNoDuplicatedInTemp()
             AbilityApi.abilityDrawer.drawWithYesNoMessage(abilityPlayer, AbilityApi.abilityManager.abilities, tempAbility)
+            abilityPlayer.ability?.let { ability ->
+                player.sendMessage("")
+                player.sendMessage("${ability.name} §e능력을 확정했습니다.")
+                XSound.ENTITY_PLAYER_LEVELUP.play(player, 1F, 1F)
+            }
         }
     }
 
