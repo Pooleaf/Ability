@@ -11,6 +11,7 @@ import net.pooleaf.gamecore.map.GameMapManager
 import net.pooleaf.gamecore.player.DefaultGamePlayerManager
 import net.pooleaf.gamecore.player.GamePlayer
 import net.pooleaf.gamecore.player.GamePlayerManager
+import net.pooleaf.gamecore.sql.GameSqlManager
 import net.pooleaf.gamecore.team.DefaultTeamManager
 import net.pooleaf.gamecore.team.Team
 import net.pooleaf.gamecore.team.TeamManager
@@ -26,6 +27,8 @@ object GameCore {
     lateinit var mapManager: GameMapManager<GameMap>
 
     lateinit var teamManager: TeamManager<Team>
+
+    lateinit var sqlManager: GameSqlManager
 
 
     val autoGameConfig: AutoGameConfig by lazy {
@@ -58,6 +61,12 @@ object GameCore {
         this.playerManager = playerManager
         this.mapManager = mapManager
         this.teamManager = teamManager
+
+        this.sqlManager = GameSqlManager()
+
+        sqlManager.connect()
+
+        loadConfig()
     }
 
     fun loadConfig() {

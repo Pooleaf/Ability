@@ -4,6 +4,7 @@ import net.pooleaf.core.modules.eventsupport.bukkit.events.damage.EntityDamageBy
 import net.pooleaf.core.modules.eventsupport.bukkit.events.damage.PlayerDamageByPlayerEvent
 import net.pooleaf.core.modules.eventsupport.bukkit.events.damage.PlayerDamageEvent
 import net.pooleaf.gamecore.GameCore
+import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -26,6 +27,15 @@ class ObserverControlListener: Listener {
         return !GameCore.game.mapTeleported
     }
 
+
+    @EventHandler
+    fun onPlayerJoin(event: PlayerJoinEvent) {
+        GameCore.playerManager.getObservers().forEach { event.player.hidePlayer(it.player) }
+
+        if (isObserver(event.player)) {
+            Bukkit.getOnlinePlayers().forEach { it.hidePlayer(it) }
+        }
+    }
 
     @EventHandler
     fun onBlockBreak(event: BlockBreakEvent) {

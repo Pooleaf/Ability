@@ -50,7 +50,7 @@ open class GamePlayer : AbstractPlayer<Player> {
                 player.isFlying = false
                 player.spigot().collidesWithEntities = true
                 player.activePotionEffects.forEach { player.removePotionEffect(it.type) }
-                // TODO hide player 해제
+                Bukkit.getOnlinePlayers().forEach { it.showPlayer(it) }
 
                 GuiModule.getQuickBarManager().removeTo(player)
             }
@@ -88,7 +88,7 @@ open class GamePlayer : AbstractPlayer<Player> {
                 }
                 player.spigot().collidesWithEntities = false
                 player.addPotionEffect(PotionEffect(PotionEffectType.INVISIBILITY, 100000, 0, true))
-                // TODO hide player
+                Bukkit.getOnlinePlayers().forEach { it.hidePlayer(it) }
 
                 ObserverQuickBar().setTo(player)
 
@@ -100,7 +100,7 @@ open class GamePlayer : AbstractPlayer<Player> {
                 player.isFlying = false
                 player.spigot().collidesWithEntities = true
                 player.activePotionEffects.forEach { player.removePotionEffect(it.type) }
-                // TODO hide player 해제
+                Bukkit.getOnlinePlayers().forEach { it.showPlayer(it) }
 
                 GuiModule.getQuickBarManager().removeTo(player)
 

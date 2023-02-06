@@ -4,6 +4,7 @@ import com.cryptomorin.xseries.XSound
 import kotlinx.coroutines.launch
 import net.pooleaf.core.modules.commonscheduler.CommonSchedulerModule
 import net.pooleaf.core.modules.coroutine.bukkit.BukkitAsyncScope
+import net.pooleaf.core.modules.support.common.logger.Logger
 import net.pooleaf.core.plugin.CorePlugin
 import net.pooleaf.gamecore.Broadcaster
 import net.pooleaf.gamecore.DefaultTitleBuilder
@@ -19,10 +20,11 @@ import org.bukkit.entity.Player
 open class EndPhase: Phase() {
 
     override fun onStart() {
-        GameCore.game.end()
+        // 우승자 계산
+        val winners = GameCore.game.winners!!
 
-        // 우승자
-        val winners = GameCore.teamManager.getNotDefeatedOnlineTeams()[0].players
+        // 게임 종료
+        GameCore.game.end()
 
         // 우승 타이틀 띄우기
         val winnerNames: String = winners.joinToString(", ") { it.displayName }

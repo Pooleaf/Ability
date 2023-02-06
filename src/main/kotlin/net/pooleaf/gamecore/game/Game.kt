@@ -4,9 +4,11 @@ import com.cryptomorin.xseries.XSound
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import net.pooleaf.ability.player.AbilityPlayer
 import net.pooleaf.core.modules.coroutine.bukkit.BukkitAsyncScope
 import net.pooleaf.core.modules.coroutine.bukkit.BukkitSyncScope
 import net.pooleaf.core.modules.support.bukkit.util.TeleportUtil
+import net.pooleaf.core.modules.support.common.logger.Logger
 import net.pooleaf.gamecore.Broadcaster
 import net.pooleaf.gamecore.DefaultTitleBuilder
 import net.pooleaf.gamecore.GameCore
@@ -14,6 +16,10 @@ import net.pooleaf.gamecore.events.game.*
 import net.pooleaf.gamecore.map.GameMap
 import net.pooleaf.gamecore.phase.PhasePipeline
 import net.pooleaf.gamecore.phase.PhaseTask
+import net.pooleaf.gamecore.player.GamePlayer
+import net.pooleaf.gamecore.sql.dtos.GameParticipantDto
+import net.pooleaf.gamecore.sql.dtos.GameWinnerDto
+import net.pooleaf.gamecore.sql.dtos.toDto
 import org.bukkit.Bukkit
 import org.bukkit.GameMode
 import org.bukkit.command.CommandSender
@@ -23,7 +29,7 @@ import java.util.*
 
 abstract class Game {
 
-    val gameType: Int
+    val gameTypeId: Int
     var gameId: UUID? = null
 
     var initialized: Boolean = true
@@ -36,8 +42,10 @@ abstract class Game {
     var mapTeleported: Boolean = false
     var pvpStarted: Boolean = false
     var ended: Boolean = false
+    var cancelled: Boolean = false
 
-    var startTime: LocalDateTime? = null
+    var startedAt: LocalDateTime? = null
+    var endedAt: LocalDateTime? = null
 
     var currentGameMode: GameMode = GameMode.ADVENTURE // 현재 상황의 게임 모드
     set(value) {
@@ -49,13 +57,15 @@ abstract class Game {
         }
     }
 
+    var winners: Set<out GamePlayer>? = null
+
     var map: GameMap? = null
 
     var phaseTask: PhaseTask
 
 
     constructor(gameType: Int) {
-        this.gameType = gameType
+        this.gameTypeId = gameType
         this.phaseTask = PhaseTask(createPhasePipeline())
     }
 
@@ -73,10 +83,14 @@ abstract class Game {
         mapTeleported = false
         pvpStarted = false
         ended = false
+        cancelled = false
 
-        startTime = null
+        startedAt = null
+        endedAt = null
 
         currentGameMode = GameMode.ADVENTURE
+
+        winners = null
 
         // 스폰으로 텔레포트
         BukkitSyncScope.async {
@@ -209,7 +223,7 @@ abstract class Game {
         gameId = UUID.randomUUID()
 
         countingStarted = true
-        startTime = LocalDateTime.now()
+        startedAt = LocalDateTime.now()
 
         // ActionBar 제거
         Broadcaster.removeActionBar()
@@ -218,10 +232,21 @@ abstract class Game {
         phaseTask.start()
 
         // 이벤트
-        onStarted(starter)
-        Bukkit.getPluginManager().callEvent(GameCountingStartedEvent(starter))
+        try {
+            onStarted(starter)
+            Bukkit.getPluginManager().callEvent(GameCountingStartedEvent(starter))
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
 
-        // TODO 게임 DB 저장
+        // 게임 정보 저장
+        GameCore.sqlManager.gameDao.insertGame(this@Game.toDto())
+
+        // 게임 참여자 정보 저장
+        val gameParticipantDtos = GameCore.playerManager.getJoinedPlayers().map {
+            GameParticipantDto(gameId.toString(), it.uuid.toString())
+        }.toList()
+        GameCore.sqlManager.gameDao.insertGameParticipants(gameParticipantDtos)
 
         return true
     }
@@ -231,7 +256,7 @@ abstract class Game {
      */
     open fun canEnd(): Boolean {
         return gameStarted && !ended
-                && System.currentTimeMillis() - startTime!!.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli() > GameCore.autoGameConfig.winAllowTime * 1000 // 우승 가능 시간인지 체크
+                && System.currentTimeMillis() - startedAt!!.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli() > GameCore.autoGameConfig.winAllowTime * 1000 // 우승 가능 시간인지 체크
                 && GameCore.teamManager.getNotDefeatedOnlineTeams().size == 1 // 한 팀만 남았는지 체크
     }
 
@@ -242,13 +267,29 @@ abstract class Game {
         if (!countingStarted || !canEnd() || ended) return false
 
         ended = true
+        endedAt = LocalDateTime.now()
+
+        // 우승자 계산
+        winners = calculateWinners()
 
         // 이벤트
-        onEnded()
-        Bukkit.getPluginManager().callEvent(GameEndedEvent())
+        try {
+            onEnded()
+            Bukkit.getPluginManager().callEvent(GameEndedEvent())
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
 
-        // TODO 게임 DB 저장
+        // 게임 정보 저장
+        GameCore.sqlManager.gameDao.insertGame(this@Game.toDto())
 
+        // 종료 정보 저장
+        winners?.let { winners ->
+            val gameWinnerDtos = winners.map {
+                GameWinnerDto(gameId.toString(), it.uuid.toString())
+            }.toList()
+            GameCore.sqlManager.gameDao.insertGameWinner(gameWinnerDtos)
+        }
         return true
     }
 
@@ -259,8 +300,12 @@ abstract class Game {
         if (!ended) return false
 
         // 이벤트
-        onEndReset()
-        Bukkit.getPluginManager().callEvent(GameEndResetEvent())
+        try {
+            onEndReset()
+            Bukkit.getPluginManager().callEvent(GameEndResetEvent())
+        } catch(e: Exception) {
+            e.printStackTrace()
+        }
 
         // 초기화
         init()
@@ -286,9 +331,19 @@ abstract class Game {
     suspend fun cancel(): Boolean {
         if (!countingStarted) return false
 
+        cancelled = true
+        endedAt = LocalDateTime.now()
+
         // 이벤트
-        onCancelled()
-        Bukkit.getPluginManager().callEvent(GameCancelledEvent())
+        try {
+            onCancelled()
+            Bukkit.getPluginManager().callEvent(GameCancelledEvent())
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+        // 게임 정보 저장
+        GameCore.sqlManager.gameDao.insertGame(this@Game.toDto())
 
         // 초기화
         init()
@@ -296,18 +351,23 @@ abstract class Game {
         // 대기 액션바
         Broadcaster.broadcastWaitingActionBar()
 
-        // TODO 게임 DB 저장
-
         return true
     }
 
-    fun onPlayerJoin() {
+    /**
+     * 우승자를 계산합니다.
+     */
+    open fun calculateWinners(): Set<out GamePlayer> {
+        return GameCore.teamManager.getNotDefeatedOnlineTeams()[0].players
+    }
+
+    open fun onPlayerJoin() {
         if (GameCore.game.canStart()) {
             GameCore.game.start(null)
         }
     }
 
-    fun onPlayerLeft() {
+    open fun onPlayerLeft() {
         // 우승 가능한 시간이 지나야만 우승
         if (GameCore.game.canEnd()) {
             GameCore.game.end()
