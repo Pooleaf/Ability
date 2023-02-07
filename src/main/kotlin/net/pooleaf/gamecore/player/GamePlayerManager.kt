@@ -15,11 +15,15 @@ abstract class GamePlayerManager<T: GamePlayer>: AbstractManager<UUID, T>() {
      */
     abstract fun create(uuid: UUID): T
 
-    override fun remove(key: UUID?) {
+    override fun remove(key: UUID?): Boolean {
         get(key).let {
             it.team?.removePlayer(it)
             super.remove(key)
+
+            return true
         }
+
+        return false
     }
 
     /**
