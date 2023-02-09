@@ -28,6 +28,11 @@ class WaitingQuickBar: QuickBar() {
                 }
 
                 override fun onClick(event: SlotClickEvent) {
+                    if (GameCore.game.countingStarted) {
+                        event.player.sendMessage("이미 게임이 시작되었습니다.")
+                        return
+                    }
+
                     GameCore.startVoteService.startVoteGui.open(event.player)
                 }
             }
@@ -45,6 +50,11 @@ class WaitingQuickBar: QuickBar() {
                 }
 
                 override fun onClick(event: SlotClickEvent) {
+                    if (GameCore.game.countingStarted) {
+                        event.player.sendMessage("이미 게임이 시작되었습니다.")
+                        return
+                    }
+
                     GameCore.mapVoteService.mapVoteGui.open(event.player)
                 }
             }

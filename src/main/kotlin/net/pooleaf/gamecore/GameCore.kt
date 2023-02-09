@@ -72,13 +72,12 @@ object GameCore {
         this.quickBarManager = QuickBarManager()
 
         this.sqlManager = GameSqlManager()
-
-        this.startVoteService = StartVoteService()
-        this.mapVoteService = MapVoteService()
-
         sqlManager.connect()
 
         loadConfig()
+
+        this.startVoteService = StartVoteService()
+        this.mapVoteService = MapVoteService()
     }
 
     fun loadConfig() {

@@ -7,7 +7,7 @@ import net.pooleaf.gamecore.player.GamePlayer
 class StartVoteService {
 
     val startVote = StartVote()
-    val startVoteGui = StartVoteGui(startVote)
+    val startVoteGui = StartVoteGui()
 
 
     /**
@@ -42,7 +42,6 @@ class StartVoteService {
         if (!GameCore.game.countingStarted
             && startVote.agreePlayers.size >= GameCore.playerManager.getOnlineJoinedPlayers().size.toFloat() / 2) {
             GameCore.game.start(null)
-
         }
     }
 

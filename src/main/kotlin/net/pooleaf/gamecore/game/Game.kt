@@ -4,11 +4,10 @@ import com.cryptomorin.xseries.XSound
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import net.pooleaf.ability.player.AbilityPlayer
+import net.pooleaf.core.modules.channel.ChannelModule
 import net.pooleaf.core.modules.coroutine.bukkit.BukkitAsyncScope
 import net.pooleaf.core.modules.coroutine.bukkit.BukkitSyncScope
 import net.pooleaf.core.modules.support.bukkit.util.TeleportUtil
-import net.pooleaf.core.modules.support.common.logger.Logger
 import net.pooleaf.gamecore.Broadcaster
 import net.pooleaf.gamecore.DefaultTitleBuilder
 import net.pooleaf.gamecore.GameCore
@@ -115,8 +114,11 @@ abstract class Game {
 
             // 10초 후 서버 종료
             BukkitAsyncScope.launch {
-                delay(10_000L)
-                // TODO 로비로 텔레포트
+                // 로비로 텔레포트
+                delay(8000L)
+                Bukkit.getOnlinePlayers().forEach { ChannelModule.getLobbyChannelGroup().fastJoin(it.uniqueId) }
+
+                delay(2000L)
                 Bukkit.shutdown()
             }
         }

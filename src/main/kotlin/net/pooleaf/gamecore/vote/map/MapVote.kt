@@ -34,7 +34,7 @@ class MapVote {
      * [map]의 투표 수를 확인합니다.
      */
     fun getVoteCount(map: GameMap): Int {
-        return votedMap.filter { it.equals(map) }.count()
+        return votedMap.filter { it.value == map }.count()
     }
 
     /**

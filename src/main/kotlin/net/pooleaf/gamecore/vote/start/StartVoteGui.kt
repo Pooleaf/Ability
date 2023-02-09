@@ -9,13 +9,13 @@ import net.pooleaf.gamecore.GameCore
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 
-class StartVoteGui(val startVote: StartVote): InventoryGui("시작 투표", 3) {
+class StartVoteGui(): InventoryGui("시작 투표", 3) {
 
     init {
         // 찬성 아이콘
         val agreeIcon = object : InventoryIcon() {
             override fun updateItem(): ItemStack {
-                val agreePlayerCount = startVote.agreePlayers.size
+                val agreePlayerCount = GameCore.startVoteService.startVote.agreePlayers.size
 
                 return ItemBuilder("159:5")
                     .amount(agreePlayerCount)
@@ -29,9 +29,9 @@ class StartVoteGui(val startVote: StartVote): InventoryGui("시작 투표", 3) {
 
                 gamePlayer?.let {
                     GameCore.startVoteService.voteToAgree(it)
-                    event.player.closeInventory()
-
                     it.playSoundSafely(XSound.UI_BUTTON_CLICK)
+
+                    event.player.closeInventory()
                 }
             }
         }
@@ -39,7 +39,7 @@ class StartVoteGui(val startVote: StartVote): InventoryGui("시작 투표", 3) {
         // 반대 아이콘
         val disagreeIcon = object : InventoryIcon() {
             override fun updateItem(): ItemStack {
-                val disagreePlayerCount = startVote.disagreePlayers.size
+                val disagreePlayerCount = GameCore.startVoteService.startVote.disagreePlayers.size
 
                 return ItemBuilder("159:14")
                     .amount(disagreePlayerCount)
@@ -53,9 +53,9 @@ class StartVoteGui(val startVote: StartVote): InventoryGui("시작 투표", 3) {
 
                 gamePlayer?.let {
                     GameCore.startVoteService.voteToDisagree(it)
-                    event.player.closeInventory()
-
                     it.playSoundSafely(XSound.UI_BUTTON_CLICK)
+
+                    event.player.closeInventory()
                 }
             }
         }
