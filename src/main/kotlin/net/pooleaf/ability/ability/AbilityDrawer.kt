@@ -9,6 +9,8 @@ import net.pooleaf.ability.player.AbilityPlayer
 import net.pooleaf.core.modules.coroutine.bukkit.BukkitAsyncScope
 import net.pooleaf.core.modules.gui.bukkit.title.Title
 import net.pooleaf.core.modules.gui.bukkit.title.TitleBuilder
+import net.pooleaf.core.modules.support.bukkit.messager.sendMessageSafely
+import net.pooleaf.core.modules.support.bukkit.sound.playSoundSafely
 import net.pooleaf.core.modules.support.common.component.SimpleComponentBuilder
 import net.pooleaf.gamecore.DefaultTitleBuilder
 import org.bukkit.entity.Player
@@ -40,8 +42,8 @@ class AbilityDrawer(
             for (i in 0 until pollingCount) {
                 tempAbility = abilities.random()
 
-                createAbilityTitle(tempAbility).send(player)
-                XSound.UI_BUTTON_CLICK.play(player)
+                createAbilityTitle(tempAbility).sendSafely(player)
+                player.playSoundSafely(XSound.UI_BUTTON_CLICK)
 
                 delay(pollingPeriod)
                 pollingPeriod += addPollingPeriod.toInt()
@@ -66,11 +68,11 @@ class AbilityDrawer(
 
             when (tempAbility.rank) {
                 AbilityRank.SS -> {
-                    XSound.ENTITY_IRON_GOLEM_DEATH.play(player)
-                    XSound.ENTITY_WITHER_SPAWN.play(player, 0.7F, 1F)
+                    player.playSoundSafely(XSound.ENTITY_IRON_GOLEM_DEATH)
+                    player.playSoundSafely(XSound.ENTITY_WITHER_SPAWN, 0.7F, 1F)
                 }
                 else -> {
-                    XSound.ENTITY_PLAYER_LEVELUP.play(player, 1F, 0.5F)
+                    player.playSoundSafely(XSound.ENTITY_PLAYER_LEVELUP, 1F, 0.5F)
                 }
             }
 
@@ -100,7 +102,7 @@ class AbilityDrawer(
         }
         yesComponent.addExtra(noComponent)
 
-        abilityPlayer.player?.sendMessage(yesComponent)
+        abilityPlayer.player?.sendMessageSafely(yesComponent)
     }
 
     /**
@@ -115,47 +117,46 @@ class AbilityDrawer(
         ability: Ability? = null
     ): Ability? {
         return BukkitAsyncScope.async {
+            val player = abilityPlayer.player
+
             // 능력 추첨
-            val ability = AbilityApi.abilityDrawer.drawTo(abilityPlayer.player, abilities, ability)
+            val ability = AbilityApi.abilityDrawer.drawTo(player, abilities, ability)
             abilityPlayer.tempAbility = ability
 
             delay(2000L)
 
-            abilityPlayer.player?.let { player ->
-                // 능력 정보 메시지 보내기
-                ability?.sendManual(player) ?: player.sendMessage("능력이 부족하여 능력을 할당받지 못했습니다.")
-                XSound.ENTITY_ITEM_PICKUP.play(player)
+            // 능력 정보 메시지
+            ability?.sendManual(player) ?: player.sendMessageSafely("능력이 부족하여 능력을 할당받지 못했습니다.")
+            player.playSoundSafely(XSound.ENTITY_ITEM_PICKUP)
 
-                // 능력이 부족할 경우 능력 확정으로 취급
-                if (ability == null) {
-                    abilityPlayer.abilityDrawComplete = true
-                    return@async null
-                }
-
-                // 능력 추첨 Phase일 경우 추가 메시지 보내기
-                val currentPhase = AbilityApi.game.phaseTask.phasePipeline.getCurrentPhase()
-                if (!(currentPhase is AbilityDrawPhase)) {
-                    return@async ability
-                }
-
-                if (ability != null) {
-                    // 재추첨 횟수가 남지 않았을 경우 능력 확정
-                    if (abilityPlayer.redrawCount >= abilityPlayer.maxRedrawCount) {
-                        abilityPlayer.abilityDrawComplete = true
-                        abilityPlayer.assignAbility(abilityPlayer.tempAbility!!.javaClass)
-                        abilityPlayer.tempAbility = null
-                        return@async ability
-                    }
-
-                    // 능력 확정 버튼 메시지 보내기
-                    player.sendMessage("")
-
-                    delay(1000L)
-
-                    AbilityApi.abilityDrawer.sendYesNoMessage(abilityPlayer)
-                    XSound.ENTITY_GENERIC_EAT.play(player, 0.5F, 1F)
-                }
+            // 능력이 부족할 경우 능력 확정으로 취급
+            if (ability == null) {
+                abilityPlayer.abilityDrawComplete = true
+                return@async null
             }
+
+            // 능력 추첨 Phase일 경우 추가 메시지
+            val currentPhase = AbilityApi.game.phaseTask.phasePipeline.getCurrentPhase()
+            if (!(currentPhase is AbilityDrawPhase)) {
+                abilityPlayer.assignAbility(abilityPlayer.tempAbility!!.javaClass)
+                return@async ability
+            }
+
+            // 재추첨 횟수가 남지 않았을 경우 능력 확정
+            if (abilityPlayer.redrawCount >= abilityPlayer.maxRedrawCount) {
+                abilityPlayer.abilityDrawComplete = true
+                abilityPlayer.assignAbility(abilityPlayer.tempAbility!!.javaClass)
+                abilityPlayer.tempAbility = null
+                return@async ability
+            }
+
+            // 능력 확정 버튼 메시지 보내기
+            player.sendMessageSafely("")
+
+            delay(1000L)
+
+            AbilityApi.abilityDrawer.sendYesNoMessage(abilityPlayer)
+            player.playSoundSafely( XSound.ENTITY_GENERIC_EAT, 0.5F, 1F)
 
             return@async ability
         }.await()

@@ -36,7 +36,7 @@ class MapCommand {
     fun map_setSpawn(player: CommonPlayer<Player>, result: CommandResult?) {
         GameCore.spawnConfig.spawnLocation = player.platformSender.location
         GameCore.spawnConfig.save()
-        player.nmessage("§b현재 위치를 스폰 위치로 설정했습니다.")
+        player.sendMessage("§b현재 위치를 스폰 위치로 설정했습니다.")
     }
 
     @Command(
@@ -49,11 +49,11 @@ class MapCommand {
     )
     fun map_create(player: CommonPlayer<Player>, result: CommandResult) {
         if (result.argumentsLength > 1) {
-            player.nwarning("맵 이름은 띄어쓰기가 불가능합니다.")
+            player.sendWarning("맵 이름은 띄어쓰기가 불가능합니다.")
             return
         }
         if (GameCore.mapManager.exists(result.getArgument(0))) {
-            player.nwarning("이미 존재하는 맵 이름입니다.")
+            player.sendWarning("이미 존재하는 맵 이름입니다.")
             return
         }
 
@@ -63,7 +63,7 @@ class MapCommand {
         map.saveConfig()
         GameCore.mapManager.set(map.name, map)
 
-        player.nmessage("${map.name} §b맵을 생성했습니다.")
+        player.sendMessage("${map.name} §b맵을 생성했습니다.")
     }
 
     @Command(
@@ -77,7 +77,7 @@ class MapCommand {
     fun map_setDisplayName(player: CommonPlayer<Player>, result: CommandResult) {
         val map: GameMap = GameCore.mapManager.get(result.enteredArguments)
         if (map == null) {
-            player.nwarning("존재하지 않는 맵입니다.")
+            player.sendWarning("존재하지 않는 맵입니다.")
             return
         }
 
@@ -85,7 +85,7 @@ class MapCommand {
         map.displayName = newDisplayName
         map.saveConfig()
 
-        player.nmessage("${map.name} §b맵의 표기 이름을 §f${map.displayName} §b(으)로 설정했습니다.")
+        player.sendMessage("${map.name} §b맵의 표기 이름을 §f${map.displayName} §b(으)로 설정했습니다.")
     }
 
     @Command(
@@ -99,14 +99,14 @@ class MapCommand {
     fun map_setLocation(player: CommonPlayer<Player>, result: CommandResult) {
         val map: GameMap = GameCore.mapManager.get(result.enteredArguments)
         if (map == null) {
-            player.nwarning("존재하지 않는 맵입니다.")
+            player.sendWarning("존재하지 않는 맵입니다.")
             return
         }
 
         map.setCenterLocation(player.platformSender.location)
         map.saveConfig()
 
-        player.nmessage("§b현재 위치를 §f${map.name} §b맵의 중앙 위치로 설정했습니다.")
+        player.sendMessage("§b현재 위치를 §f${map.name} §b맵의 중앙 위치로 설정했습니다.")
     }
 
     @Command(
@@ -120,20 +120,20 @@ class MapCommand {
     fun map_setRadius(player: CommonPlayer<Player>, result: CommandResult) {
         val map: GameMap = GameCore.mapManager.get(result.subArgument(0, result.argumentsLength - 2))
         if (map == null) {
-            player.nwarning("존재하지 않는 맵입니다.")
+            player.sendWarning("존재하지 않는 맵입니다.")
             return
         }
 
         val radius = result.getArgumentAsInt(result.argumentsLength - 1)
         if (radius == null) {
-            player.nwarning("범위는 정수만 입력할 수 있습니다.")
+            player.sendWarning("범위는 정수만 입력할 수 있습니다.")
             return
         }
 
         map.worldBorderSize = radius
         map.saveConfig()
 
-        player.nmessage("${map.name} §b맵의 범위를 §f$radius§b로 설정했습니다.")
+        player.sendMessage("${map.name} §b맵의 범위를 §f$radius§b로 설정했습니다.")
     }
 
     @Command(
@@ -147,14 +147,14 @@ class MapCommand {
     fun map_delete(player: CommonPlayer<Player>, result: CommandResult) {
         val map: GameMap = GameCore.mapManager.get(result.subArgument(0))
         if (map == null) {
-            player.nwarning("존재하지 않는 맵입니다.")
+            player.sendWarning("존재하지 않는 맵입니다.")
             return
         }
 
         map.deleteConfig()
         GameCore.mapManager.remove(map.name)
 
-        player.nmessage("${map.name} §b맵을 삭제했습니다.")
+        player.sendMessage("${map.name} §b맵을 삭제했습니다.")
     }
 
     @Command(
@@ -204,20 +204,20 @@ class MapCommand {
     fun map_teleport(player: CommonPlayer<Player>, result: CommandResult) {
         val map: GameMap = GameCore.mapManager.get(result.subArgument(0))
         if (map == null) {
-            player.nwarning("존재하지 않는 맵입니다.")
+            player.sendWarning("존재하지 않는 맵입니다.")
             return
         }
 
         // 맵이 로딩 되어 있지 않으면 로딩
         if (!map.isLoaded()) {
-            player.nmessage("${map.name} §b맵을 불러오는 중입니다..")
+            player.sendMessage("${map.name} §b맵을 불러오는 중입니다..")
             map.load()
-            player.nmessage("${map.name} §b맵을 불러왔습니다.")
+            player.sendMessage("${map.name} §b맵을 불러왔습니다.")
         }
 
         // 텔레포트
         TeleportUtil.teleport(player.platformSender, map.getCenterLocation())
-        player.nmessage("${map.name} §b맵으로 텔레포트했습니다.")
+        player.sendMessage("${map.name} §b맵으로 텔레포트했습니다.")
     }
 
 }

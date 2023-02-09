@@ -135,7 +135,14 @@ abstract class Game {
             if (!it.isOnline) {
                 GameCore.playerManager.remove(it.uuid)
             }
+
+            // 대기 퀵바
+            GameCore.quickBarManager.waitingQuickBar.setTo(it.player)
         }
+
+        // 투표 초기화
+        GameCore.startVoteService.initVote()
+        GameCore.mapVoteService.initVote()
 
         initialized = true
     }

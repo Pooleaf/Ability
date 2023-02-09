@@ -23,7 +23,7 @@ class AdminAbilityCommand {
     fun ability_drawSkip(sender: CommonCommandSender<CommandSender>, result: CommandResult) {
         val currentPhase = AbilityApi.game.phaseTask.phasePipeline.getCurrentPhase()
         if (!(currentPhase is AbilityDrawPhase)) {
-            sender.nmessage("§c능력 추첨 중이 아닙니다.")
+            sender.sendMessage("§c능력 추첨 중이 아닙니다.")
             return
         }
 

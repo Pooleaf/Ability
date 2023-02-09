@@ -5,27 +5,29 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import net.pooleaf.core.modules.coroutine.bukkit.BukkitSyncScope
 import net.pooleaf.core.modules.gui.GuiModule
-import net.pooleaf.core.modules.gui.bukkit.title.Title
-import net.pooleaf.core.modules.support.common.player.AbstractPlayer
-import net.pooleaf.gamecore.DefaultTitleBuilder
+import net.pooleaf.core.modules.support.bukkit.player.AbstractBukkitPlayer
 import net.pooleaf.gamecore.GameCore
 import net.pooleaf.gamecore.quickbars.ObserverQuickBar
 import net.pooleaf.gamecore.team.Team
 import org.bukkit.Bukkit
 import org.bukkit.GameMode
-import org.bukkit.OfflinePlayer
-import org.bukkit.entity.Player
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
 import java.util.*
 
-open class GamePlayer : AbstractPlayer<Player> {
+open class GamePlayer : AbstractBukkitPlayer {
 
-    var joined = false // 게임 참여 여부
-    var defeated = false // 패배 여부
-    var observer = false // 관전 모드
+    // 게임 참여 여부
+    var joined = false
 
-    var team: Team? = null // 팀
+    // 패배 여부
+    var defeated = false
+
+    // 관전 모드
+    var observer = false
+
+    // 팀
+    var team: Team? = null
 
 
     internal constructor(uuid: UUID) : super(uuid)
@@ -90,7 +92,11 @@ open class GamePlayer : AbstractPlayer<Player> {
                 player.addPotionEffect(PotionEffect(PotionEffectType.INVISIBILITY, 100000, 0, true))
                 Bukkit.getOnlinePlayers().forEach { it.hidePlayer(it) }
 
-                ObserverQuickBar().setTo(player)
+                if (GameCore.game.gameStarted) {
+                    GameCore.quickBarManager.observerQuickBar.setTo(player)
+                } else {
+                    GameCore.quickBarManager.waitingQuickBar.setTo(player)
+                }
 
                 observer = true
             } else {
@@ -102,32 +108,15 @@ open class GamePlayer : AbstractPlayer<Player> {
                 player.activePotionEffects.forEach { player.removePotionEffect(it.type) }
                 Bukkit.getOnlinePlayers().forEach { it.showPlayer(it) }
 
-                GuiModule.getQuickBarManager().removeTo(player)
+                if (GameCore.game.gameStarted) {
+                    GuiModule.getQuickBarManager().removeTo(player)
+                } else {
+                    GameCore.quickBarManager.waitingQuickBar.setTo(player)
+                }
 
                 observer = false
             }
         }.await()
-    }
-
-    fun sendTitle(title: Title) {
-        title.send(player)
-    }
-
-    fun sendTitle(title: String?) {
-        sendTitle(
-            DefaultTitleBuilder()
-                .title(title)
-                .build()
-        )
-    }
-
-    fun sendTitle(title: String?, subtitle: String?) {
-        sendTitle(
-            DefaultTitleBuilder()
-                .title(title)
-                .subtitle(subtitle)
-                .build()
-        )
     }
 
 }

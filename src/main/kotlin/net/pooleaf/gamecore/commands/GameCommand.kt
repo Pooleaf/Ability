@@ -37,7 +37,7 @@ class GameCommand {
     )
     fun game_start(sender: CommonCommandSender<CommandSender>, result: CommandResult?) {
         if (GameCore.game.countingStarted) {
-            sender.nwarning("이미 게임이 시작되었습니다.")
+            sender.sendWarning("이미 게임이 시작되었습니다.")
             return
         }
 
@@ -54,7 +54,7 @@ class GameCommand {
     )
     fun game_stop(sender: CommonCommandSender<CommandSender>, result: CommandResult?) {
         if (!GameCore.game.countingStarted) {
-            sender.nwarning("아직 게임 중이 아닙니다.")
+            sender.sendWarning("아직 게임 중이 아닙니다.")
             return
         }
 
@@ -73,7 +73,7 @@ class GameCommand {
     fun game_observer(player: CommonPlayer<Player>, result: CommandResult?) {
         // 대기 중에만 사용 가능. 단 관리자는 아무 때나 사용할 수 있음
         if (GameCore.game.gameStarted && !player.platformSender.isOp) {
-            player.nwarning("게임 중에는 사용할 수 없습니다.")
+            player.sendWarning("게임 중에는 사용할 수 없습니다.")
             return
         }
 
@@ -84,7 +84,7 @@ class GameCommand {
             if (!gamePlayer.observer) {
                 // 게임 카운팅 중 인원이 적으면 관전 전환 불가
                 if (GameCore.game.countingStarted && GameCore.playerManager.getOnlinePlayingPlayers().size <= 2 && !player.platformSender.isOp) {
-                    player.nwarning("인원이 적어 관전 모드로 전환할 수 없습니다.")
+                    player.sendWarning("인원이 적어 관전 모드로 전환할 수 없습니다.")
                     return@launch
                 }
 
@@ -98,7 +98,7 @@ class GameCommand {
             else {
                 // 관리자는 게임 중에도 관전을 해제할 수 있으나, 게임 종료 후에는 불가능
                 if (GameCore.game.ended) {
-                    player.nwarning("게임이 종료되어 관전을 해제할 수 없습니다.")
+                    player.sendWarning("게임이 종료되어 관전을 해제할 수 없습니다.")
                     return@launch
                 }
 
@@ -124,7 +124,7 @@ class GameCommand {
         description = "게임에 참여 중인 플레이어 목록을 확인합니다."
     )
     fun game_playerList(sender: CommonCommandSender<CommandSender>, result: CommandResult) {
-        sender.nmessage("")
+        sender.sendMessage("")
 
         // 참여자
         var players = when {
@@ -162,13 +162,13 @@ class GameCommand {
             }.joinToString(", ")
         }
         var playerCount = GameCore.playerManager.getOnlinePlayingPlayers().size
-        sender.nmessage("§c참여자($playerCount): §f$players")
+        sender.sendMessage("§c참여자($playerCount): §f$players")
 
         // 관전자
         if (!GameCore.playerManager.getObservers().isEmpty()) {
             val observerPlayers = GameCore.playerManager.getObservers().map { it.displayName }.joinToString(", ")
             val observerCount = GameCore.playerManager.getObservers().size
-            sender.nmessage("§b관전자($observerCount): §f${observerPlayers}")
+            sender.sendMessage("§b관전자($observerCount): §f${observerPlayers}")
         }
     }
 
