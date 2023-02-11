@@ -2,9 +2,9 @@ package net.pooleaf.ability
 
 import net.pooleaf.core.modules.support.common.CommonChatColor
 import net.pooleaf.core.plugin.BukkitCorePlugin
-import net.pooleaf.gamecore.v1.GameCore
-import net.pooleaf.gamecore.v1.player.GamePlayer
-import net.pooleaf.gamecore.v1.player.GamePlayerManager
+import net.pooleaf.gamecore.GameCore
+import net.pooleaf.gamecore.player.GamePlayer
+import net.pooleaf.gamecore.player.GamePlayerManager
 
 class AbilityPlugin: BukkitCorePlugin() {
 
@@ -20,7 +20,8 @@ class AbilityPlugin: BukkitCorePlugin() {
         color = CommonChatColor.RED
         registerLoggerPrefix()
 
-        GameCore.init(this, AbilityApi.game, AbilityApi.playerManager as GamePlayerManager<GamePlayer>)
+        GameCore.init(this, AbilityApi.game)
+        GameCore.unsafe.playerManager = AbilityApi.playerManager as GamePlayerManager<GamePlayer>
 
         registerEventListeners()
         registerCommonEventListeners()
@@ -36,7 +37,7 @@ class AbilityPlugin: BukkitCorePlugin() {
     }
 
     override fun onConfigLoaded() {
-        GameCore.loadConfig()
+        GameCore.unsafe.loadConfig()
     }
 
 }

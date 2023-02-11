@@ -10,7 +10,7 @@ import net.pooleaf.core.modules.annocommand.common.HelpCommandResult
 import net.pooleaf.core.modules.coroutine.bukkit.BukkitAsyncScope
 import net.pooleaf.core.modules.gui.bukkit.title.DefaultTitleBuilder
 import net.pooleaf.core.modules.support.bukkit.util.TeleportUtil
-import net.pooleaf.gamecore.v1.GameCore
+import net.pooleaf.gamecore.GameCore
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 
@@ -48,7 +48,7 @@ class AbilityCommand {
     fun ability_yes(player: Player, result: CommandResult) {
         val abilityPlayer = AbilityApi.playerManager.get(player.uniqueId) ?: error("gamePlayer cannot be null")
 
-        val currentPhase = AbilityApi.game.phaseTask.phasePipeline.getCurrentPhase()
+        val currentPhase = AbilityApi.game.phasePipeline.currentPhase
         if (!(currentPhase is AbilityDrawPhase)) {
             player.sendMessage("§c능력 추첨 중이 아닙니다.")
             return
@@ -89,7 +89,7 @@ class AbilityCommand {
     fun ability_no(player: Player, result: CommandResult) {
         val abilityPlayer = AbilityApi.playerManager.get(player.uniqueId) ?: error("gamePlayer cannot be null")
 
-        val currentPhase = AbilityApi.game.phaseTask.phasePipeline.getCurrentPhase()
+        val currentPhase = AbilityApi.game.phasePipeline.currentPhase
         if (currentPhase !is AbilityDrawPhase) {
             player.sendMessage("§c능력 추첨 중이 아닙니다.")
             return

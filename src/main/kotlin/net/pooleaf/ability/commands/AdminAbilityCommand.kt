@@ -8,7 +8,7 @@ import net.pooleaf.core.modules.annocommand.common.Command
 import net.pooleaf.core.modules.annocommand.common.CommandResult
 import net.pooleaf.core.modules.commonsender.common.CommonCommandSender
 import net.pooleaf.core.modules.support.common.CommonChatColor
-import net.pooleaf.gamecore.v1.Broadcaster
+import net.pooleaf.gamecore.Broadcaster
 import org.bukkit.command.CommandSender
 
 class AdminAbilityCommand {
@@ -21,7 +21,7 @@ class AdminAbilityCommand {
         permission = AbilityPermission.ADMIN
     )
     fun ability_drawSkip(sender: CommonCommandSender<CommandSender>, result: CommandResult) {
-        val currentPhase = AbilityApi.game.phaseTask.phasePipeline.getCurrentPhase()
+        val currentPhase = AbilityApi.game.phasePipeline.currentPhase
         if (!(currentPhase is AbilityDrawPhase)) {
             sender.sendMessage("§c능력 추첨 중이 아닙니다.")
             return

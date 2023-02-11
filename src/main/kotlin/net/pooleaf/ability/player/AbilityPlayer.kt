@@ -1,7 +1,7 @@
 package net.pooleaf.ability.player
 
 import net.pooleaf.ability.ability.Ability
-import net.pooleaf.gamecore.v1.player.GamePlayer
+import net.pooleaf.gamecore.player.GamePlayer
 import java.util.*
 
 class AbilityPlayer(uuid: UUID) : GamePlayer(uuid) {
@@ -22,17 +22,6 @@ class AbilityPlayer(uuid: UUID) : GamePlayer(uuid) {
     // 능력 추첨 완료 여부
     var abilityDrawComplete: Boolean = false
 
-
-    override suspend fun init() {
-        super.init()
-
-        resignAbility()
-        tempAbility = null
-
-        redrawCount = 0
-        maxRedrawCount = 1 // TODO 능력 재추첨 횟수 불러오기
-        abilityDrawComplete = false
-    }
 
     fun assignAbility(abilityClass: Class<out Ability>) {
         ability = abilityClass.newInstance()

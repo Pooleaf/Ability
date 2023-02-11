@@ -1,0 +1,51 @@
+package net.pooleaf.gamecore.phases
+
+import com.cryptomorin.xseries.XSound
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import net.pooleaf.core.modules.coroutine.bukkit.BukkitSyncScope
+import net.pooleaf.gamecore.Broadcaster
+import net.pooleaf.gamecore.GameCore
+import net.pooleaf.gamecore.phase.Phase
+
+class StartCountPhase(
+    val teleportToMap: Boolean = true
+): Phase() {
+
+    override suspend fun onStart() {
+        GameCore.game.isCountingStarted = true
+
+        Broadcaster.broadcastActionBar("§e잠시 후 게임이 시작됩니다.")
+        Broadcaster.broadcastSound(XSound.UI_BUTTON_CLICK, 0.3F, 0.7F)
+
+        delay(5000L)
+
+        // 카운트
+        for (count in 5 downTo 1) {
+            when (count) {
+                in 4..5 -> {
+                    Broadcaster.broadcastTitle("§e${count}")
+                    Broadcaster.broadcastSound(XSound.UI_BUTTON_CLICK, 0.3f, 0.7f)
+                }
+                in 1..3 -> {
+                    Broadcaster.broadcastTitle("§c${count}")
+                    Broadcaster.broadcastSound(XSound.UI_BUTTON_CLICK, 0.3f, 0.7f)
+                }
+            }
+
+            delay(1000L)
+        }
+    }
+
+    override fun onEnd() {
+        GameCore.unsafe.gameManager.onGameStarted()
+
+        // 맵으로 텔레포트
+        if (teleportToMap) {
+            BukkitSyncScope.launch {
+                GameCore.unsafe.gameManager.teleportToMap()
+            }
+        }
+    }
+
+}

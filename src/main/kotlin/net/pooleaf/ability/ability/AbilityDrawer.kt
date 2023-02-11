@@ -135,7 +135,7 @@ class AbilityDrawer(
             }
 
             // 능력 추첨 Phase일 경우 추가 메시지
-            val currentPhase = AbilityApi.game.phaseTask.phasePipeline.getCurrentPhase()
+            val currentPhase = AbilityApi.game.phasePipeline.currentPhase
             if (!(currentPhase is AbilityDrawPhase)) {
                 abilityPlayer.assignAbility(abilityPlayer.tempAbility!!.javaClass)
                 return@async ability
