@@ -1,11 +1,11 @@
 package net.pooleaf.gamecore.player
 
-import net.pooleaf.core.modules.support.common.manager.AbstractEhcacheManager
-import java.util.UUID
+import net.pooleaf.core.modules.support.common.manager.AbstractSyncManager
+import java.util.*
 
 open class GamePlayerManager<T: GamePlayer>(
     val gamePlayerFactory: GamePlayerFactory<T>
-): AbstractEhcacheManager<UUID, T>() {
+): AbstractSyncManager<UUID, T>() {
 
     override fun remove(key: UUID?): Boolean {
         // 팀에서도 삭제

@@ -21,7 +21,7 @@ import java.util.*
 
 class GameManager {
 
-    lateinit var game: net.pooleaf.gamecore.game.Game
+    lateinit var game: Game
         internal set
 
 

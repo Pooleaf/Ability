@@ -1,6 +1,6 @@
 package net.pooleaf.gamecore.map
 
-import net.pooleaf.core.modules.support.common.manager.AbstractEhcacheManager
+import net.pooleaf.core.modules.support.common.manager.AbstractSyncManager
 
 /**
  * [GameMap] 객체를 관리합니다.
@@ -8,7 +8,7 @@ import net.pooleaf.core.modules.support.common.manager.AbstractEhcacheManager
  */
 open class GameMapManager<T: GameMap>(
     val gameMapFactory: GameMapFactory<T>
-): AbstractEhcacheManager<String, T>() {
+): AbstractSyncManager<String, T>() {
 
     // 현재 맵
     var currentMap: GameMap? = null

@@ -1,5 +1,6 @@
 package net.pooleaf.gamecore
 
+import net.pooleaf.gamecore.game.GameManager
 import net.pooleaf.gamecore.map.*
 import net.pooleaf.gamecore.player.DefaultGamePlayerManager
 import net.pooleaf.gamecore.player.GamePlayer
@@ -18,7 +19,7 @@ object GameCore {
     object unsafe {
         lateinit var gamePlugin: JavaPlugin
 
-        lateinit var gameManager: net.pooleaf.gamecore.game.GameManager
+        lateinit var gameManager: GameManager
 
         lateinit var mapManager: GameMapManager<GameMap>
         lateinit var mapService: GameMapService

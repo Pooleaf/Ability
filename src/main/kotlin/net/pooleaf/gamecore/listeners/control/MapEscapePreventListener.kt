@@ -10,6 +10,7 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerMoveEvent
+import org.bukkit.event.player.PlayerRespawnEvent
 import org.bukkit.event.player.PlayerTeleportEvent
 
 class MapEscapePreventListener: Listener {
@@ -59,6 +60,13 @@ class MapEscapePreventListener: Listener {
             else {
                 GameCore.currentMap?.getCenterLocation()?.let { TeleportUtil.teleport(event.player, it) }
             }
+        }
+    }
+
+    @EventHandler
+    fun onRespawn(event: PlayerRespawnEvent) {
+        if (!isInMap(event.respawnLocation)) {
+            GameCore.currentMap?.getCenterLocation()?.let { event.respawnLocation = it }
         }
     }
 
