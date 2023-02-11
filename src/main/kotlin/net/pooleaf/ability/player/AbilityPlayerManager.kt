@@ -1,6 +1,6 @@
 package net.pooleaf.ability.player
 
-import net.pooleaf.gamecore.player.GamePlayerManager
+import net.pooleaf.gamecore.v1.player.GamePlayerManager
 import java.util.*
 
 class AbilityPlayerManager: GamePlayerManager<AbilityPlayer>() {

@@ -1,0 +1,64 @@
+package net.pooleaf.gamecore.v2.game
+
+import net.pooleaf.gamecore.v2.phase.PhasePipeline
+import org.bukkit.GameMode
+import java.time.LocalDateTime
+import java.util.UUID
+
+abstract class Game {
+
+    val gameTypeId: Int
+
+    var gameId: UUID? = null
+        internal set
+
+    // 시작 카운팅 시작 여부
+    var isCountingStarted: Boolean = false
+        internal set
+
+    // 시작 여부
+    var isGameStarted: Boolean = false
+        internal set
+
+    // 맵 텔레포트 여부
+    var isTeleportedToMap: Boolean = false
+        internal set
+
+    // PVP 시작 여부
+    var isPvpStarted: Boolean = false
+        internal set
+
+    // 게임 종료 여부
+    var isEnded: Boolean = false
+        internal set
+
+    // 게임 실행 중 여부
+    val isRunning
+        get() = phasePipeline.isRunning()
+
+    // 시작 시간
+    var startedAt: LocalDateTime? = null
+        internal set
+
+    // 종료 시간
+    var endedAt: LocalDateTime? = null
+        internal set
+
+    // 대기 중 게임 모드
+    val waitingGameMode: GameMode
+
+    // 현재 게임 모드
+    var currentGameMode: GameMode = GameMode.ADVENTURE
+        internal set
+
+    // 게임 Phase
+    val phasePipeline: PhasePipeline
+
+
+    constructor(gameTypeId: Int, phasePipeline: PhasePipeline, waitingGameMode: GameMode = GameMode.ADVENTURE) {
+        this.gameTypeId = gameTypeId
+        this.phasePipeline = phasePipeline
+        this.waitingGameMode = waitingGameMode
+    }
+
+}

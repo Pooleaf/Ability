@@ -5,8 +5,8 @@ import kotlinx.coroutines.launch
 import net.pooleaf.ability.AbilityApi
 import net.pooleaf.core.modules.coroutine.bukkit.BukkitAsyncScope
 import net.pooleaf.core.modules.support.common.logger.Logger
-import net.pooleaf.gamecore.Broadcaster
-import net.pooleaf.gamecore.phase.Phase
+import net.pooleaf.gamecore.v1.Broadcaster
+import net.pooleaf.gamecore.v1.phase.Phase
 
 class AbilityDrawPhase: Phase() {
 

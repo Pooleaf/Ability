@@ -12,7 +12,6 @@ import net.pooleaf.core.modules.gui.bukkit.title.TitleBuilder
 import net.pooleaf.core.modules.support.bukkit.messager.sendMessageSafely
 import net.pooleaf.core.modules.support.bukkit.sound.playSoundSafely
 import net.pooleaf.core.modules.support.common.component.SimpleComponentBuilder
-import net.pooleaf.gamecore.DefaultTitleBuilder
 import org.bukkit.entity.Player
 
 class AbilityDrawer(

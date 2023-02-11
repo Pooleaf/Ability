@@ -8,7 +8,7 @@ import net.pooleaf.core.modules.annocommand.common.Command
 import net.pooleaf.core.modules.annocommand.common.CommandResult
 import net.pooleaf.core.modules.commonsender.common.CommonCommandSender
 import net.pooleaf.core.modules.support.common.CommonChatColor
-import net.pooleaf.gamecore.Broadcaster
+import net.pooleaf.gamecore.v1.Broadcaster
 import org.bukkit.command.CommandSender
 
 class AdminAbilityCommand {

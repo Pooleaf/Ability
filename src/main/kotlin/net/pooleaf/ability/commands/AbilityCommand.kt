@@ -8,9 +8,9 @@ import net.pooleaf.core.modules.annocommand.common.Command
 import net.pooleaf.core.modules.annocommand.common.CommandResult
 import net.pooleaf.core.modules.annocommand.common.HelpCommandResult
 import net.pooleaf.core.modules.coroutine.bukkit.BukkitAsyncScope
+import net.pooleaf.core.modules.gui.bukkit.title.DefaultTitleBuilder
 import net.pooleaf.core.modules.support.bukkit.util.TeleportUtil
-import net.pooleaf.gamecore.DefaultTitleBuilder
-import net.pooleaf.gamecore.GameCore
+import net.pooleaf.gamecore.v1.GameCore
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 
@@ -145,7 +145,7 @@ class AbilityCommand {
         }
 
         // 게임 중에는 스폰으로 이동 불가
-        if (AbilityApi.game.gameStarted) {
+        if (AbilityApi.game.isGameStarted) {
             player.sendMessage("§c게임 중에는 스폰으로 이동할 수 없습니다.")
             return
         }

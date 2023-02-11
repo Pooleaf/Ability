@@ -2,9 +2,9 @@ package net.pooleaf.ability
 
 import net.pooleaf.core.modules.support.common.CommonChatColor
 import net.pooleaf.core.plugin.BukkitCorePlugin
-import net.pooleaf.gamecore.GameCore
-import net.pooleaf.gamecore.player.GamePlayer
-import net.pooleaf.gamecore.player.GamePlayerManager
+import net.pooleaf.gamecore.v1.GameCore
+import net.pooleaf.gamecore.v1.player.GamePlayer
+import net.pooleaf.gamecore.v1.player.GamePlayerManager
 
 class AbilityPlugin: BukkitCorePlugin() {
 

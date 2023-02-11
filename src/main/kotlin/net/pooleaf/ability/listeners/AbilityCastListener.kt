@@ -16,7 +16,7 @@ class AbilityCastListener: Listener {
     @EventHandler
     fun handleCastById(event: PlayerInteractEvent) {
         // 게임 시작 체크
-        if (!AbilityApi.game.pvpStarted) return
+        if (!AbilityApi.game.isPvpStarted) return
 
         // 클릭 타입 계산
         val clickType = when (event.action) {

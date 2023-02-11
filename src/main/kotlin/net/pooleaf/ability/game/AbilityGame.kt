@@ -1,14 +1,14 @@
 package net.pooleaf.ability.game
 
 import net.pooleaf.ability.phases.AbilityDrawPhase
-import net.pooleaf.gamecore.GameCore
-import net.pooleaf.gamecore.game.Game
-import net.pooleaf.gamecore.phase.DelayPhase
-import net.pooleaf.gamecore.phase.PhasePipeline
-import net.pooleaf.gamecore.phase.RunnablePhase
-import net.pooleaf.gamecore.phases.EndPhase
-import net.pooleaf.gamecore.phases.GamePhase
-import net.pooleaf.gamecore.phases.StartCountPhase
+import net.pooleaf.gamecore.v1.GameCore
+import net.pooleaf.gamecore.v1.game.Game
+import net.pooleaf.gamecore.v1.phase.DelayPhase
+import net.pooleaf.gamecore.v1.phase.PhasePipeline
+import net.pooleaf.gamecore.v1.phase.RunnablePhase
+import net.pooleaf.gamecore.v1.phases.EndPhase
+import net.pooleaf.gamecore.v1.phases.GamePhase
+import net.pooleaf.gamecore.v1.phases.StartCountPhase
 import org.bukkit.GameMode
 
 class AbilityGame: Game(100) {
@@ -23,7 +23,7 @@ class AbilityGame: Game(100) {
             .addPhase(AbilityDrawPhase())
             .addPhase(RunnablePhase() {
                 GameCore.game.currentGameMode = GameMode.SURVIVAL
-                GameCore.game.pvpStarted = true
+                GameCore.game.isPvpStarted = true
             })
             .addPhase(GamePhase())
             .addPhase(EndPhase())
