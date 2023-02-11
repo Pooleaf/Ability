@@ -7,6 +7,8 @@ import net.pooleaf.core.modules.coroutine.bukkit.BukkitAsyncScope
 import net.pooleaf.core.modules.coroutine.bukkit.BukkitSyncScope
 import net.pooleaf.gamecore.Broadcaster
 import net.pooleaf.gamecore.GameCore
+import net.pooleaf.gamecore.events.player.GamePlayerJoinEvent
+import net.pooleaf.gamecore.events.player.GamePlayerQuitEvent
 import org.bukkit.Bukkit
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
@@ -30,7 +32,6 @@ class GamePlayerListener: Listener {
         val isNewPlayer = (gamePlayer == null)
 
         BukkitSyncScope.launch {
-            println("1111111: ${player.name}")
             // 새로운 GamePlayer라면 등록 및 초기화
             if (isNewPlayer) {
                 gamePlayer = GameCore.unsafe.playerManager.gamePlayerFactory.createGamePlayer(player.uniqueId)
@@ -44,7 +45,6 @@ class GamePlayerListener: Listener {
 
             // 게임 중이 아니라면
             if (!GameCore.game.isGameStarted) {
-                println("22222: ${player.name}")
                 // 게임에 참여
                 GameCore.unsafe.playerService.joinToGame(gamePlayer)
             }
@@ -66,13 +66,7 @@ class GamePlayerListener: Listener {
             }
 
             // 이벤트
-            Bukkit.getPluginManager().callEvent(
-                net.pooleaf.gamecore.events.player.GamePlayerJoinEvent(
-                    gamePlayer,
-                    event
-                )
-            )
-            println("333333: ${player.name}")
+            Bukkit.getPluginManager().callEvent(GamePlayerJoinEvent(gamePlayer, event))
         }
     }
 
@@ -115,12 +109,7 @@ class GamePlayerListener: Listener {
             }
 
             // 이벤트
-            Bukkit.getPluginManager().callEvent(
-                net.pooleaf.gamecore.events.player.GamePlayerQuitEvent(
-                    gamePlayer,
-                    event
-                )
-            )
+            Bukkit.getPluginManager().callEvent(GamePlayerQuitEvent(gamePlayer, event))
 
             // 관전 해제
             if (gamePlayer.isSpectator) {

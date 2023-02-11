@@ -1,8 +1,6 @@
 package net.pooleaf.gamecore.player
 
 import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
-import net.pooleaf.core.modules.coroutine.bukkit.BukkitAsyncScope
 import net.pooleaf.core.modules.coroutine.bukkit.BukkitSyncScope
 import net.pooleaf.core.modules.gui.GuiModule
 import net.pooleaf.gamecore.Broadcaster

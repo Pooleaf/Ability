@@ -1,7 +1,6 @@
 package net.pooleaf.gamecore.vote.start
 
 import kotlinx.coroutines.launch
-import net.pooleaf.core.modules.coroutine.bukkit.BukkitAsyncScope
 import net.pooleaf.core.modules.coroutine.bukkit.BukkitSyncScope
 import net.pooleaf.gamecore.Broadcaster
 import net.pooleaf.gamecore.GameCore

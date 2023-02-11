@@ -1,5 +1,9 @@
 package net.pooleaf.gamecore
 
+import net.pooleaf.gamecore.configs.AutoGameConfig
+import net.pooleaf.gamecore.configs.QuickBarConfig
+import net.pooleaf.gamecore.configs.SpawnConfig
+import net.pooleaf.gamecore.configs.TeamConfig
 import net.pooleaf.gamecore.game.GameManager
 import net.pooleaf.gamecore.map.*
 import net.pooleaf.gamecore.player.DefaultGamePlayerManager
@@ -36,25 +40,25 @@ object GameCore {
         lateinit var quickBarManager: QuickBarManager
 
 
-        val autoGameConfig: net.pooleaf.gamecore.configs.AutoGameConfig by lazy {
-            net.pooleaf.gamecore.configs.AutoGameConfig(File(GameCore.gamePlugin.dataFolder, "game-config.yml"))
+        val autoGameConfig: AutoGameConfig by lazy {
+            AutoGameConfig(File(GameCore.gamePlugin.dataFolder, "game-config.yml"))
         }
 
-        val spawnConfig: net.pooleaf.gamecore.configs.SpawnConfig by lazy {
-            net.pooleaf.gamecore.configs.SpawnConfig(File(GameCore.gamePlugin.dataFolder, "spawn-config.yml"))
+        val spawnConfig: SpawnConfig by lazy {
+            SpawnConfig(File(GameCore.gamePlugin.dataFolder, "spawn-config.yml"))
         }
 
-        val quickBarConfig: net.pooleaf.gamecore.configs.QuickBarConfig by lazy {
-            net.pooleaf.gamecore.configs.QuickBarConfig(File(GameCore.gamePlugin.dataFolder, "quickbar-config.yml"))
+        val quickBarConfig: QuickBarConfig by lazy {
+            QuickBarConfig(File(GameCore.gamePlugin.dataFolder, "quickbar-config.yml"))
         }
 
-        val teamConfig: net.pooleaf.gamecore.configs.TeamConfig by lazy {
-            net.pooleaf.gamecore.configs.TeamConfig(File(GameCore.gamePlugin.dataFolder, "team-config.yml"))
+        val teamConfig: TeamConfig by lazy {
+            TeamConfig(File(GameCore.gamePlugin.dataFolder, "team-config.yml"))
         }
 
 
         fun init() {
-            gameManager = net.pooleaf.gamecore.game.GameManager()
+            gameManager = GameManager()
 
             mapManager = DefaultGameMapManager()
             mapService = GameMapService()

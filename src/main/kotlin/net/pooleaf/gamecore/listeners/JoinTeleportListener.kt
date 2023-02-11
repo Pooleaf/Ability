@@ -2,13 +2,14 @@ package net.pooleaf.gamecore.listeners
 
 import net.pooleaf.core.modules.support.bukkit.util.TeleportUtil
 import net.pooleaf.gamecore.GameCore
+import net.pooleaf.gamecore.events.player.GamePlayerJoinEvent
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 
 class JoinTeleportListener: Listener {
 
     @EventHandler
-    fun onPlayerJoin(event: net.pooleaf.gamecore.events.player.GamePlayerJoinEvent) {
+    fun onPlayerJoin(event: GamePlayerJoinEvent) {
         val gamePlayer = event.gamePlayer
         val player = gamePlayer.player
 
