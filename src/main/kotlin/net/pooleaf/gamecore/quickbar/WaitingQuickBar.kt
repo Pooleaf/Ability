@@ -7,6 +7,7 @@ import net.pooleaf.core.modules.gui.bukkit.quickbar.FakeSlot
 import net.pooleaf.core.modules.gui.bukkit.quickbar.QuickBar
 import net.pooleaf.core.modules.gui.bukkit.quickbar.Slot
 import net.pooleaf.core.modules.gui.bukkit.quickbar.event.SlotClickEvent
+import net.pooleaf.core.modules.support.bukkit.messager.sendWarningSafely
 import net.pooleaf.core.modules.support.bukkit.util.ItemBuilder
 import net.pooleaf.gamecore.GameCore
 import org.bukkit.Material
@@ -29,7 +30,13 @@ class WaitingQuickBar: QuickBar() {
 
                 override fun onClick(event: SlotClickEvent) {
                     if (GameCore.game.phasePipeline.isRunning()) {
-                        event.player.sendMessage("이미 게임이 시작되었습니다.")
+                        event.player.sendWarningSafely("게임이 시작되어 투표할 수 없습니다.")
+                        return
+                    }
+
+                    val gamePlayer = GameCore.unsafe.playerManager.get(event.player.uniqueId)
+                    if (gamePlayer.isSpectator) {
+                        gamePlayer.sendWarningSafely("관전 중에는 투표에 참여할 수 없습니다.")
                         return
                     }
 
@@ -51,7 +58,13 @@ class WaitingQuickBar: QuickBar() {
 
                 override fun onClick(event: SlotClickEvent) {
                     if (GameCore.game.isCountingStarted) {
-                        event.player.sendMessage("이미 게임이 시작되었습니다.")
+                        event.player.sendWarningSafely("게임이 시작되어 투표할 수 없습니다.")
+                        return
+                    }
+
+                    val gamePlayer = GameCore.unsafe.playerManager.get(event.player.uniqueId)
+                    if (gamePlayer.isSpectator) {
+                        gamePlayer.sendWarningSafely("관전 중에는 투표에 참여할 수 없습니다.")
                         return
                     }
 
@@ -61,20 +74,24 @@ class WaitingQuickBar: QuickBar() {
         }
 
         // 관전 모드 전환 슬롯
-        val toggleObserverSlot = object : FakeSlot() {
-            override fun updateItem(player: Player): ItemStack {
+        val toggleSpectatorSlot = object : FakeSlot() {
+            override fun updateItem(player: Player): ItemStack? {
                 val gamePlayer = GameCore.unsafe.playerManager.get(player.uniqueId)
 
-                val itemStack = if (gamePlayer?.let { it.isSpectator } == true) {
-                    ItemBuilder(Material.IRON_SWORD)
-                        .displayName("§b§l관전 모드 해제 §f§l(우클릭)")
-                        .lore("§f우클릭 시 관전 모드를 해제합니다.")
-                        .build()
+                val itemStack = if (GameCore.game.isRunning) {
+                    null
                 } else {
-                    ItemBuilder(Material.EYE_OF_ENDER)
-                        .displayName("§b§l관전 모드로 전환 §f§l(우클릭)")
-                        .lore("§f우클릭 시 관전 모드로 전환합니다.")
-                        .build()
+                    if (gamePlayer?.let { it.isSpectator } == true) {
+                        ItemBuilder(Material.IRON_SWORD)
+                            .displayName("§b§l관전 모드 해제 §f§l(우클릭)")
+                            .lore("§f우클릭 시 관전 모드를 해제합니다.")
+                            .build()
+                    } else {
+                        ItemBuilder(Material.EYE_OF_ENDER)
+                            .displayName("§b§l관전 모드로 전환 §f§l(우클릭)")
+                            .lore("§f우클릭 시 관전 모드로 전환합니다.")
+                            .build()
+                    }
                 }
 
                 return itemStack
@@ -119,7 +136,7 @@ class WaitingQuickBar: QuickBar() {
         // 슬롯 배치
         setSlot(1, startVoteSlot)
         setSlot(if (startVoteSlot == null) 1 else 2, mapVoteSlot)
-        setSlot(8, toggleObserverSlot)
+        setSlot(8, toggleSpectatorSlot)
         setSlot(9, lobbySlot)
 
         updateAsynchronously()

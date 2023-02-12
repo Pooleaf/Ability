@@ -61,7 +61,7 @@ class StartVoteGui(): InventoryGui("시작 투표", 3) {
         }
 
         // 장식 아이템 배치
-        val deco = ItemBuilder(Material.STAINED_GLASS_PANE).build()
+        val deco = ItemBuilder(Material.STAINED_GLASS_PANE).displayName("§f").build()
         for (i in 0 until 27) {
             mainPanel.set(i, deco)
         }

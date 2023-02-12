@@ -119,7 +119,7 @@ class GameMapService {
      * 경계선을 [newSize]로 즉시 업데이트합니다.
      */
     fun updateWorldBorder(map: GameMap, newSize: Int) {
-        map.getCenterLocation()?.let { centerLocation ->
+        map.centerLocation?.let { centerLocation ->
             val worldBorder = centerLocation.world.worldBorder
             worldBorder.center = centerLocation
             worldBorder.size = newSize.toDouble()
@@ -137,7 +137,7 @@ class GameMapService {
         if (newSize < 0) error("newSize cannot be less than 0 (value: ${newSize})")
         if (updateSizePerSeconds < 1) error("updateSizePerSeconds cannot be less than 1 (value: ${updateSizePerSeconds}")
 
-        map.getCenterLocation()?.let { centerLocation ->
+        map.centerLocation?.let { centerLocation ->
             // 줄어드는 데 걸리는 시간
             val updateDurationTime = (abs(map.currentWorldBorderSize - newSize) / updateSizePerSeconds).toLong()
 
@@ -198,6 +198,7 @@ class GameMapService {
 
         BukkitSyncScope.async {
             swmPlugin.generateWorld(slimeWorld)
+            initWorldBorder(map)
         }.await()
     }
 

@@ -72,7 +72,7 @@ open class GamePlayerManager<T: GamePlayer>(
     * 관전 중인 [T]를 반환합니다.
     * 관전 중인 [T]는 퇴장 시 관전이 해제되므로 온라인 상태인 [T]만 반환됩니다.
     */
-    fun getOnlineObservers(): List<T> {
+    fun getOnlineSpectators(): List<T> {
         return values().filter { it.isSpectator && it.isOnline }
     }
 

@@ -8,9 +8,11 @@ import net.pooleaf.core.modules.coroutine.bukkit.BukkitAsyncScope
 import net.pooleaf.core.modules.coroutine.bukkit.BukkitSyncScope
 import net.pooleaf.core.modules.gui.GuiModule
 import net.pooleaf.core.modules.support.bukkit.util.TeleportUtil
+import net.pooleaf.core.modules.support.common.util.toMillis
 import net.pooleaf.gamecore.Broadcaster
 import net.pooleaf.gamecore.GameCore
 import net.pooleaf.gamecore.events.game.*
+import net.pooleaf.gamecore.phases.EndPhase
 import net.pooleaf.gamecore.team.Team
 import org.bukkit.Bukkit
 import org.bukkit.GameMode
@@ -35,7 +37,7 @@ class GameManager {
         game.isCountingStarted = false
         game.isGameStarted = false
         game.isTeleportedToMap = false
-        game.isPvpStarted = false
+        game.isGodMode = false
         game.isEnded = false
 
         game.startedAt = null
@@ -51,32 +53,15 @@ class GameManager {
      * 게임을 리셋시킵니다.
      */
     suspend fun resetGame() {
+        // 초기화
+        initGame()
+
         // 스폰으로 텔레포트
         BukkitSyncScope.launch {
             GameCore.spawnConfig.spawnLocation?.let { location ->
                 Bukkit.getOnlinePlayers().forEach { player -> TeleportUtil.teleport(player, location) }
             }
         }.join()
-
-        // 맵 언로드
-        GameCore.currentMap?.let { map ->
-            // 언로드 실패 시 서버 재부팅
-            if (!map.unloadWorld()) {
-                Broadcaster.broadcastTitle("§c오류", "§c게임 초기화에 실패하여 서버가 재부팅됩니다.", 10 * 20)
-
-                // 10초 후 서버 종료
-                BukkitAsyncScope.launch {
-                    // 로비로 이동
-                    delay(8000L)
-                    Bukkit.getOnlinePlayers().forEach { ChannelModule.getLobbyChannelGroup().fastJoin(it.uniqueId) }
-
-                    // 서버 종료
-                    delay(2000L)
-                    Bukkit.shutdown()
-                }.join()
-            }
-        }
-        GameCore.unsafe.mapManager.currentMap = null
 
         // Phase 초기화
         if (game.phasePipeline.isRunning()) {
@@ -100,11 +85,31 @@ class GameManager {
         }
 
         // 대기 액션바
-        Broadcaster.broadcastWaitingActionBar(GameCore.unsafe.playerManager.getOnlineJoinedPlayers().size, GameCore.autoGameConfig.startPlayerCount)
+        Broadcaster.broadcastWaitingActionBar(GameCore.unsafe.playerManager.getOnlineJoinedPlayers().size, GameCore.gameConfig.startPlayerCount)
 
         // 투표 초기화
         GameCore.unsafe.startVoteManager.initVote()
         GameCore.unsafe.mapVoteManager.initVote()
+
+        // 맵 언로드
+        GameCore.currentMap?.let { map ->
+            // 언로드 실패 시 서버 재부팅
+            if (!map.unloadWorld()) {
+                Broadcaster.broadcastTitle("§c오류", "§c게임 초기화에 실패하여 서버가 재부팅됩니다.", 10 * 20)
+
+                // 10초 후 서버 종료
+                BukkitAsyncScope.launch {
+                    // 로비로 이동
+                    delay(8000L)
+                    Bukkit.getOnlinePlayers().forEach { ChannelModule.getLobbyChannelGroup().fastJoin(it.uniqueId) }
+
+                    // 서버 종료
+                    delay(2000L)
+                    Bukkit.shutdown()
+                }.join()
+            }
+        }
+        GameCore.unsafe.mapManager.currentMap = null
 
         // 이벤트
         Bukkit.getPluginManager().callEvent(GameResetEvent())
@@ -113,9 +118,11 @@ class GameManager {
 
     /**
      * 게임을 시작시킵니다.
+     * PrimaryThread에서 실행해야 합니다
      */
     suspend fun startGame(starterSender: CommandSender?) {
         if (game.phasePipeline.isRunning()) error("Game has already started")
+        if (!Bukkit.isPrimaryThread()) error("Game start cannot start asynchronously")
 
         // 설정된 맵 없으면 랜덤 맵으로 설정
         if (GameCore.currentMap == null) {
@@ -147,6 +154,9 @@ class GameManager {
         // 액션바 제거
         Broadcaster.removeActionBar()
 
+        // 대기 퀵바 업데이트 (관전 슬롯 제거)
+        GameCore.unsafe.quickBarManager.waitingQuickBar.updateAsynchronously()
+
         // Phase 시작
         game.phasePipeline.runPhases()
 
@@ -165,8 +175,6 @@ class GameManager {
         game.isGameStarted = true
         game.startedAt = LocalDateTime.now()
 
-        // TODO 게임 정보 저장
-
         // 액션바 제거
         Broadcaster.removeActionBar()
 
@@ -174,13 +182,16 @@ class GameManager {
         Bukkit.getOnlinePlayers().forEach { GuiModule.getQuickBarManager().removeTo(it) }
 
         // 관전자 설정
-        GameCore.unsafe.playerManager.getOnlineObservers().forEach {
+        GameCore.unsafe.playerManager.getOnlineSpectators().forEach {
             // 관전 퀵바
-            GameCore.unsafe.quickBarManager.observerQuickBar.setTo(it.player)
+            GameCore.unsafe.quickBarManager.spectatorQuickBar.setTo(it.player)
 
             // 관전자 날기 활성화
             it.player.isFlying = true
         }
+
+        // 관전 텔레포터 GUI 업데이트
+        GameCore.unsafe.quickBarManager.spectatorQuickBar.spectatorTeleporterGuis.values.forEach { it.updatePlayers() }
 
         // 이벤트
         Bukkit.getPluginManager().callEvent(GameStartedEvent())
@@ -191,7 +202,7 @@ class GameManager {
      */
     fun canAutoStart(): Boolean {
         return !GameCore.game.isRunning
-                && GameCore.unsafe.playerManager.getOnlineJoinedPlayers().size >= GameCore.autoGameConfig.startPlayerCount
+                && GameCore.unsafe.playerManager.getOnlineJoinedPlayers().size >= GameCore.gameConfig.startPlayerCount
     }
 
     /**
@@ -199,26 +210,84 @@ class GameManager {
      */
     fun canEnd(): Boolean {
         return game.isGameStarted && !game.isEnded
-                && GameCore.unsafe.teamManager.getNotDefeatedOnlineTeams().size == 1
+                && GameCore.unsafe.teamManager.getNotDefeatedOnlineTeams().size < 2
+    }
+
+    /**
+     * 게임 중단 또는 종료 가능 여부를 반환합니다.
+     */
+    fun canStop(): Boolean {
+        return game.isRunning
+                && (
+                !GameCore.game.isGameStarted && GameCore.unsafe.playerManager.getOnlinePlayingPlayers().size <= GameCore.teamConfig.playerCountPerTeam
+                || GameCore.game.isGameStarted && !GameCore.game.isEnded && GameCore.unsafe.teamManager.getNotDefeatedOnlineTeams().size < 2
+                        )
+    }
+
+    /**
+     * 게임 중단 또는 종료
+     */
+    suspend fun stopGame() {
+        if (!canStop()) error("game cannot stop")
+
+        // 게임 시작 전 중단
+        if (!GameCore.game.isGameStarted && GameCore.unsafe.playerManager.getOnlinePlayingPlayers().size <= GameCore.teamConfig.playerCountPerTeam) {
+            GameCore.unsafe.gameManager.cancelGame(null, "인원이 적어 게임이 중단됩니다.")
+            Broadcaster.broadcast("§c인원이 적어 게임이 중단되었습니다.")
+        }
+
+        // 플레이 중인 팀이 한팀 남았으면 게임 종료
+        else if (GameCore.game.isGameStarted && GameCore.unsafe.teamManager.getNotDefeatedOnlineTeams().size < 2) {
+            // 우승 시간 안됐을 때 중단
+            if (System.currentTimeMillis() - GameCore.game.startedAt!!.toMillis() < GameCore.gameConfig.winAllowSeconds) {
+                GameCore.unsafe.gameManager.cancelGame(null, "게임 진행 시간이 적어 우승할 수 없습니다.")
+                Broadcaster.broadcast("§c게임 진행 시간이 적어 승자가 결정되지 않았습니다.")
+                Broadcaster.broadcast("§c더 많은 시간을 플레이해야 게임이 정상적으로 종료됩니다.")
+            }
+            // 우승
+            else {
+                GameCore.unsafe.gameManager.skipToEnd()
+            }
+        }
     }
 
     /**
      * 우승 가능 여부를 반환합니다.
      */
     fun isWinAllowTime(): Boolean {
-        return game.startedAt?.let { System.currentTimeMillis() - it.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli() > GameCore.autoGameConfig.winAllowTime * 1000 } == true
+        return game.startedAt?.let { System.currentTimeMillis() - it.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli() > GameCore.gameConfig.winAllowSeconds * 1000 } == true
+    }
+
+    /**
+     * EndPhase까지 Phase를 스킵합니다.
+     */
+    fun skipToEnd() {
+        if (!game.phasePipeline.isRunning()) error("game is not running")
+
+        val endPhase = game.phasePipeline.phases.filter { it is EndPhase }.firstOrNull()
+        endPhase?.let {
+            game.phasePipeline.cancelPhases()
+            game.phasePipeline.currentPhase = endPhase
+            game.phasePipeline.job = BukkitAsyncScope.launch {
+                endPhase.start()
+            }
+        }
     }
 
     /**
      * 게임 종료 시 실행됩니다.
      * 우승 팀을 반환합니다.
      */
-    fun onGameEnd(): Team? {
+    suspend fun onGameEnd(): Team? {
         if (!canEnd()) error("End of game condition not met")
 
         // 게임 정보 업데이트
         game.isEnded = true
         game.endedAt = LocalDateTime.now()
+
+        // 재접속 중인 플레이어 탈락처리
+        GameCore.unsafe.playerManager.getJoinedPlayers().filter { it.reconnectJob?.isActive == true }
+            .forEach { GameCore.unsafe.playerService.defeatPlayer(it) }
 
         // 우승자 계산
         val winnerTeam = GameCore.unsafe.teamManager.getNotDefeatedOnlineTeams().firstOrNull()
@@ -253,8 +322,10 @@ class GameManager {
 
         map?.let {
             BukkitSyncScope.launch {
-                // 관전자 맵으로 텔레포트
-                GameCore.unsafe.playerManager.getOnlineObservers().forEach { TeleportUtil.teleport(it.player, map.getCenterLocation()) }
+                // 관전자를 맵으로 텔레포트
+                map.centerLocation?.let { centerLocation ->
+                    GameCore.unsafe.playerManager.getOnlineSpectators().forEach { TeleportUtil.teleport(it.player, centerLocation) }
+                }
 
                 // 팀끼리 맵으로 텔레포트
                 GameCore.unsafe.teamManager.teams.forEach { team ->
@@ -262,7 +333,7 @@ class GameManager {
                     location?.let {
                         team.spawnLocation = location
                         team.teleport(location)
-                    } ?: error("location cannot be null")
+                    } ?: error("random location cannot be null")
                 }
             }.join()
 
@@ -277,9 +348,21 @@ class GameManager {
         } ?: error("currentMap cannot be null")
     }
 
-    suspend fun changeGameMode(gameMode: GameMode) {
-        GameCore.game.currentGameMode = gameMode
-        GameCore.unsafe.playerManager.getPlayingPlayers().forEach { it.player?.gameMode = gameMode }
+    /**
+     * 현재 게임 모드를 변경합니다.
+     */
+    suspend fun changeCurrentGameMode(gameMode: GameMode) {
+        BukkitSyncScope.launch {
+            GameCore.game.currentGameMode = gameMode
+            GameCore.unsafe.playerManager.getPlayingPlayers().forEach {
+                it.player?.gameMode = gameMode
+
+                if (gameMode != GameMode.CREATIVE) {
+                    it.player?.allowFlight = false
+                    it.player?.isFlying = false
+                }
+            }
+        }.join()
     }
 
 }

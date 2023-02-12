@@ -26,8 +26,8 @@ abstract class Game {
     var isTeleportedToMap: Boolean = false
         internal set
 
-    // PVP 시작 여부
-    var isPvpStarted: Boolean = false
+    // 무적 모드 여부
+    var isGodMode: Boolean = false
         internal set
 
     // 게임 종료 여부
@@ -63,24 +63,47 @@ abstract class Game {
         this.waitingGameMode = waitingGameMode
     }
 
+    /**
+     * 게임 정보를 초기화 시킵니다.
+     */
     fun init() {
         GameCore.unsafe.gameManager.initGame()
     }
 
+    /**
+    * 게임을 시작시킵니다.
+    * PrimaryThread에서 실행해야 합니다
+    */
     suspend fun start(starterSender: CommandSender?) {
         GameCore.unsafe.gameManager.startGame(starterSender)
     }
 
+    /**
+     * 게임을 리셋시킵니다.
+     */
     suspend fun reset() {
         GameCore.unsafe.gameManager.resetGame()
     }
 
+    /**
+     * 게임을 중단시킵니다.
+     */
     suspend fun cancel(cancelSender: CommandSender?, cancelCause: String = "게임이 중단되었습니다.") {
         GameCore.unsafe.gameManager.cancelGame(cancelSender, cancelCause)
     }
 
-    suspend fun changeGameMode(gameMode: GameMode) {
-        GameCore.unsafe.gameManager.changeGameMode(gameMode)
+    /**
+     * 현재 게임 모드를 변경합니다.
+     */
+    suspend fun changeCurrentGameMode(gameMode: GameMode) {
+        GameCore.unsafe.gameManager.changeCurrentGameMode(gameMode)
+    }
+
+    /**
+     * EndPhase까지 Phase를 스킵합니다.
+     */
+    fun skipToEnd() {
+        GameCore.unsafe.gameManager.skipToEnd()
     }
 
 }

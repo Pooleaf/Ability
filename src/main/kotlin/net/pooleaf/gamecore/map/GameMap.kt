@@ -47,7 +47,7 @@ open class GameMap {
     var centerPitch: Float = 0f
         internal set
 
-    // 경계선 범위 (맵 탈출 방지)
+    // 경계선 지름 범위 (맵 탈출 방지)
     @ConfigName("경계선 범위")
     var worldBorderSize: Int = 0
         internal set
@@ -63,28 +63,43 @@ open class GameMap {
         internal set
 
     /**
+     * 맵 중앙 위치를 반환합니다.
+     * 맵 중앙 위치가 설정되지 않았을 경우 null을 반환합니다.
+     */
+    var centerLocation: Location?
+        get() {
+            return centerWorldName?.let {
+                val world = Bukkit.getWorld(it)
+                world?.let { Location(world, centerX, centerY, centerZ, centerYaw, centerPitch) }
+            }
+        }
+        set(value) {
+            value?.let {
+                centerWorldName = it.world.name
+                centerX = it.x
+                centerY = it.y
+                centerZ = it.z
+                centerYaw = it.yaw
+                centerPitch = it.pitch
+            }
+        }
+
+    /**
      * 사용 가능 맵 여부를 반환합니다.
      */
     val canUse
         get() = centerWorldName != null && worldBorderSize != null
 
 
-    /**
-     * 맵 중앙 [Location]을 반환합니다.
-     * 맵 중앙 위치가 설정되지 않았을 경우 null을 반환합니다.
-     */
-    fun getCenterLocation(): Location? {
-        return centerWorldName?.let {
-            val world = Bukkit.getWorld(it)
-            world?.let { Location(world, centerX, centerY, centerZ, centerYaw, centerPitch) }
-        }
+    fun getCenterLocationString(): String {
+        return "$centerWorldName, $centerX, $centerY, $centerZ, $centerYaw, $centerPitch"
     }
 
     /**
      * 해당 위치가 맵 안인지 여부를 반환합니다.
      */
     fun isInMap(location: Location): Boolean {
-        return getCenterLocation()?.let { centerLocation ->
+        return centerLocation?.let { centerLocation ->
             location.world.equals(centerLocation.world)
                     && Math.abs(centerLocation.x - location.x) <= worldBorderSize / 2
                     && Math.abs(centerLocation.z - location.z) <= worldBorderSize / 2
@@ -95,10 +110,10 @@ open class GameMap {
      * 맵 내의 랜덤 위치를 불러옵니다.
      */
     fun getRandomLocation(): Location? {
-        return getCenterLocation()?.let { centerLocation ->
+        return centerLocation?.let { centerLocation ->
             // 랜덤 x, z
-            val x = (centerLocation.x + Math.random() * (worldBorderSize / 2)).toInt()
-            val z = (centerLocation.z + Math.random() * (worldBorderSize / 2)).toInt()
+            val x = ((centerLocation.x - worldBorderSize / 2) + (Math.random() * worldBorderSize)).toInt()
+            val z = ((centerLocation.z - worldBorderSize / 2) + (Math.random() * worldBorderSize)).toInt()
 
             // 랜덤 위치에서 제일 높은 블럭 찾기
             val block = centerLocation.world.getHighestBlockAt(x, z) ?: return getRandomLocation()
@@ -155,6 +170,27 @@ open class GameMap {
      */
     suspend fun unloadWorld(): Boolean {
         return GameCore.unsafe.mapService.unloadWorld(this)
+    }
+
+    /**
+     * 맵 설정을 불러옵니다.
+     */
+    fun loadMapConfig() {
+        GameCore.unsafe.mapService.loadMapConfig(name)
+    }
+
+    /**
+     * 맵 설정을 저장합닏.
+     */
+    fun saveMapConfig() {
+        GameCore.unsafe.mapService.saveMapConfig(this)
+    }
+
+    /**
+     * 맵 설정을 삭제합니다.
+     */
+    fun deleteMapConfig() {
+        GameCore.unsafe.mapService.deleteMapConfig(name)
     }
 
 }

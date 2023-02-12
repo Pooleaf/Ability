@@ -19,7 +19,7 @@ class JoinMessageListener: Listener {
 
         if (!GameCore.game.isGameStarted) {
             if (!GameCore.game.isRunning) {
-                playerJoinEvent.joinMessage = "§f${gamePlayer.displayName} §e님께서 접속했습니다. §f(${GameCore.unsafe.playerManager.getOnlinePlayingPlayers().size}/${GameCore.autoGameConfig.startPlayerCount})"
+                playerJoinEvent.joinMessage = "§f${gamePlayer.displayName} §e님께서 접속했습니다. §f(${GameCore.unsafe.playerManager.getOnlinePlayingPlayers().size}/${GameCore.gameConfig.startPlayerCount})"
             } else {
                 playerJoinEvent.joinMessage = "§f${gamePlayer.displayName} §e님께서 접속했습니다."
             }
@@ -45,7 +45,7 @@ class JoinMessageListener: Listener {
 
         if (!GameCore.game.isGameStarted) {
             if (!GameCore.game.isRunning) {
-                playerQuitEvent.quitMessage = "§f${gamePlayer.displayName} §e님께서 퇴장했습니다. §f(${GameCore.unsafe.playerManager.getOnlinePlayingPlayers().size}/${GameCore.autoGameConfig.startPlayerCount})"
+                playerQuitEvent.quitMessage = "§f${gamePlayer.displayName} §e님께서 퇴장했습니다. §f(${GameCore.unsafe.playerManager.getOnlinePlayingPlayers().size}/${GameCore.gameConfig.startPlayerCount})"
             } else {
                 playerQuitEvent.quitMessage = "§f${gamePlayer.displayName} §e님께서 퇴장했습니다."
             }

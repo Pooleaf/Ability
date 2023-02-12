@@ -3,8 +3,9 @@ package net.pooleaf.gamecore.phase
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import net.pooleaf.core.modules.coroutine.bukkit.BukkitAsyncScope
+import org.bukkit.Bukkit
 
-class PhasePipeline {
+open class PhasePipeline {
 
     val phases = mutableListOf<Phase>()
 
@@ -34,6 +35,7 @@ class PhasePipeline {
 
     /**
      * 모든 Phase를 실행시킵니다.
+     * 비동기 쓰레드에서 진행됩니다.
      */
     suspend fun runPhases() {
         job = BukkitAsyncScope.launch {
@@ -42,8 +44,6 @@ class PhasePipeline {
                 it.start()
             }
         }
-
-        job?.join()
     }
 
     /**

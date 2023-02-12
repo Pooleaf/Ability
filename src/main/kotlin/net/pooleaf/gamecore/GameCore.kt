@@ -1,6 +1,6 @@
 package net.pooleaf.gamecore
 
-import net.pooleaf.gamecore.configs.AutoGameConfig
+import net.pooleaf.gamecore.configs.GameConfig
 import net.pooleaf.gamecore.configs.QuickBarConfig
 import net.pooleaf.gamecore.configs.SpawnConfig
 import net.pooleaf.gamecore.configs.TeamConfig
@@ -40,8 +40,8 @@ object GameCore {
         lateinit var quickBarManager: QuickBarManager
 
 
-        val autoGameConfig: AutoGameConfig by lazy {
-            AutoGameConfig(File(GameCore.gamePlugin.dataFolder, "game-config.yml"))
+        val gameConfig: GameConfig by lazy {
+            GameConfig(File(GameCore.gamePlugin.dataFolder, "game-config.yml"))
         }
 
         val spawnConfig: SpawnConfig by lazy {
@@ -78,8 +78,8 @@ object GameCore {
         }
 
         fun loadConfig() {
-            autoGameConfig.load()
-            autoGameConfig.save()
+            gameConfig.load()
+            gameConfig.save()
 
             spawnConfig.load()
             spawnConfig.save()
@@ -97,8 +97,8 @@ object GameCore {
     val gamePlugin
         get() = unsafe.gamePlugin
 
-    val autoGameConfig
-        get() = unsafe.autoGameConfig
+    val gameConfig
+        get() = unsafe.gameConfig
 
     val spawnConfig
         get() = unsafe.spawnConfig

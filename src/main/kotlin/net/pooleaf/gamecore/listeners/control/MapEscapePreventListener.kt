@@ -7,6 +7,7 @@ import net.pooleaf.core.modules.support.bukkit.util.TeleportUtil
 import net.pooleaf.gamecore.GameCore
 import org.bukkit.Location
 import org.bukkit.event.EventHandler
+import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerMoveEvent
@@ -30,7 +31,7 @@ class MapEscapePreventListener: Listener {
             delay(400L)
 
             if (isTeleportedToMap() && !isInMap(event.player.location)) {
-                GameCore.currentMap?.getCenterLocation()?.let { TeleportUtil.teleport(event.player, it) }
+                GameCore.currentMap?.centerLocation?.let { TeleportUtil.teleport(event.player, it) }
             }
         }
     }
@@ -44,7 +45,7 @@ class MapEscapePreventListener: Listener {
             }
             // 원래 위치가 맵 밖이라면 맵 중앙으로
             else {
-                GameCore.currentMap?.getCenterLocation()?.let { TeleportUtil.teleport(event.player, it) }
+                GameCore.currentMap?.centerLocation?.let { TeleportUtil.teleport(event.player, it) }
             }
         }
     }
@@ -58,15 +59,15 @@ class MapEscapePreventListener: Listener {
             }
             // 원래 위치가 맵 밖이라면 맵 중앙으로
             else {
-                GameCore.currentMap?.getCenterLocation()?.let { TeleportUtil.teleport(event.player, it) }
+                GameCore.currentMap?.centerLocation?.let { TeleportUtil.teleport(event.player, it) }
             }
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGH)
     fun onRespawn(event: PlayerRespawnEvent) {
         if (!isInMap(event.respawnLocation)) {
-            GameCore.currentMap?.getCenterLocation()?.let { event.respawnLocation = it }
+            GameCore.currentMap?.centerLocation?.let { event.respawnLocation = it }
         }
     }
 

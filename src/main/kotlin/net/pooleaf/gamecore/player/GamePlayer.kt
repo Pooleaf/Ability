@@ -5,6 +5,7 @@ import net.pooleaf.core.modules.support.bukkit.player.AbstractBukkitPlayer
 import net.pooleaf.gamecore.GameCore
 import net.pooleaf.gamecore.team.Team
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 
 open class GamePlayer(uuid: UUID) : AbstractBukkitPlayer(uuid) {
 
@@ -27,6 +28,13 @@ open class GamePlayer(uuid: UUID) : AbstractBukkitPlayer(uuid) {
     // 재접속 Job
     var reconnectJob: Job? = null
         internal set
+
+    // 마지막에 이 플레이어를 때린 플레이어 시간 기록 (GamePlayer / Millis)
+    val lastDamagers = ConcurrentHashMap<GamePlayer, Long>()
+
+    // 마지막에 이 플레이어를 때린 플레이어 정보
+    val lastDamagerInfo: Pair<GamePlayer, Long>?
+        get() = lastDamagers.toList().maxByOrNull { (key, value) -> value }
 
 
     /**
@@ -63,6 +71,13 @@ open class GamePlayer(uuid: UUID) : AbstractBukkitPlayer(uuid) {
      */
     suspend fun disableSpectatorMode() {
         GameCore.unsafe.playerService.disableSpectatorMode(this)
+    }
+
+    /**
+     * 플레이어를 탈락시킵니다.
+     */
+    suspend fun defeat() {
+        GameCore.unsafe.playerService.defeatPlayer(this)
     }
 
 }

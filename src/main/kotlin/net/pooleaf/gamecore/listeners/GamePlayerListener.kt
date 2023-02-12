@@ -58,6 +58,9 @@ class GamePlayerListener: Listener {
                     // 재접속 타이머 해제
                     gamePlayer.reconnectJob?.cancel()
                     gamePlayer.reconnectJob = null
+
+                    // 관전 텔레포터 GUI 업데이트
+                    GameCore.unsafe.quickBarManager.spectatorQuickBar.spectatorTeleporterGuis.values.forEach { it.updatePlayers() }
                 }
                 // 참여하지 않았다면
                 else {
@@ -65,8 +68,10 @@ class GamePlayerListener: Listener {
                 }
             }
 
+
             // 이벤트
             Bukkit.getPluginManager().callEvent(GamePlayerJoinEvent(gamePlayer, event))
+
         }
     }
 
@@ -85,19 +90,24 @@ class GamePlayerListener: Listener {
             // 게임 중이 아니라면
             if (!GameCore.game.isGameStarted) {
                 GameCore.unsafe.playerManager.remove(player.uniqueId)
+                GameCore.unsafe.playerService.quitFromGame(gamePlayer)
             }
             // 게임 중이라면
             else {
                 // 게임에 참여했다면
                 if (gamePlayer.isJoined) {
-                    // 살아있다면 재접속 타이머
+                    // 플레이 중이라면
                     if (gamePlayer.isPlaying()) {
+                        // 재접속 타이머
                         gamePlayer.reconnectJob = BukkitAsyncScope.launch {
-                            delay(GameCore.autoGameConfig.reconnectAllowSeconds * 1000L)
+                            delay(GameCore.gameConfig.reconnectAllowSeconds * 1000L)
                             GameCore.unsafe.playerService.defeatPlayer(gamePlayer)
                             Broadcaster.broadcast("§c${gamePlayer.displayName} 님께서 재접속하지 않아 탈락했습니다.")
                             Broadcaster.broadcastSound(XSound.BLOCK_NOTE_BLOCK_BASS)
                         }
+
+                        // 관전 텔레포터 GUI 업데이트
+                        GameCore.unsafe.quickBarManager.spectatorQuickBar.spectatorTeleporterGuis.values.forEach { it.updatePlayers() }
                     }
 
                     // 기록이나 재접속을 위해 GamePlayer 보존
@@ -115,6 +125,15 @@ class GamePlayerListener: Listener {
             if (gamePlayer.isSpectator) {
                 GameCore.unsafe.playerService.disableSpectatorMode(gamePlayer)
             }
+
+            // 게임 중단
+            Bukkit.getScheduler().runTaskLater(GameCore.gamePlugin, {
+                BukkitSyncScope.launch {
+                    if (GameCore.unsafe.gameManager.canStop()) {
+                        GameCore.unsafe.gameManager.stopGame()
+                    }
+                }
+            }, 1L)
         }
     }
 

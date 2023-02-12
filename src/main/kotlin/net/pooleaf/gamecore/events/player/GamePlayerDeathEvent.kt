@@ -1,15 +1,15 @@
 package net.pooleaf.gamecore.events.player
 
 import net.pooleaf.core.modules.eventsupport.bukkit.events.HandlerEvent
+import net.pooleaf.core.modules.eventsupport.bukkit.events.damage.PlayerDamageEvent
 import net.pooleaf.gamecore.player.GamePlayer
-import org.bukkit.event.entity.PlayerDeathEvent
 
 /**
  * 플레이어 사망 시 호출됩니다.
  */
-class GamePlayerDeadEvent(
+class GamePlayerDeathEvent(
     val deadGamePlayer: GamePlayer,
     val killerGamePlayer: GamePlayer?,
-    val playerDeathEvent: PlayerDeathEvent
+    val playerDamageEvent: PlayerDamageEvent
 ): HandlerEvent() {
 }

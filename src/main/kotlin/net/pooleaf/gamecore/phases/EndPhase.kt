@@ -5,6 +5,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.pooleaf.core.modules.coroutine.bukkit.BukkitAsyncScope
 import net.pooleaf.core.modules.coroutine.bukkit.BukkitSyncScope
+import net.pooleaf.core.modules.support.common.util.toMillis
 import net.pooleaf.gamecore.Broadcaster
 import net.pooleaf.gamecore.GameCore
 import net.pooleaf.gamecore.phase.Phase
@@ -18,6 +19,12 @@ import org.bukkit.entity.Player
 class EndPhase(): Phase() {
 
     override suspend fun onStart() {
+        // 우승 가능 시간이 안될경우 중단
+        if (System.currentTimeMillis() - GameCore.game.startedAt!!.toMillis() < GameCore.gameConfig.winAllowSeconds) {
+            GameCore.unsafe.gameManager.stopGame()
+        }
+
+        // 우승
         val winnerTeam = GameCore.unsafe.gameManager.onGameEnd()
 
         winnerTeam?.let { winnerTeam ->

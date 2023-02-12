@@ -30,6 +30,11 @@ class StartVoteManager {
             return
         }
 
+        if (gamePlayer.isSpectator) {
+            gamePlayer.sendWarningSafely("관전 중에는 투표에 참여할 수 없습니다.")
+            return
+        }
+
         if (startVote.isAgree(gamePlayer.uuid)) {
             gamePlayer.sendWarningSafely("이미 투표에 찬성했습니다.")
             return
@@ -43,7 +48,9 @@ class StartVoteManager {
         broadcastProgress()
 
         // 과반수 동의 시 게임 시작
+        // 최소 2명 투표해야 시작 가능
         if (!GameCore.game.isCountingStarted
+            && startVote.agreePlayers.size >= 2
             && startVote.agreePlayers.size >= GameCore.unsafe.playerManager.getOnlineJoinedPlayers().size.toFloat() / 2) {
             BukkitSyncScope.launch { GameCore.unsafe.gameManager.startGame(null) }
         }
@@ -55,6 +62,11 @@ class StartVoteManager {
     fun voteToDisagree(gamePlayer: GamePlayer) {
         if (GameCore.game.isRunning) {
             gamePlayer.sendWarningSafely("이미 게임이 시작되었습니다.")
+            return
+        }
+
+        if (gamePlayer.isSpectator) {
+            gamePlayer.sendWarningSafely("관전 중에는 투표에 참여할 수 없습니다.")
             return
         }
 

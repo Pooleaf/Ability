@@ -22,6 +22,11 @@ class MapVoteManager {
             return
         }
 
+        if (gamePlayer.isSpectator) {
+            gamePlayer.sendWarningSafely("관전 중에는 투표에 참여할 수 없습니다.")
+            return
+        }
+
         if (mapVote.votedMap.get(gamePlayer.uuid)?.let { it == map } == true) {
             gamePlayer.sendWarningSafely("이미 ${map.displayName} 맵에 투표했습니다.")
             return

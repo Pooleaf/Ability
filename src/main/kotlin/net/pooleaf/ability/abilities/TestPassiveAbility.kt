@@ -5,6 +5,7 @@ import net.pooleaf.ability.ability.Ability
 import net.pooleaf.ability.ability.AbilityRank
 import net.pooleaf.ability.ability.AbilityType
 import net.pooleaf.core.modules.eventsupport.bukkit.events.damage.PlayerDamageByEntityEvent
+import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 
 class TestPassiveAbility: Ability(), Listener {
@@ -17,10 +18,11 @@ class TestPassiveAbility: Ability(), Listener {
         type = AbilityType.PASSIVE
         description = listOf("공격을 받으면 상대에게 번개가 칩니다.")
 
-        ban = false
+        ban = true
     }
 
 
+    @EventHandler
     fun onPlayerDamageByEntity(event: PlayerDamageByEntityEvent) {
         player?.player?.let { player ->
             // 플레이어 체크

@@ -38,7 +38,7 @@ class Team {
      * 팀 탈락 여부를 확인합니다.
      */
     fun isDefeated(): Boolean {
-        return players.size == players.filter { it.isDefeated }.size
+        return players.size == players.filter { !it.isPlaying() }.size
     }
 
     /**

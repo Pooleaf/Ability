@@ -21,13 +21,13 @@ class JoinTeleportListener: Listener {
         else if (GameCore.game.isTeleportedToMap) {
             // 관전자 맵 텔레포트
             if (!gamePlayer.isPlaying()) {
-                GameCore.currentMap?.getCenterLocation()?.let { TeleportUtil.teleport(player, it) }
+                GameCore.currentMap?.centerLocation.let { TeleportUtil.teleport(player, it) }
             }
             // 게임 중인 플레이어 텔레포트 안됐으면 팀 스폰으로
             else {
                 GameCore.currentMap?.let { currentMap ->
                     if (!currentMap.isInMap(player.location)) {
-                        currentMap.getCenterLocation()?.let { TeleportUtil.teleport(player, it) }
+                        currentMap.centerLocation.let { TeleportUtil.teleport(player, it) }
                     }
                 }
             }

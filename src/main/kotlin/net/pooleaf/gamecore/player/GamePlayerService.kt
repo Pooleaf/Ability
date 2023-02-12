@@ -1,6 +1,7 @@
 package net.pooleaf.gamecore.player
 
 import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import net.pooleaf.core.modules.coroutine.bukkit.BukkitSyncScope
 import net.pooleaf.core.modules.gui.GuiModule
 import net.pooleaf.gamecore.Broadcaster
@@ -21,6 +22,8 @@ class GamePlayerService {
         gamePlayer.isJoined = false
         gamePlayer.isDefeated = false
         gamePlayer.isSpectator = false
+
+        gamePlayer.lastDamagers.clear()
 
         gamePlayer.team?.removePlayer(gamePlayer)
 
@@ -65,10 +68,14 @@ class GamePlayerService {
             player.activePotionEffects.forEach { player.removePotionEffect(it.type) }
 
             // 투명 해제
-            Bukkit.getOnlinePlayers().forEach { it.showPlayer(it) }
+            Bukkit.getOnlinePlayers().forEach { it.showPlayer(player) }
 
             // 퀵바 제거
             GuiModule.getQuickBarManager().removeTo(player)
+
+            // 투표 삭제
+            GameCore.unsafe.startVoteManager.unvote(gamePlayer)
+            GameCore.unsafe.mapVoteManager.unvote(gamePlayer)
 
             // 이벤트
             Bukkit.getPluginManager().callEvent(GamePlayerResetEvent(gamePlayer))
@@ -91,7 +98,7 @@ class GamePlayerService {
         // 대기 중이라면
         if (!GameCore.game.isRunning) {
             // 대기 액션바
-            Broadcaster.broadcastWaitingActionBar(GameCore.unsafe.playerManager.getOnlineJoinedPlayers().size, GameCore.autoGameConfig.startPlayerCount)
+            Broadcaster.broadcastWaitingActionBar(GameCore.unsafe.playerManager.getOnlineJoinedPlayers().size, GameCore.gameConfig.startPlayerCount)
 
             // 게임 시작
             if (GameCore.unsafe.gameManager.canAutoStart()) {
@@ -101,6 +108,43 @@ class GamePlayerService {
 
         // 이벤트
         Bukkit.getPluginManager().callEvent(GamePlayerJoinToGameEvent(gamePlayer))
+    }
+
+    /**
+     * 플레이어를 게임 참여에서 제외시킵니다.
+     * 온라인 플레이어에게만 사용할 수 있습니다.
+     */
+    suspend fun quitFromGame(gamePlayer: GamePlayer) {
+        if (!gamePlayer.isOnline) error("gamePlayer is not online")
+
+        // 게임 참여
+        gamePlayer.isJoined = false
+
+        // 리셋
+        resetPlayer(gamePlayer)
+
+        // 대기 중이라면
+        if (!GameCore.game.isRunning) {
+            // 대기 액션바
+            Broadcaster.broadcastWaitingActionBar(GameCore.unsafe.playerManager.getOnlineJoinedPlayers().size, GameCore.gameConfig.startPlayerCount)
+
+            // 게임 시작
+            if (GameCore.unsafe.gameManager.canAutoStart()) {
+                GameCore.unsafe.gameManager.startGame(null)
+            }
+        }
+        // 게임 중이라면
+        else {
+            if (GameCore.unsafe.gameManager.canStop()) {
+                GameCore.unsafe.gameManager.stopGame()
+            } else {
+                // 관전 텔레포터 GUI 업데이트
+                GameCore.unsafe.quickBarManager.spectatorQuickBar.spectatorTeleporterGuis.values.forEach { it.updatePlayers() }
+            }
+        }
+
+        // 이벤트
+        Bukkit.getPluginManager().callEvent(GamePlayerQuitFromGameEvent(gamePlayer))
     }
 
     /**
@@ -145,16 +189,15 @@ class GamePlayerService {
     suspend fun enableSpectatorMode(gamePlayer: GamePlayer) {
         if (gamePlayer.isSpectator) error("gamePlayer already spectator")
 
-        BukkitSyncScope.async {
+        BukkitSyncScope.launch {
             // 정보 업데이트
             gamePlayer.isSpectator = true
-            // 게임 시작 전이면 참여 해제
-            if (!GameCore.game.isGameStarted) {
-                gamePlayer.isJoined = false
-            }
 
             // 오프라인일 경우 실행 안함
-            if (!gamePlayer.isOnline) return@async
+            if (!gamePlayer.isOnline) return@launch
+
+            // 참여 해제
+            quitFromGame(gamePlayer)
 
             // 리셋
             resetPlayer(gamePlayer)
@@ -181,18 +224,14 @@ class GamePlayerService {
 
             // 퀵바
             if (GameCore.game.isGameStarted) {
-                GameCore.unsafe.quickBarManager.observerQuickBar.setTo(player)
+                GameCore.unsafe.quickBarManager.spectatorQuickBar.setTo(player)
             } else {
                 GameCore.unsafe.quickBarManager.waitingQuickBar.setTo(player)
             }
 
-            // TODO 게임 종료
-
             // 이벤트
-            Bukkit.getPluginManager().callEvent(
-                GamePlayerEnableSpectatorModeEvent(gamePlayer)
-            )
-        }.await()
+            Bukkit.getPluginManager().callEvent(GamePlayerEnableSpectatorModeEvent(gamePlayer))
+        }.join()
     }
 
     /**
@@ -226,10 +265,19 @@ class GamePlayerService {
     suspend fun defeatPlayer(gamePlayer: GamePlayer) {
         gamePlayer.isDefeated = true
 
+        // 재접속 타이머 취소
+        if (gamePlayer.reconnectJob?.isActive == true) {
+            gamePlayer.reconnectJob?.cancel()
+            gamePlayer.reconnectJob = null
+        }
+
         // 관전 전환
         if (gamePlayer.isOnline) {
             enableSpectatorMode(gamePlayer)
         }
+
+        // 관전 텔레포터 GUI 업데이트
+        GameCore.unsafe.quickBarManager.spectatorQuickBar.spectatorTeleporterGuis.values.forEach { it.updatePlayers() }
 
         // 이벤트
         Bukkit.getPluginManager().callEvent(GamePlayerDefeatEvent(gamePlayer))
