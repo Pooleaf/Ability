@@ -7,12 +7,10 @@ import net.pooleaf.core.modules.gui.bukkit.quickbar.event.SlotClickEvent
 import net.pooleaf.core.modules.support.bukkit.util.ItemBuilder
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
-import java.util.*
-import java.util.concurrent.ConcurrentHashMap
 
 class SpectatorQuickBar: QuickBar() {
 
-    val spectatorTeleporterGuis = ConcurrentHashMap<UUID, SpectatorTeleporterGui>()
+    val spectatorTeleporterGui = SpectatorTeleporterGui()
 
 
     init {
@@ -25,9 +23,6 @@ class SpectatorQuickBar: QuickBar() {
             }
 
             override fun onClick(event: SlotClickEvent) {
-                val spectatorTeleporterGui = SpectatorTeleporterGui()
-                spectatorTeleporterGuis.put(event.player.uniqueId, spectatorTeleporterGui)
-
                 spectatorTeleporterGui.open(event.player)
             }
         }

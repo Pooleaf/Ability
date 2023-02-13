@@ -60,7 +60,7 @@ class GamePlayerListener: Listener {
                     gamePlayer.reconnectJob = null
 
                     // 관전 텔레포터 GUI 업데이트
-                    GameCore.unsafe.quickBarManager.spectatorQuickBar.spectatorTeleporterGuis.values.forEach { it.updatePlayers() }
+                    GameCore.unsafe.quickBarManager.spectatorQuickBar.spectatorTeleporterGui.updateAsynchronously()
                 }
                 // 참여하지 않았다면
                 else {
@@ -105,9 +105,6 @@ class GamePlayerListener: Listener {
                             Broadcaster.broadcast("§c${gamePlayer.displayName} 님께서 재접속하지 않아 탈락했습니다.")
                             Broadcaster.broadcastSound(XSound.BLOCK_NOTE_BLOCK_BASS)
                         }
-
-                        // 관전 텔레포터 GUI 업데이트
-                        GameCore.unsafe.quickBarManager.spectatorQuickBar.spectatorTeleporterGuis.values.forEach { it.updatePlayers() }
                     }
 
                     // 기록이나 재접속을 위해 GamePlayer 보존
@@ -128,6 +125,11 @@ class GamePlayerListener: Listener {
 
             // 게임 중단
             Bukkit.getScheduler().runTaskLater(GameCore.gamePlugin, {
+                if (gamePlayer.isJoined) {
+                    // 관전 텔레포터 GUI 업데이트
+                    GameCore.unsafe.quickBarManager.spectatorQuickBar.spectatorTeleporterGui.updateAsynchronously()
+                }
+
                 BukkitSyncScope.launch {
                     if (GameCore.unsafe.gameManager.canStop()) {
                         GameCore.unsafe.gameManager.stopGame()

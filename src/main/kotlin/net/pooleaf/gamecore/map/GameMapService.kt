@@ -72,6 +72,8 @@ class GameMapService {
         }
 
         GameCore.unsafe.mapManager.set(mapName, map)
+
+        GameCore.unsafe.mapVoteManager.mapVoteGui.updateAsynchronously()
     }
 
     /**

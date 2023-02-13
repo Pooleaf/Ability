@@ -191,7 +191,7 @@ class GameManager {
         }
 
         // 관전 텔레포터 GUI 업데이트
-        GameCore.unsafe.quickBarManager.spectatorQuickBar.spectatorTeleporterGuis.values.forEach { it.updatePlayers() }
+        GameCore.unsafe.quickBarManager.spectatorQuickBar.spectatorTeleporterGui.updateAsynchronously()
 
         // 이벤트
         Bukkit.getPluginManager().callEvent(GameStartedEvent())

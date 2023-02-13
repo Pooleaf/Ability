@@ -11,7 +11,9 @@ import org.bukkit.inventory.ItemStack
 
 class MapVoteGui(): LargePageableGui ("맵 투표") {
 
-    init {
+    override fun onUpdate() {
+        clear()
+
         // 랜덤 투표 아이콘
         val randomIcon = object : InventoryIcon() {
             override fun updateItem(): ItemStack {
@@ -66,8 +68,6 @@ class MapVoteGui(): LargePageableGui ("맵 투표") {
 
             addItem(mapIcon)
         }
-
-        updateAsynchronously()
     }
 
 }
