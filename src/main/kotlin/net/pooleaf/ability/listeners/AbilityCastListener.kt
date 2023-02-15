@@ -14,7 +14,7 @@ class AbilityCastListener: Listener {
      * 아이템으로 캐스팅하는 능력 처리
      */
     @EventHandler
-    fun handleCastById(event: PlayerInteractEvent) {
+    fun handleCastByItem(event: PlayerInteractEvent) {
         // 게임 시작 체크
         if (!AbilityApi.game.isGodMode) return
 
@@ -35,7 +35,7 @@ class AbilityCastListener: Listener {
 
             // 손에 든 아이템 체크
             val itemInHand = event.item
-            if (itemInHand == null || itemInHand.type == Material.AIR) return
+            if (itemInHand == null || itemInHand.type == Material.AIR || !ability.isCastItem(itemInHand)) return
 
             // 캐스팅
             if (ability.onCastByItem(event, itemInHand, clickType)) {

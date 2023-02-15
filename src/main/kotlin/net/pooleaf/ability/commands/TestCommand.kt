@@ -2,6 +2,7 @@ package net.pooleaf.ability.commands
 
 import com.cryptomorin.xseries.XMaterial
 import com.cryptomorin.xseries.XSound
+import net.pooleaf.ability.AbilityPermission
 import net.pooleaf.ability.AbilityPlugin
 import net.pooleaf.core.modules.annocommand.common.Command
 import net.pooleaf.core.modules.annocommand.common.CommandResult
@@ -20,7 +21,7 @@ class TestCommand: Listener {
     @Command(
         name = ["abtest"],
         helpCommand = true,
-        permission = "ability.admin"
+        permission = AbilityPermission.ADMIN
     )
     fun abtest(sender: CommandSender, result: HelpCommandResult) {
     }
