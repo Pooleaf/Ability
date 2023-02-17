@@ -16,6 +16,8 @@ class AbilityPlayerDefeatListener: Listener {
             if (!AbilityApi.game.isGameStarted) return@launch
 
             val gamePlayer = event.deadGamePlayer
+            if (!gamePlayer.isDefeated) return@launch
+
             gamePlayer.defeat()
             gamePlayer.sendTitleSafely("§c탈락했습니다")
             gamePlayer.playSoundSafely(XSound.ENTITY_WITHER_DEATH, 0.5F, 1.0F)
