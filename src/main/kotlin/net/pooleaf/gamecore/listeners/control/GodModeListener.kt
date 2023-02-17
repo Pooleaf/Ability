@@ -9,7 +9,7 @@ class GodModeListener: Listener {
 
     @EventHandler
     fun onPlayerDamage(event: PlayerDamageEvent) {
-        event.isCancelled = !GameCore.game.isGodMode
+        event.isCancelled = GameCore.game.isGodMode
     }
 
 }
