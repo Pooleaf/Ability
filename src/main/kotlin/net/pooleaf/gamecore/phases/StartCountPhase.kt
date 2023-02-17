@@ -25,11 +25,11 @@ class StartCountPhase(
             when (count) {
                 in 4..5 -> {
                     Broadcaster.broadcastTitle("§e${count}")
-                    Broadcaster.broadcastSound(XSound.UI_BUTTON_CLICK, 0.3f, 0.7f)
+                    Broadcaster.broadcastSound(XSound.UI_BUTTON_CLICK, 0.3F, 0.7F)
                 }
                 in 1..3 -> {
                     Broadcaster.broadcastTitle("§c${count}")
-                    Broadcaster.broadcastSound(XSound.UI_BUTTON_CLICK, 0.3f, 0.7f)
+                    Broadcaster.broadcastSound(XSound.UI_BUTTON_CLICK, 0.3F, 0.7F)
                 }
             }
 

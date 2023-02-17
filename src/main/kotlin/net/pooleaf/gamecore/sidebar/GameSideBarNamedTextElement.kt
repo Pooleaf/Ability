@@ -1,13 +1,12 @@
 package net.pooleaf.gamecore.sidebar
 
-class GameSideBarNamedTextElement(
-    override val priority: Int,
-    var nameText: String,
-    var valueText: String = "",
-    override var show: Boolean = true
+abstract class GameSideBarNamedTextElement(
+    open var nameText: String,
+    open var valueText: String = "",
 ): GameSideBarElement {
 
-    override val texts: List<String>
-        get() = listOf<String>(nameText, valueText)
+    final override fun getTexts(): List<String> {
+        return listOf(nameText, valueText)
+    }
 
 }

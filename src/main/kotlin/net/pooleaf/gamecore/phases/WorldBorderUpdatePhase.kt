@@ -1,13 +1,28 @@
 package net.pooleaf.gamecore.phases
 
+import com.cryptomorin.xseries.XSound
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import net.pooleaf.ability.util.StringUtil
+import net.pooleaf.core.modules.coroutine.bukkit.BukkitAsyncScope
+import net.pooleaf.core.modules.support.bukkit.particle.Particle
 import net.pooleaf.core.modules.support.common.CommonChatColor
 import net.pooleaf.gamecore.Broadcaster
 import net.pooleaf.gamecore.GameCore
 import net.pooleaf.gamecore.phase.Phase
+import org.bukkit.Location
 
 abstract class WorldBorderUpdatePhase(): Phase() {
+
+    // 경계선 변화 남은 시간
+    var updateRemainingSeconds: Int? = null
+
+    // 경계선 변화 지속 시간
+    var updateDurationSeconds: Int? = null
+
+    // 경계 파티클 Job
+    var particleJob: Job? = null
 
     /**
      * 새로운 경계선 크기
@@ -24,6 +39,14 @@ abstract class WorldBorderUpdatePhase(): Phase() {
      */
     abstract fun getUpdateSizePerSeconds(): Int
 
+
+    override fun onInit() {
+        updateRemainingSeconds = null
+        updateDurationSeconds = null
+
+        particleJob?.cancel()
+        particleJob = null
+    }
 
     override suspend fun onStart() {
         GameCore.currentMap?.let { currentMap ->
@@ -43,27 +66,84 @@ abstract class WorldBorderUpdatePhase(): Phase() {
 
             // 경계선 변화 알림 메시지
             for (count in getUpdateWaitSeconds() downTo 1) {
-                if (count == getUpdateWaitSeconds() || count <= 10) {
+                updateRemainingSeconds = count
+
+                if (count == getUpdateWaitSeconds() || count <= 5) {
                     val updateTime = StringUtil.buildTimeStringWithColor(count * 1000L, CommonChatColor.WHITE, CommonChatColor.YELLOW)
 
                     Broadcaster.broadcast("${updateTime} §e후 맵의 경계가 ${updateMessage}.")
+                    Broadcaster.broadcastSound(XSound.UI_BUTTON_CLICK, 0.3F, 0.7F)
+
+                    startParticleTimer()
                 }
+
+                GameCore.unsafe.sideBarManager.sideBar?.let { it.update() }
 
                 delay(1000L)
             }
+            updateRemainingSeconds = null
 
             // 경계선 변화 시작
-            val updateDurationSeconds = currentMap.updateWorldBorder(getNewWorldBorderSize(), getUpdateSizePerSeconds())
-            val updateDurationTime = StringUtil.buildTimeStringWithColor(updateDurationSeconds * 1000L, CommonChatColor.WHITE, CommonChatColor.YELLOW)
+            updateDurationSeconds = currentMap.updateWorldBorder(getNewWorldBorderSize(), getUpdateSizePerSeconds())
+            val updateDurationTime = StringUtil.buildTimeStringWithColor(updateDurationSeconds!! * 1000L, CommonChatColor.WHITE, CommonChatColor.YELLOW)
 
             Broadcaster.broadcast("${updateDurationTime} §e동안 맵의 경계가 ${updateMessage}.")
+            Broadcaster.broadcastSound(XSound.UI_BUTTON_CLICK, 0.3F, 0.7F)
 
-            delay(updateDurationSeconds * 1000L)
+            delay(updateDurationSeconds!! * 1000L)
+            updateDurationSeconds = null
         } ?: error("currentMap cannot be null")
     }
 
     override fun onEnd() {
-        super.onEnd()
+        onInit()
+    }
+
+    override fun onCancel() {
+        onInit()
+    }
+
+    fun startParticleTimer() {
+        particleJob = BukkitAsyncScope.launch {
+            GameCore.currentMap?.let { map ->
+                val centerLocation = map.centerLocation!!
+                val newWorldBorderSize = getNewWorldBorderSize()
+
+                val startX = (centerLocation.x - (newWorldBorderSize / 2)).toInt()
+                val endX = (centerLocation.x + (newWorldBorderSize / 2)).toInt()
+                val startZ = (centerLocation.z - (newWorldBorderSize / 2)).toInt()
+                val endZ = (centerLocation.z + (newWorldBorderSize / 2)).toInt()
+
+                while (!isEnded) {
+                    GameCore.unsafe.playerManager.getOnlinePlayingPlayers().forEach { gamePlayer ->
+                        val playerLocation = gamePlayer.player.location
+
+                        for (x in startX .. endX) {
+                            val startZLocation = Location(playerLocation.world, x.toDouble(), playerLocation.y, startZ.toDouble())
+                            val endZLocation = Location(playerLocation.world, x.toDouble(), playerLocation.y, endZ.toDouble())
+
+                            Particle.SPELL_INSTANT.spawn(startZLocation, 0.0F, 1)
+                            Particle.SPELL_INSTANT.spawn(endZLocation, 0.0F, 1)
+                        }
+
+                        for (z in startZ .. endZ) {
+                            val startXLocation = Location(playerLocation.world, startX.toDouble(), playerLocation.y, z.toDouble())
+                            val endXLocation = Location(playerLocation.world, endX.toDouble(), playerLocation.y, z.toDouble())
+
+                            Particle.SPELL_INSTANT.spawn(startXLocation, 0.0F, 1)
+                            Particle.SPELL_INSTANT.spawn(endXLocation, 0.0F, 1)
+                        }
+                    }
+
+                    delay(300L)
+                }
+            }
+        }
+    }
+
+    fun stopParticleTimer() {
+        particleJob?.cancel()
+        particleJob = null
     }
 
 }

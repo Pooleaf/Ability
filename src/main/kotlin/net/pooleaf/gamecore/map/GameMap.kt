@@ -47,7 +47,7 @@ open class GameMap {
     var centerPitch: Float = 0f
         internal set
 
-    // 경계선 지름 범위 (맵 탈출 방지)
+    // 경계선 범위 (지름)
     @ConfigName("경계선 범위")
     var worldBorderSize: Int = 0
         internal set
@@ -57,7 +57,7 @@ open class GameMap {
     var showWorldBorder: Boolean = true
         internal set*/
 
-    // 현재 맵 범위 (경계선 줄일 때 사용)
+    // 현재 맵 범위 (지름) (경계선 줄일 때 사용)
     @ConfigExclude
     var currentWorldBorderSize: Int = 0
         internal set
@@ -107,6 +107,17 @@ open class GameMap {
     }
 
     /**
+     * 해당 위치가 경계선 안인지 확인합니다.
+     */
+    fun isInWorldBorder(location: Location): Boolean {
+        return centerLocation?.let { centerLocation ->
+            location.world.equals(centerLocation.world)
+                    && Math.abs(centerLocation.x - location.x) <= currentWorldBorderSize / 2
+                    && Math.abs(centerLocation.z - location.z) <= currentWorldBorderSize / 2
+        } == true
+    }
+
+    /**
      * 맵 내의 랜덤 위치를 불러옵니다.
      */
     fun getRandomLocation(): Location? {
@@ -147,7 +158,7 @@ open class GameMap {
      * 줄어드는 시간은 정수여야 하기 때문에 [updateSizePerSeconds]는 정확하게 반영되지 않을 수 있습니다.
      * 줄어드는 데 걸리는 시간을 반환합니다.
      */
-    fun updateWorldBorder(newSize: Int, updateSizePerSeconds: Int): Long {
+    fun updateWorldBorder(newSize: Int, updateSizePerSeconds: Int): Int {
         return GameCore.unsafe.mapService.updateWorldBorder(this, newSize, updateSizePerSeconds)
     }
 

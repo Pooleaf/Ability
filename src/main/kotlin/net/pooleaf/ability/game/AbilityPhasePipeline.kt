@@ -32,21 +32,21 @@ class AbilityPhasePipeline: PhasePipeline() {
         // 경계선 줄이기 (1차)
         addPhase(object : WorldBorderUpdatePhase() {
             override fun getNewWorldBorderSize(): Int = (GameCore.currentMap!!.worldBorderSize * 2.toFloat() / 3).toInt()
-            override fun getUpdateWaitSeconds(): Int = 60 * 6
+            override fun getUpdateWaitSeconds(): Int = 10
             override fun getUpdateSizePerSeconds(): Int = 5
         })
 
         // 경계선 줄이기 (2차)
         addPhase(object : WorldBorderUpdatePhase() {
             override fun getNewWorldBorderSize(): Int = (GameCore.currentMap!!.worldBorderSize * 1.toFloat() / 3).toInt()
-            override fun getUpdateWaitSeconds(): Int = 60 * 3
+            override fun getUpdateWaitSeconds(): Int = 10
             override fun getUpdateSizePerSeconds(): Int = 5
         })
 
         // 경계선 줄이기 (3차) - 마지막 크기는 20칸으로 고정
         addPhase(object : WorldBorderUpdatePhase() {
             override fun getNewWorldBorderSize(): Int = 20
-            override fun getUpdateWaitSeconds(): Int = 60 * 3
+            override fun getUpdateWaitSeconds(): Int = 10
             override fun getUpdateSizePerSeconds(): Int = 5
             override suspend fun onStart() {
                 // 이미 2차에서 20칸보다 작아졌을 경우 스킵

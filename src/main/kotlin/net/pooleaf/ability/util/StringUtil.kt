@@ -14,15 +14,9 @@ object StringUtil {
         var string = ""
 
         string += if (days > 0) "${numberColor}${days}${charColor}일" else ""
-
-        string += if (string.isNotEmpty()) " " else ""
-        string += if (hours > 0) "${numberColor}${hours}${charColor}시간" else ""
-
-        string += if (string.isNotEmpty()) " " else ""
-        string += if (minutes > 0) "${numberColor}${minutes}${charColor}분" else ""
-
-        string += if (string.isNotEmpty()) " " else ""
-        string += if (seconds > 0) "${numberColor}${seconds}${charColor}초" else ""
+        string += if (hours > 0) (if (string.isNotEmpty()) " " else "") + "${numberColor}${hours}${charColor}시간" else ""
+        string += if (minutes > 0) (if (string.isNotEmpty()) " " else "") + "${numberColor}${minutes}${charColor}분" else ""
+        string += if (seconds > 0) (if (string.isNotEmpty()) " " else "") + "${numberColor}${seconds}${charColor}초" else ""
 
         return string
     }

@@ -11,6 +11,7 @@ import net.pooleaf.gamecore.player.GamePlayer
 import net.pooleaf.gamecore.player.GamePlayerManager
 import net.pooleaf.gamecore.player.GamePlayerService
 import net.pooleaf.gamecore.quickbar.QuickBarManager
+import net.pooleaf.gamecore.sidebar.GameSideBarManager
 import net.pooleaf.gamecore.team.TeamManager
 import net.pooleaf.gamecore.team.TeamService
 import net.pooleaf.gamecore.vote.map.MapVoteManager
@@ -38,6 +39,8 @@ object GameCore {
         lateinit var mapVoteManager: MapVoteManager
 
         lateinit var quickBarManager: QuickBarManager
+
+        lateinit var sideBarManager: GameSideBarManager
 
 
         val gameConfig: GameConfig by lazy {
@@ -73,6 +76,8 @@ object GameCore {
             mapVoteManager = MapVoteManager()
 
             quickBarManager = QuickBarManager()
+
+            sideBarManager = GameSideBarManager()
 
             loadConfig()
         }

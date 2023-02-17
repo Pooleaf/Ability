@@ -27,6 +27,7 @@ class AbilityPlugin: BukkitCorePlugin() {
         registerCommonEventListeners()
         registerCommands()
 
+        AbilityApi.init()
         AbilityApi.abilityManager.registerAbilities(this)
 
         loadConfig()

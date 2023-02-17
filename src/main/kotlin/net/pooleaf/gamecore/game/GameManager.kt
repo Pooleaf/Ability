@@ -111,6 +111,12 @@ class GameManager {
         }
         GameCore.unsafe.mapManager.currentMap = null
 
+        // 사이드바
+        if (GameCore.unsafe.sideBarManager.isSideBarTimerRunning()) {
+            GameCore.unsafe.sideBarManager.stopSideBarTimer()
+            GameCore.unsafe.sideBarManager.sideBar?.update()
+        }
+
         // 이벤트
         Bukkit.getPluginManager().callEvent(GameResetEvent())
     }
@@ -156,6 +162,11 @@ class GameManager {
 
         // 대기 퀵바 업데이트 (관전 슬롯 제거)
         GameCore.unsafe.quickBarManager.waitingQuickBar.updateAsynchronously()
+
+        // 사이드바
+        if (GameCore.unsafe.sideBarManager.sideBar != null && !GameCore.unsafe.sideBarManager.isSideBarTimerRunning()) {
+            GameCore.unsafe.sideBarManager.startSideBarTimer()
+        }
 
         // Phase 시작
         game.phasePipeline.runPhases()

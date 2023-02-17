@@ -135,18 +135,18 @@ class GameMapService {
      * 경계선을 [newSize] 크기로 초당 [updateSizePerSeconds] 칸만큼 변화시킵니다.
      * 줄어드는 데 걸리는 시간을 반환합니다.
      */
-    fun updateWorldBorder(map: GameMap, newSize: Int, updateSizePerSeconds: Int): Long {
+    fun updateWorldBorder(map: GameMap, newSize: Int, updateSizePerSeconds: Int): Int {
         if (newSize < 0) error("newSize cannot be less than 0 (value: ${newSize})")
         if (updateSizePerSeconds < 1) error("updateSizePerSeconds cannot be less than 1 (value: ${updateSizePerSeconds}")
 
         map.centerLocation?.let { centerLocation ->
             // 줄어드는 데 걸리는 시간
-            val updateDurationTime = (abs(map.currentWorldBorderSize - newSize) / updateSizePerSeconds).toLong()
+            val updateDurationTime = (abs(map.currentWorldBorderSize - newSize) / updateSizePerSeconds).toInt()
 
             // 경계선 설정
             val worldBorder = centerLocation.world.worldBorder
             worldBorder.center = centerLocation
-            worldBorder.setSize(newSize.toDouble(), updateDurationTime)
+            worldBorder.setSize(newSize.toDouble(), updateDurationTime.toLong())
             worldBorder.damageBuffer = 0.0
 
             map.currentWorldBorderSize = newSize
