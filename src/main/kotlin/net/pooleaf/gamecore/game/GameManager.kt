@@ -246,7 +246,7 @@ class GameManager {
 
         // 게임 시작 전 중단
         if (!GameCore.game.isGameStarted && GameCore.unsafe.playerManager.getOnlinePlayingPlayers().size <= GameCore.teamConfig.playerCountPerTeam) {
-            GameCore.unsafe.gameManager.cancelGame(null, "인원이 적어 게임이 중단됩니다.")
+            cancelGame(null, "인원이 적어 게임이 중단됩니다.")
             Broadcaster.broadcast("§c인원이 적어 게임이 중단되었습니다.")
         }
 
@@ -254,13 +254,17 @@ class GameManager {
         else if (GameCore.game.isGameStarted && GameCore.unsafe.teamManager.getNotDefeatedOnlineTeams().size < 2) {
             // 우승 시간 안됐을 때 중단
             if (System.currentTimeMillis() - GameCore.game.startedAt!!.toMillis() < GameCore.gameConfig.winAllowSeconds) {
-                GameCore.unsafe.gameManager.cancelGame(null, "게임 진행 시간이 적어 우승할 수 없습니다.")
+                cancelGame(null, "게임 진행 시간이 적어 우승할 수 없습니다.")
                 Broadcaster.broadcast("§c게임 진행 시간이 적어 승자가 결정되지 않았습니다.")
                 Broadcaster.broadcast("§c더 많은 시간을 플레이해야 게임이 정상적으로 종료됩니다.")
             }
+            // 아무도 없을 경우
+            else if (GameCore.unsafe.teamManager.getNotDefeatedOnlineTeams().isEmpty()) {
+                cancelGame(null)
+            }
             // 우승
             else {
-                GameCore.unsafe.gameManager.skipToEnd()
+                skipToEnd()
             }
         }
     }

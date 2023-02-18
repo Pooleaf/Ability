@@ -4,6 +4,7 @@ import kotlinx.coroutines.launch
 import net.pooleaf.core.modules.coroutine.bukkit.BukkitSyncScope
 import net.pooleaf.core.modules.gui.bukkit.sidebar.SideBar
 import net.pooleaf.gamecore.player.GamePlayer
+import org.bukkit.Bukkit
 import java.util.concurrent.ConcurrentHashMap
 
 open class GameSideBar(val title: String) {
@@ -55,7 +56,7 @@ open class GameSideBar(val title: String) {
         if (!isPersonalSideBar) error("Personal element is not exists")
         if (!gamePlayer.isOnline) error("gamePlayer is not online")
 
-        if (!viewers.contains(gamePlayer)) {
+        if (!viewers.containsKey(gamePlayer)) {
             viewers.put(gamePlayer, SideBar(title))
         }
 
@@ -101,7 +102,7 @@ open class GameSideBar(val title: String) {
      * 플레이어에게 사이드바를 보여줍니다.
      */
     fun setTo(gamePlayer: GamePlayer) {
-        if (viewers.contains(gamePlayer)) error("gamePlayer is already use sidebar")
+        if (viewers.containsKey(gamePlayer)) error("gamePlayer is already use sidebar")
         if (!gamePlayer.isOnline) error("gamePlayer is not online")
 
         viewers.put(gamePlayer, SideBar(title))
@@ -122,8 +123,11 @@ open class GameSideBar(val title: String) {
      * 플레이어에게서 사이드바를 제거합니다.
      */
     fun removeTo(gamePlayer: GamePlayer) {
-        if (!viewers.contains(gamePlayer)) error("gamePlayer is already not use sidebar")
+        if (!viewers.containsKey(gamePlayer)) error("gamePlayer is already not use sidebar")
         if (!gamePlayer.isOnline) error("gamePlayer is not online")
+
+        viewers.remove(gamePlayer)
+        gamePlayer.player.scoreboard = Bukkit.getScoreboardManager().newScoreboard
     }
 
 }
