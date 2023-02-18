@@ -24,33 +24,35 @@ class AbilityPhasePipeline: PhasePipeline() {
         // 능력 추첨
         addPhase(AbilityDrawPhase())
 
-        // PVP 시작
-        addPhase(RunnablePhase() {
-            AbilityApi.game.isGodMode = false
+        addPhase(DelayPhase(2))
+
+        // 무적 시간
+        addPhase(object : GodModPhase() {
+            override fun getGodModSeconds(): Int = AbilityApi.abilityGameConfig.godModSeconds
         })
+
+        addPhase(DelayPhase(2))
+
 
         // 경계선 줄이기 (1차)
         addPhase(object : WorldBorderUpdatePhase() {
             override fun getNewWorldBorderSize(): Int = (GameCore.currentMap!!.worldBorderSize * 2.toFloat() / 3).toInt()
-//            override fun getUpdateWaitSeconds(): Int = 60 * 6
-            override fun getUpdateWaitSeconds(): Int = 10
-            override fun getUpdateSizePerSeconds(): Int = 5
+            override fun getUpdateWaitSeconds(): Int = AbilityApi.abilityGameConfig.firstWorldBorderReduceWaitSeconds
+            override fun getUpdateSizePerSeconds(): Int = AbilityApi.abilityGameConfig.firstWorldBorderReduceSizePerSeconds
         })
 
         // 경계선 줄이기 (2차)
         addPhase(object : WorldBorderUpdatePhase() {
             override fun getNewWorldBorderSize(): Int = (GameCore.currentMap!!.worldBorderSize * 1.toFloat() / 3).toInt()
-//            override fun getUpdateWaitSeconds(): Int = 60 * 3
-            override fun getUpdateWaitSeconds(): Int = 10
-            override fun getUpdateSizePerSeconds(): Int = 5
+            override fun getUpdateWaitSeconds(): Int = AbilityApi.abilityGameConfig.secondWorldBorderReduceWaitSeconds
+            override fun getUpdateSizePerSeconds(): Int = AbilityApi.abilityGameConfig.secondWorldBorderReduceSizePerSeconds
         })
 
         // 경계선 줄이기 (3차) - 마지막 크기는 20칸으로 고정
         addPhase(object : WorldBorderUpdatePhase() {
             override fun getNewWorldBorderSize(): Int = 20
-//            override fun getUpdateWaitSeconds(): Int = 60 * 3
-            override fun getUpdateWaitSeconds(): Int = 10
-            override fun getUpdateSizePerSeconds(): Int = 5
+            override fun getUpdateWaitSeconds(): Int = AbilityApi.abilityGameConfig.thirdWorldBorderReduceWaitSeconds
+            override fun getUpdateSizePerSeconds(): Int = AbilityApi.abilityGameConfig.thirdWorldBorderReduceSizePerSeconds
             override suspend fun onStart() {
                 // 이미 2차에서 20칸보다 작아졌을 경우 스킵
                 if (GameCore.currentMap!!.currentWorldBorderSize <= getNewWorldBorderSize()) return

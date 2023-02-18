@@ -1,6 +1,5 @@
 package net.pooleaf.ability.abilities
 
-import net.pooleaf.ability.AbilityApi
 import net.pooleaf.ability.AbilityPlugin
 import net.pooleaf.ability.ability.Ability
 import net.pooleaf.ability.ability.AbilityRank

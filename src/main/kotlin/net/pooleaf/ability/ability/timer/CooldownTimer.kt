@@ -1,7 +1,7 @@
 package net.pooleaf.ability.ability.timer
 
 import net.pooleaf.ability.ability.Ability
-import net.pooleaf.ability.util.StringUtil
+import net.pooleaf.gamecore.util.StringUtil
 import net.pooleaf.core.modules.gui.bukkit.actionbar.ActionBar
 import net.pooleaf.core.modules.support.common.CommonChatColor
 

@@ -16,6 +16,9 @@ class AbilitySideBar: GameSideBar("§e§l능력자") {
         // 경계선 축소 중
         elements.add(WorldBorderReducingElement())
 
+        // 무적 시간
+        elements.add(GodModRemainingTimeElement())
+
         // 능력
         elements.add(AbilityElement())
 

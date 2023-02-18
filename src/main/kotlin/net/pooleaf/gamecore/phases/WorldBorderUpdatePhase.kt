@@ -4,7 +4,7 @@ import com.cryptomorin.xseries.XSound
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import net.pooleaf.ability.util.StringUtil
+import net.pooleaf.gamecore.util.StringUtil
 import net.pooleaf.core.modules.coroutine.bukkit.BukkitAsyncScope
 import net.pooleaf.core.modules.support.bukkit.particle.Particle
 import net.pooleaf.core.modules.support.common.CommonChatColor

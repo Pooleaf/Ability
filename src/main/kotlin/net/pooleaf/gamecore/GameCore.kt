@@ -155,4 +155,8 @@ object GameCore {
         game.init()
     }
 
+    fun loadConfig() {
+        unsafe.loadConfig()
+    }
+
 }
