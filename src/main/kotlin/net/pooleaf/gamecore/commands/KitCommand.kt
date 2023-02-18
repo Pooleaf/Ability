@@ -14,6 +14,7 @@ import net.pooleaf.core.modules.support.common.pageable.PageableCommand
 import net.pooleaf.gamecore.GameCore
 import net.pooleaf.gamecore.GameCorePermission
 import net.pooleaf.gamecore.kit.Kit
+import net.pooleaf.gamecore.kit.KitEditGui
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
@@ -74,27 +75,7 @@ class KitCommand {
         }
 
         val kit = GameCore.unsafe.kitManager.get(kitName)
-
-        val gui = object : InventoryGui(kitName, 3) {
-            val kit = kit
-            val player = player
-
-            init {
-                clickDelayMillis = 0
-                kit.items.forEach { index, item -> mainPanel.set(index, item) }
-            }
-
-            override fun onClick(event: InevntoryGuiClickEvent) {
-                event.isCancelled = false
-            }
-
-            override fun onClose(event: InventoryGuiCloseEvent) {
-                mainPanel.items.forEach { index, item -> kit.items.put(index, item as ItemStack) }
-                kit.saveKitConfig()
-
-                player.sendMessage("${kit.name} §b킷을 저장했습니다.")
-            }
-        }
+        KitEditGui(kit, player.platformSender).open(player.platformSender)
     }
 
     @Command(

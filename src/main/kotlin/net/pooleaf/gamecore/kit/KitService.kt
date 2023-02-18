@@ -15,7 +15,7 @@ class KitService {
     fun saveKitConfig(kit: Kit) {
         kitFolder.mkdirs()
 
-        val file = File(kitFolder, kit.name)
+        val file = File(kitFolder, "${kit.name}.yml")
         AnnoConfigModule.save(file, kit)
     }
 
@@ -34,7 +34,7 @@ class KitService {
         kit.name = name
         GameCore.unsafe.kitManager.set(name, kit)
 
-        val file = File(kitFolder, kit.name)
+        val file = File(kitFolder, "${kit.name}.yml")
         AnnoConfigModule.load(file, kit)
     }
 

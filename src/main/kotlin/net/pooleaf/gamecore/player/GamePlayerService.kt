@@ -22,6 +22,7 @@ class GamePlayerService {
         gamePlayer.isJoined = false
         gamePlayer.isDefeated = false
         gamePlayer.isSpectator = false
+        gamePlayer.isReceiveStartItems = false
 
         gamePlayer.lastDamagers.clear()
 

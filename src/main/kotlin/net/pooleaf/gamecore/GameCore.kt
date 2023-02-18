@@ -8,13 +8,18 @@ import net.pooleaf.gamecore.game.Game
 import net.pooleaf.gamecore.game.GameManager
 import net.pooleaf.gamecore.kit.KitManager
 import net.pooleaf.gamecore.kit.KitService
-import net.pooleaf.gamecore.map.*
+import net.pooleaf.gamecore.map.DefaultGameMapManager
+import net.pooleaf.gamecore.map.GameMap
+import net.pooleaf.gamecore.map.GameMapManager
+import net.pooleaf.gamecore.map.GameMapService
 import net.pooleaf.gamecore.player.DefaultGamePlayerManager
 import net.pooleaf.gamecore.player.GamePlayer
 import net.pooleaf.gamecore.player.GamePlayerManager
 import net.pooleaf.gamecore.player.GamePlayerService
 import net.pooleaf.gamecore.quickbar.QuickBarManager
 import net.pooleaf.gamecore.sidebar.GameSideBarManager
+import net.pooleaf.gamecore.startitem.StartItemManager
+import net.pooleaf.gamecore.startitem.StartItemService
 import net.pooleaf.gamecore.team.TeamManager
 import net.pooleaf.gamecore.team.TeamService
 import net.pooleaf.gamecore.vote.map.MapVoteManager
@@ -46,6 +51,9 @@ object GameCore {
 
         lateinit var kitManager: KitManager
         lateinit var kitService: KitService
+
+        lateinit var startItemManager: StartItemManager
+        lateinit var startItemService: StartItemService
 
 
         val gameConfig: GameConfig by lazy {
@@ -86,6 +94,9 @@ object GameCore {
             kitManager = KitManager()
             kitService = KitService()
 
+            startItemManager = StartItemManager()
+            startItemService = StartItemService()
+
             loadConfig()
         }
 
@@ -105,6 +116,7 @@ object GameCore {
             mapService.loadMapConfigs()
 
             kitService.loadKitConfigs()
+            startItemService.loadStartItemConfig()
         }
     }
 

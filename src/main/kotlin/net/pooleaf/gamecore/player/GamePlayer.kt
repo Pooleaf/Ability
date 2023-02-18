@@ -21,6 +21,10 @@ open class GamePlayer(uuid: UUID) : AbstractBukkitPlayer(uuid) {
     var isSpectator = false
         internal set
 
+    // 시작 아이템 지급 여부
+    var isReceiveStartItems = false
+        internal set
+
     // 팀
     var team: Team? = null
         internal set
@@ -78,6 +82,14 @@ open class GamePlayer(uuid: UUID) : AbstractBukkitPlayer(uuid) {
      */
     suspend fun defeat() {
         GameCore.unsafe.playerService.defeatPlayer(this)
+    }
+
+    /**
+     * 플레이어에게 시작 아이템을 지급합니다.
+     * 온라인 플레이어에게만 사용할 수 있습니다.
+     */
+    fun giveStartItem() {
+        GameCore.unsafe.startItemService.giveStartItem(this)
     }
 
 }

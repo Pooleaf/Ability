@@ -204,6 +204,9 @@ class GameManager {
         // 관전 텔레포터 GUI 업데이트
         GameCore.unsafe.quickBarManager.spectatorQuickBar.spectatorTeleporterGui.updateAsynchronously()
 
+        // 시작 아이템 지급
+        GameCore.unsafe.playerManager.getOnlinePlayingPlayers().forEach { it.giveStartItem() }
+
         // 이벤트
         Bukkit.getPluginManager().callEvent(GameStartedEvent())
     }
