@@ -9,9 +9,4 @@ class AbilityGame: Game(
 
     var abilityDrawStarted: Boolean = false
 
-
-    init {
-        isGodMode = true
-    }
-
 }

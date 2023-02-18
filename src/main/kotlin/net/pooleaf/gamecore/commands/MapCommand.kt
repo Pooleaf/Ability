@@ -34,7 +34,7 @@ class MapCommand {
 
 
     @Command(
-        parent = ["맵"],
+        parent = ["맵", "게임 맵"],
         name = ["스폰설정", "setSpawn"],
         description = "현재 위치 스폰 위치로 설정합니다.",
         color = CommonChatColor.AQUA,
@@ -48,7 +48,7 @@ class MapCommand {
     }
 
     @Command(
-        parent = ["맵"],
+        parent = ["맵", "게임 맵"],
         name = ["생성", "create"],
         arguments = "<맵이름>",
         description = "현재 위치를 중앙으로한 맵을 생성합니다.",
@@ -76,17 +76,17 @@ class MapCommand {
     }
 
     @Command(
-        parent = ["맵"],
+        parent = ["맵", "게임 맵"],
         name = ["표기설정", "setDisplayName"],
         arguments = "<맵이름> <표기이름>",
         description = "해당 맵의 표기 이름을 설정합니다.",
         color = CommonChatColor.AQUA,
         permission = GameCorePermission.ADMIN
     )
-    fun map_setDisplayName(player: CommonPlayer<Player>, result: CommandResult) {
+    fun map_setDisplayName(sender: CommonCommandSender<CommandSender>, result: CommandResult) {
         val map = GameCore.unsafe.mapManager.get(result.enteredArguments)
         if (map == null) {
-            player.sendWarning("존재하지 않는 맵입니다.")
+            sender.sendWarning("존재하지 않는 맵입니다.")
             return
         }
 
@@ -94,11 +94,11 @@ class MapCommand {
         map.displayName = newDisplayName
         map.saveMapConfig()
 
-        player.sendMessage("${map.name} §b맵의 표기 이름을 §f${map.displayName} §b(으)로 설정했습니다.")
+        sender.sendMessage("${map.name} §b맵의 표기 이름을 §f${map.displayName} §b(으)로 설정했습니다.")
     }
 
     @Command(
-        parent = ["맵"],
+        parent = ["맵", "게임 맵"],
         name = ["위치설정", "setLocation"],
         arguments = "<맵이름>",
         description = "현재 위치를 맵의 중앙으로 설정합니다.",
@@ -119,62 +119,62 @@ class MapCommand {
     }
 
     @Command(
-        parent = ["맵"],
+        parent = ["맵", "게임 맵"],
         name = ["범위설정", "setRadius", "setRange"],
         arguments = "<맵이름> <반지름>",
         description = "현재 위치를 중앙으로한 맵을 생성합니다.",
         color = CommonChatColor.AQUA,
         permission = GameCorePermission.ADMIN
     )
-    fun map_setRadius(player: CommonPlayer<Player>, result: CommandResult) {
+    fun map_setRadius(sender: CommonCommandSender<CommandSender>, result: CommandResult) {
         val map = GameCore.unsafe.mapManager.get(result.getArgument(0))
         if (map == null) {
-            player.sendWarning("존재하지 않는 맵입니다.")
+            sender.sendWarning("존재하지 않는 맵입니다.")
             return
         }
 
         val radius = result.getArgumentAsInt(result.argumentsLength - 1)
         if (radius == null) {
-            player.sendWarning("범위는 정수만 입력할 수 있습니다.")
+            sender.sendWarning("범위는 정수만 입력할 수 있습니다.")
             return
         }
 
         map.worldBorderSize = radius
         map.saveMapConfig()
 
-        player.sendMessage("${map.name} §b맵의 범위를 §f${radius}§b로 설정했습니다.")
+        sender.sendMessage("${map.name} §b맵의 범위를 §f${radius}§b로 설정했습니다.")
     }
 
     @Command(
-        parent = ["맵"],
+        parent = ["맵", "게임 맵"],
         name = ["삭제", "delete"],
         arguments = "<맵이름>",
         description = "맵을 삭제합니다.",
         color = CommonChatColor.AQUA,
         permission = GameCorePermission.ADMIN
     )
-    fun map_delete(player: CommonPlayer<Player>, result: CommandResult) {
+    fun map_delete(sender: CommonCommandSender<CommandSender>, result: CommandResult) {
         val map = GameCore.unsafe.mapManager.get(result.subArgument(0))
         if (map == null) {
-            player.sendWarning("존재하지 않는 맵입니다.")
+            sender.sendWarning("존재하지 않는 맵입니다.")
             return
         }
 
         map.deleteMapConfig()
         GameCore.unsafe.mapManager.remove(map.name)
 
-        player.sendMessage("${map.name} §b맵을 삭제했습니다.")
+        sender.sendMessage("${map.name} §b맵을 삭제했습니다.")
     }
 
     @Command(
-        parent = ["맵"],
+        parent = ["맵", "게임 맵"],
         name = ["목록", "list"],
         arguments = "(페이지)",
         description = "맵 목록을 확인합니다.",
         color = CommonChatColor.AQUA,
         permission = GameCorePermission.ADMIN
     )
-    fun map_list(sender: CommonCommandSender<*>?, result: CommandResult) {
+    fun map_list(sender: CommonCommandSender<CommandSender>, result: CommandResult) {
         object : PageableCommand<GameMap>(result.entered, ArrayList(GameCore.unsafe.mapManager.values()), 7) {
             override fun getHeaderColor(): CommonChatColor {
                 return (GameCore.gamePlugin as CorePlugin).color
@@ -203,7 +203,7 @@ class MapCommand {
     }
 
     @Command(
-        parent = ["맵"],
+        parent = ["맵", "게임 맵"],
         name = ["이동", "teleport", "tp"],
         arguments = "<맵이름>",
         description = "맵으로 텔레포트합니다.",

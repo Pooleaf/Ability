@@ -1,16 +1,18 @@
 package net.pooleaf.gamecore.listeners
 
 import net.pooleaf.core.modules.eventsupport.bukkit.events.damage.PlayerDamageEvent
+import net.pooleaf.gamecore.Broadcaster
 import net.pooleaf.gamecore.GameCore
 import net.pooleaf.gamecore.events.player.GamePlayerDeathEvent
 import org.bukkit.Bukkit
 import org.bukkit.event.EventHandler
+import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 
 class FakeDeathListener: Listener {
 
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     fun onDeathDamage(event: PlayerDamageEvent) {
         val player = event.player
 
@@ -27,6 +29,13 @@ class FakeDeathListener: Listener {
 
             // 이벤트 캔슬
             event.isCancelled = true
+
+            // 메시지
+            if (killerGamePlayer == null) {
+                Broadcaster.broadcast("§c${deadGamePlayer.displayName} §c님이 죽었습니다.")
+            } else {
+                Broadcaster.broadcast("§c${killerGamePlayer.displayName} §c님이 §c${deadGamePlayer.displayName} §c님을 죽였습니다.")
+            }
 
             // 이벤트
             Bukkit.getPluginManager().callEvent(GamePlayerDeathEvent(deadGamePlayer, killerGamePlayer, event))

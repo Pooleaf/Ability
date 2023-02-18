@@ -37,7 +37,7 @@ class GameManager {
         game.isCountingStarted = false
         game.isGameStarted = false
         game.isTeleportedToMap = false
-        game.isGodMode = false
+        game.isGodMode = true
         game.isEnded = false
 
         game.startedAt = null
@@ -63,34 +63,6 @@ class GameManager {
             }
         }.join()
 
-        // Phase 초기화
-        if (game.phasePipeline.isRunning()) {
-            game.phasePipeline.cancelPhases()
-        }
-        game.phasePipeline.init()
-
-        // 플레이어 초기화
-        GameCore.unsafe.playerManager.values().forEach { gamePlayer ->
-            gamePlayer.init()
-
-            if (gamePlayer.isOnline) {
-                gamePlayer.isJoined = true
-                gamePlayer.reset()
-
-                // 대기 퀵바
-                GameCore.unsafe.quickBarManager.waitingQuickBar.setTo(gamePlayer.player)
-            } else {
-                GameCore.unsafe.playerManager.remove(gamePlayer.uuid)
-            }
-        }
-
-        // 대기 액션바
-        Broadcaster.broadcastWaitingActionBar(GameCore.unsafe.playerManager.getOnlineJoinedPlayers().size, GameCore.gameConfig.startPlayerCount)
-
-        // 투표 초기화
-        GameCore.unsafe.startVoteManager.initVote()
-        GameCore.unsafe.mapVoteManager.initVote()
-
         // 맵 언로드
         GameCore.currentMap?.let { map ->
             // 언로드 실패 시 서버 재부팅
@@ -110,6 +82,34 @@ class GameManager {
             }
         }
         GameCore.unsafe.mapManager.currentMap = null
+
+        // Phase 초기화
+        if (game.phasePipeline.isRunning()) {
+            game.phasePipeline.cancelPhases()
+        }
+        game.phasePipeline.init()
+
+        // 플레이어 초기화
+        GameCore.unsafe.playerManager.values().forEach { gamePlayer ->
+            gamePlayer.init()
+
+            if (gamePlayer.isOnline) {
+                gamePlayer.reset()
+                GameCore.unsafe.playerService.joinToGame(gamePlayer)
+
+                // 대기 퀵바
+                GameCore.unsafe.quickBarManager.waitingQuickBar.setTo(gamePlayer.player)
+            } else {
+                GameCore.unsafe.playerManager.remove(gamePlayer.uuid)
+            }
+        }
+
+        // 대기 액션바
+        Broadcaster.broadcastWaitingActionBar(GameCore.unsafe.playerManager.getOnlineJoinedPlayers().size, GameCore.gameConfig.startPlayerCount)
+
+        // 투표 초기화
+        GameCore.unsafe.startVoteManager.initVote()
+        GameCore.unsafe.mapVoteManager.initVote()
 
         // 사이드바
         if (GameCore.unsafe.sideBarManager.isSideBarTimerRunning()) {

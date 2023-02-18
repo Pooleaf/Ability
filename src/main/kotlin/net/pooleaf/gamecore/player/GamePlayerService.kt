@@ -53,6 +53,10 @@ class GamePlayerService {
 
             // 인벤토리 초기화
             player.inventory!!.clear()
+            player.inventory.helmet = null
+            player.inventory.chestplate = null
+            player.inventory.leggings = null
+            player.inventory.boots = null
             player.updateInventory()
 
             // 게임모드 초기화
@@ -103,7 +107,9 @@ class GamePlayerService {
 
             // 게임 시작
             if (GameCore.unsafe.gameManager.canAutoStart()) {
-                GameCore.unsafe.gameManager.startGame(null)
+                BukkitSyncScope.launch {
+                    GameCore.unsafe.gameManager.startGame(null)
+                }
             }
         }
 

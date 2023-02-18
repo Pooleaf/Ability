@@ -42,6 +42,8 @@ class KitService {
      * 모든 킷을 불러옵니다.
      */
     fun loadKitConfigs() {
+        kitFolder.mkdirs()
+
         kitFolder.listFiles().filter { it.name.endsWith(".yml") }
             .forEach { loadKitConfig(it.name.substringBefore(".yml")) }
     }

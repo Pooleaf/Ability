@@ -5,11 +5,11 @@ import net.pooleaf.gamecore.GameCore
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 
-class GodModeListener: Listener {
+class EndGodModListener: Listener {
 
     @EventHandler
     fun onPlayerDamage(event: PlayerDamageEvent) {
-        if (GameCore.game.isGodMode) {
+        if (GameCore.game.isEnded) {
             event.isCancelled = true
         }
     }

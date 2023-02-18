@@ -87,7 +87,7 @@ abstract class WorldBorderUpdatePhase(): Phase() {
             updateDurationSeconds = currentMap.updateWorldBorder(getNewWorldBorderSize(), getUpdateSizePerSeconds())
             val updateDurationTime = StringUtil.buildTimeStringWithColor(updateDurationSeconds!! * 1000L, CommonChatColor.WHITE, CommonChatColor.YELLOW)
 
-            Broadcaster.broadcast("${updateDurationTime} §e동안 맵의 경계가 ${updateMessage}.")
+            Broadcaster.broadcast("§e맵의 경계가 ${updateMessage}.")
             Broadcaster.broadcastSound(XSound.UI_BUTTON_CLICK, 0.3F, 0.7F)
 
             delay(updateDurationSeconds!! * 1000L)

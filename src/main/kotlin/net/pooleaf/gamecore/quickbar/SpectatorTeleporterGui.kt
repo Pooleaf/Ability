@@ -1,7 +1,7 @@
 package net.pooleaf.gamecore.quickbar
 
 import net.pooleaf.core.modules.gui.bukkit.inventory.InventoryIcon
-import net.pooleaf.core.modules.gui.bukkit.inventory.events.InevntoryGuiClickEvent
+import net.pooleaf.core.modules.gui.bukkit.inventory.events.InventoryGuiClickEvent
 import net.pooleaf.core.modules.gui.bukkit.inventory.pageable.LargePageableGui
 import net.pooleaf.core.modules.support.bukkit.messager.sendWarningSafely
 import net.pooleaf.core.modules.support.bukkit.util.ItemBuilder
@@ -27,7 +27,7 @@ class SpectatorTeleporterGui: LargePageableGui("관전할 플레이어를 선택
                         .build()
                 }
 
-                override fun onClick(event: InevntoryGuiClickEvent) {
+                override fun onClick(event: InventoryGuiClickEvent) {
                     val player = event.player
 
                     if (!this.gamePlayer.isPlaying()) {

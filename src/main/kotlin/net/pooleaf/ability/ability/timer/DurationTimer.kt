@@ -25,7 +25,7 @@ open class DurationTimer(
             ActionBar.remove(it)
         }
 
-        if (ability as Any? is Cooldownable) {
+        if (ability is Cooldownable) {
             (ability as Cooldownable).cooldownTimer.start()
         }
     }

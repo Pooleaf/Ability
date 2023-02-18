@@ -24,7 +24,7 @@ class StartItemCommand {
     }
 
     @Command(
-        parent = ["시작아이템"],
+        parent = ["시작아이템", "게임 시작아이템"],
         name = ["수정", "edit"],
         description = "시작 아이템을 수정합니다.",
         color = CommonChatColor.AQUA,

@@ -28,38 +28,37 @@ class TestActiveContinueAbility: Ability(), CastByItemHandler, Durationable {
         ban = false
     }
 
-    override val cooldownTimer: CoolDownTimer
-        get() = CoolDownTimer(this, 5000L)
+    override val castItem: List<ItemStack> = listOf(ItemStack(Material.IRON_INGOT))
 
-    override val castItem: List<ItemStack>
-        get() = listOf(ItemStack(Material.IRON_INGOT))
+    override val cooldownTimer: CoolDownTimer = CoolDownTimer(this, 5000L)
 
-    override val durationTimer: DurationTimer
-        get() = object : DurationTimer(this, 5000L) {
-            override fun onStart() {
-                super.onStart()
+    override val durationTimer = object : DurationTimer(this, 5000L) {
+        override fun onStart() {
+            super.onStart()
 
-                BukkitSyncScope.launch {
-                    player?.player?.let { player ->
-                        player.allowFlight = true
-                        player.isFlying = true
+            BukkitSyncScope.launch {
+                player?.player?.let { player ->
+                    player.allowFlight = true
+                    player.isFlying = true
 
-                        XSound.BLOCK_WOOL_BREAK.play(player, 0.8F, 1.0F)
-                    }
-                }
-            }
-
-            override fun onEnd() {
-                BukkitSyncScope.launch {
-                    player?.player?.let { player ->
-                        player.allowFlight = false
-                        player.isFlying = false
-
-                        XSound.BLOCK_WOOL_BREAK.play(player, 1.0F, 1.0F)
-                    }
+                    XSound.BLOCK_WOOL_BREAK.play(player, 0.8F, 1.0F)
                 }
             }
         }
+
+        override fun onEnd() {
+            super.onEnd()
+
+            BukkitSyncScope.launch {
+                player?.player?.let { player ->
+                    player.allowFlight = false
+                    player.isFlying = false
+
+                    XSound.BLOCK_WOOL_BREAK.play(player, 1.0F, 1.0F)
+                }
+            }
+        }
+    }
 
 
     override fun onResign() {

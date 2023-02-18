@@ -3,7 +3,7 @@ package net.pooleaf.gamecore.vote.start
 import com.cryptomorin.xseries.XSound
 import net.pooleaf.core.modules.gui.bukkit.inventory.InventoryGui
 import net.pooleaf.core.modules.gui.bukkit.inventory.InventoryIcon
-import net.pooleaf.core.modules.gui.bukkit.inventory.events.InevntoryGuiClickEvent
+import net.pooleaf.core.modules.gui.bukkit.inventory.events.InventoryGuiClickEvent
 import net.pooleaf.core.modules.support.bukkit.util.ItemBuilder
 import net.pooleaf.gamecore.GameCore
 import org.bukkit.Material
@@ -24,7 +24,7 @@ class StartVoteGui(): InventoryGui("시작 투표", 3) {
                     .build()
             }
 
-            override fun onClick(event: InevntoryGuiClickEvent) {
+            override fun onClick(event: InventoryGuiClickEvent) {
                 val gamePlayer = GameCore.unsafe.playerManager.get(event.player.uniqueId)
 
                 gamePlayer?.let {
@@ -48,7 +48,7 @@ class StartVoteGui(): InventoryGui("시작 투표", 3) {
                     .build()
             }
 
-            override fun onClick(event: InevntoryGuiClickEvent) {
+            override fun onClick(event: InventoryGuiClickEvent) {
                 val gamePlayer = GameCore.unsafe.playerManager.get(event.player.uniqueId)
 
                 gamePlayer?.let {

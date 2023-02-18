@@ -1,5 +1,6 @@
 package net.pooleaf.ability.ability
 
+import net.pooleaf.ability.AbilityApi
 import net.pooleaf.ability.AbilityPlugin
 import net.pooleaf.ability.player.AbilityPlayer
 import net.pooleaf.core.modules.support.bukkit.util.BukkitReflectionUtil
@@ -64,9 +65,9 @@ open class Ability(): Cloneable {
             resign()
         }
 
-        onAssign()
-
         this.player = player
+
+        onAssign()
 
         if (this is Listener) {
             Bukkit.getPluginManager().registerEvents(this, AbilityPlugin.instance)
@@ -133,6 +134,10 @@ open class Ability(): Cloneable {
 
         player?.sendMessage("")
         player?.sendMessage("§e§l====================================================")
+    }
+
+    protected fun canUse(): Boolean {
+        return AbilityApi.game.isGameStarted && !AbilityApi.game.isGodMode && !AbilityApi.game.isEnded
     }
 
 }

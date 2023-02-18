@@ -11,7 +11,7 @@ class Kit() {
     lateinit var name: String
 
     @ConfigName("아이템")
-    val items: ConcurrentHashMap<Int, ItemStack> = ConcurrentHashMap<Int, ItemStack>()
+    val items = arrayListOf<ItemStack>()
 
 
     /**

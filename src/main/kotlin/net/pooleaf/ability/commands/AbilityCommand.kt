@@ -78,7 +78,7 @@ class AbilityCommand {
             .build()
             .send(player);
 
-        XSound.ENTITY_PLAYER_LEVELUP.play(player, 1F, 1F)
+        XSound.ENTITY_PLAYER_LEVELUP.play(player, 0.4F, 1.0F)
     }
 
     @Command(
@@ -125,7 +125,7 @@ class AbilityCommand {
                     .build()
                     .send(player);
 
-                XSound.ENTITY_PLAYER_LEVELUP.play(player, 1F, 1F)
+                XSound.ENTITY_PLAYER_LEVELUP.play(player, 0.4F, 1.0F)
             }
         }
     }

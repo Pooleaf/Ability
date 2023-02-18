@@ -8,7 +8,7 @@ import java.io.File
 
 class StartItemService {
 
-    val file = File(GameCore.gamePlugin.dataFolder, "start-item.yml")
+    val file = File(GameCore.gamePlugin.dataFolder, "start-item-config.yml")
 
 
     /**

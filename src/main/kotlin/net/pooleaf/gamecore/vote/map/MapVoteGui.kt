@@ -2,7 +2,7 @@ package net.pooleaf.gamecore.vote.map
 
 import com.cryptomorin.xseries.XSound
 import net.pooleaf.core.modules.gui.bukkit.inventory.InventoryIcon
-import net.pooleaf.core.modules.gui.bukkit.inventory.events.InevntoryGuiClickEvent
+import net.pooleaf.core.modules.gui.bukkit.inventory.events.InventoryGuiClickEvent
 import net.pooleaf.core.modules.gui.bukkit.inventory.pageable.LargePageableGui
 import net.pooleaf.core.modules.support.bukkit.util.ItemBuilder
 import net.pooleaf.gamecore.GameCore
@@ -26,7 +26,7 @@ class MapVoteGui(): LargePageableGui ("맵 투표") {
                     .build()
             }
 
-            override fun onClick(event: InevntoryGuiClickEvent) {
+            override fun onClick(event: InventoryGuiClickEvent) {
                 val gamePlayer = GameCore.unsafe.playerManager.get(event.player.uniqueId)
 
                 gamePlayer?.let {
@@ -54,7 +54,7 @@ class MapVoteGui(): LargePageableGui ("맵 투표") {
                         .build()
                 }
 
-                override fun onClick(event: InevntoryGuiClickEvent) {
+                override fun onClick(event: InventoryGuiClickEvent) {
                     val gamePlayer = GameCore.unsafe.playerManager.get(event.player.uniqueId)
 
                     gamePlayer?.let {

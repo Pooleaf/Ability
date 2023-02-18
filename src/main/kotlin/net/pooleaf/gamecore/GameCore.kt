@@ -151,6 +151,8 @@ object GameCore {
 
         unsafe.init()
         unsafe.gameManager.game = game
+
+        game.init()
     }
 
 }

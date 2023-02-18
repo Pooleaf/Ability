@@ -11,6 +11,7 @@ import net.pooleaf.ability.ability.AbilityType
 import net.pooleaf.ability.ability.cast.CastByItemHandler
 import net.pooleaf.ability.ability.timer.CoolDownTimer
 import net.pooleaf.core.modules.coroutine.bukkit.BukkitAsyncScope
+import net.pooleaf.core.modules.coroutine.bukkit.BukkitSyncScope
 import net.pooleaf.core.modules.support.bukkit.particle.Particle
 import org.bukkit.Location
 import org.bukkit.Material
@@ -30,11 +31,9 @@ class TestActiveAbility: Ability(), CastByItemHandler {
         ban = false
     }
 
-    override val cooldownTimer: CoolDownTimer
-        get() = CoolDownTimer(this, 5000L)
+    override val castItem: List<ItemStack> = listOf(ItemStack(Material.IRON_INGOT))
 
-    override val castItem: List<ItemStack>
-        get() = listOf(ItemStack(Material.IRON_INGOT))
+    override val cooldownTimer: CoolDownTimer = CoolDownTimer(this, 5000L)
 
     // 사거리
     val targetDistance = 100
@@ -46,7 +45,7 @@ class TestActiveAbility: Ability(), CastByItemHandler {
 
 
     override fun onAssign() {
-        rangeShowJob = BukkitAsyncScope.launch {
+        rangeShowJob = BukkitSyncScope.launch {
             while (true) {
                 if (player == null) {
                     cancel()
@@ -95,7 +94,7 @@ class TestActiveAbility: Ability(), CastByItemHandler {
 
     fun getTargetLocation(): Location? {
         player?.player?.let { player ->
-            return player.getTargetBlock(null as Set<Material>, targetDistance).location
+            return player.getTargetBlock(null as Set<Material>?, targetDistance).location
         }
 
         return null

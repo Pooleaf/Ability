@@ -1,14 +1,17 @@
 package net.pooleaf.ability.abilities
 
+import net.pooleaf.ability.AbilityApi
 import net.pooleaf.ability.AbilityPlugin
 import net.pooleaf.ability.ability.Ability
 import net.pooleaf.ability.ability.AbilityRank
 import net.pooleaf.ability.ability.AbilityType
+import net.pooleaf.ability.ability.Cooldownable
+import net.pooleaf.ability.ability.timer.CoolDownTimer
 import net.pooleaf.core.modules.eventsupport.bukkit.events.damage.PlayerDamageByEntityEvent
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 
-class TestPassiveAbility: Ability(), Listener {
+class TestPassiveAbility: Ability(), Cooldownable, Listener {
 
     init {
         pluginName = AbilityPlugin.instance.name
@@ -21,14 +24,22 @@ class TestPassiveAbility: Ability(), Listener {
         ban = true
     }
 
+    override val cooldownTimer: CoolDownTimer = CoolDownTimer(this, 3000L)
 
     @EventHandler
     fun onPlayerDamageByEntity(event: PlayerDamageByEntityEvent) {
+        if (!canUse()) return
+
         player?.player?.let { player ->
             // 플레이어 체크
             if (!event.player.equals(player)) return
 
+            // 쿨타임 체크
+            if (remainingCooldownMillis > 0) return
+
+            cooldownTimer.start()
             event.damager.world.strikeLightning(event.damager.location)
         }
     }
+
 }

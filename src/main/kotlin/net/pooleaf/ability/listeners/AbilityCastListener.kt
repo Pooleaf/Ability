@@ -1,6 +1,7 @@
 package net.pooleaf.ability.listeners
 
 import net.pooleaf.ability.AbilityApi
+import net.pooleaf.ability.ability.Durationable
 import net.pooleaf.ability.ability.cast.CastByItemHandler
 import org.bukkit.Material
 import org.bukkit.event.EventHandler
@@ -15,8 +16,8 @@ class AbilityCastListener: Listener {
      */
     @EventHandler
     fun handleCastByItem(event: PlayerInteractEvent) {
-        // 게임 시작 체크
-        if (!AbilityApi.game.isGodMode) return
+        // 게임 중 체크
+        if (!AbilityApi.game.isGameStarted || AbilityApi.game.isEnded || AbilityApi.game.isGodMode) return
 
         // 클릭 타입 계산
         val clickType = when (event.action) {
@@ -33,13 +34,20 @@ class AbilityCastListener: Listener {
             // 쿨타임 체크
             if (ability.remainingCooldownMillis > 0) return
 
+            // 지속시간 체크
+            if (ability is Durationable && ability.remainingDurationMillis > 0) return
+
             // 손에 든 아이템 체크
             val itemInHand = event.item
             if (itemInHand == null || itemInHand.type == Material.AIR || !ability.isCastItem(itemInHand)) return
 
             // 캐스팅
             if (ability.onCastByItem(event, itemInHand, clickType)) {
-                ability.cooldownTimer.start()
+                if (ability is Durationable) {
+                    ability.durationTimer.start()
+                } else {
+                    ability.cooldownTimer.start()
+                }
             }
         }
     }
