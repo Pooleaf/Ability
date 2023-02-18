@@ -191,7 +191,7 @@ open class GameMap {
     }
 
     /**
-     * 맵 설정을 저장합닏.
+     * 맵 설정을 저장합니다.
      */
     fun saveMapConfig() {
         GameCore.unsafe.mapService.saveMapConfig(this)

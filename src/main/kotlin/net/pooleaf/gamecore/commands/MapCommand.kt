@@ -23,8 +23,10 @@ import org.bukkit.entity.Player
 class MapCommand {
 
     @Command(
+        parent = ["", "게임"],
         name = ["맵", "map"],
         helpCommand = true,
+        color = CommonChatColor.AQUA,
         permission = GameCorePermission.ADMIN
     )
     fun map(sender: CommonCommandSender<CommandSender>, result: HelpCommandResult) {

@@ -20,7 +20,8 @@ class TestCommand {
     @Command(
         parent = ["gtest"],
         name = ["currentPhase"],
-        description = "show current phase"
+        description = "show current phase",
+        permission = GameCorePermission.ADMIN
     )
     fun game_test_currentPhase(sender: CommandSender, result: CommandResult) {
         sender.sendMessage("Current Phase: ${GameCore.game.phasePipeline.currentPhase?.javaClass?.name}")

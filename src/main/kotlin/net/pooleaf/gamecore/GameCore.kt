@@ -4,7 +4,10 @@ import net.pooleaf.gamecore.configs.GameConfig
 import net.pooleaf.gamecore.configs.QuickBarConfig
 import net.pooleaf.gamecore.configs.SpawnConfig
 import net.pooleaf.gamecore.configs.TeamConfig
+import net.pooleaf.gamecore.game.Game
 import net.pooleaf.gamecore.game.GameManager
+import net.pooleaf.gamecore.kit.KitManager
+import net.pooleaf.gamecore.kit.KitService
 import net.pooleaf.gamecore.map.*
 import net.pooleaf.gamecore.player.DefaultGamePlayerManager
 import net.pooleaf.gamecore.player.GamePlayer
@@ -39,8 +42,10 @@ object GameCore {
         lateinit var mapVoteManager: MapVoteManager
 
         lateinit var quickBarManager: QuickBarManager
-
         lateinit var sideBarManager: GameSideBarManager
+
+        lateinit var kitManager: KitManager
+        lateinit var kitService: KitService
 
 
         val gameConfig: GameConfig by lazy {
@@ -76,8 +81,10 @@ object GameCore {
             mapVoteManager = MapVoteManager()
 
             quickBarManager = QuickBarManager()
-
             sideBarManager = GameSideBarManager()
+
+            kitManager = KitManager()
+            kitService = KitService()
 
             loadConfig()
         }
@@ -96,6 +103,8 @@ object GameCore {
             teamConfig.save()
 
             mapService.loadMapConfigs()
+
+            kitService.loadKitConfigs()
         }
     }
 
@@ -124,7 +133,7 @@ object GameCore {
 
     fun init(
         gamePlugin: JavaPlugin,
-        game: net.pooleaf.gamecore.game.Game
+        game: Game
     ) {
         unsafe.gamePlugin = gamePlugin
 
