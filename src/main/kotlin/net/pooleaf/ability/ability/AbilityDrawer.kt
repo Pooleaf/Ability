@@ -137,14 +137,14 @@ class AbilityDrawer(
             // 능력 추첨 Phase일 경우 추가 메시지
             val currentPhase = AbilityApi.game.phasePipeline.currentPhase
             if (!(currentPhase is AbilityDrawPhase)) {
-                abilityPlayer.assignAbility(abilityPlayer.tempAbility!!.javaClass)
+                abilityPlayer.assignAbility(abilityPlayer.tempAbility!!)
                 return@async ability
             }
 
             // 재추첨 횟수가 남지 않았을 경우 능력 확정
             if (abilityPlayer.redrawCount >= abilityPlayer.maxRedrawCount) {
                 abilityPlayer.abilityDrawComplete = true
-                abilityPlayer.assignAbility(abilityPlayer.tempAbility!!.javaClass)
+                abilityPlayer.assignAbility(abilityPlayer.tempAbility!!)
                 abilityPlayer.tempAbility = null
                 return@async ability
             }

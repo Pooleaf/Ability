@@ -65,7 +65,7 @@ class AbilityCommand {
         }
 
         abilityPlayer.abilityDrawComplete = true
-        abilityPlayer.assignAbility(abilityPlayer.tempAbility!!.javaClass)
+        abilityPlayer.assignAbility(abilityPlayer.tempAbility!!)
         abilityPlayer.tempAbility = null
 
         player.sendMessage("")

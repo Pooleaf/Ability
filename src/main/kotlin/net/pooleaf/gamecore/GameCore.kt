@@ -153,6 +153,7 @@ object GameCore {
         unsafe.gameManager.game = game
 
         game.init()
+        game.isInitialized = true
     }
 
     fun loadConfig() {

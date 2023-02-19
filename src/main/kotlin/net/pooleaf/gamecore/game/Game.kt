@@ -14,6 +14,14 @@ abstract class Game {
     var gameId: UUID? = null
         internal set
 
+    // 초기화 여부
+    var isInitialized: Boolean = false
+        internal set
+
+    // 게임 실행 중 여부
+    var isRunning: Boolean = false
+        internal set
+
     // 시작 카운팅 시작 여부
     var isCountingStarted: Boolean = false
         internal set
@@ -33,10 +41,6 @@ abstract class Game {
     // 게임 종료 여부
     var isEnded: Boolean = false
         internal set
-
-    // 게임 실행 중 여부
-    val isRunning
-        get() = phasePipeline.isRunning()
 
     // 시작 시간
     var startedAt: LocalDateTime? = null

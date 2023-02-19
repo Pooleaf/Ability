@@ -34,6 +34,7 @@ class GameManager {
         // 게임 정보 초기화
         game.gameId = null
 
+        game.isRunning = false
         game.isCountingStarted = false
         game.isGameStarted = false
         game.isTeleportedToMap = false
@@ -53,6 +54,8 @@ class GameManager {
      * 게임을 리셋시킵니다.
      */
     suspend fun resetGame() {
+        game.isInitialized = false
+
         // 초기화
         initGame()
 
@@ -119,6 +122,8 @@ class GameManager {
 
         // 이벤트
         Bukkit.getPluginManager().callEvent(GameResetEvent())
+
+        game.isInitialized = true
     }
 
 
@@ -127,52 +132,56 @@ class GameManager {
      * PrimaryThread에서 실행해야 합니다
      */
     suspend fun startGame(starterSender: CommandSender?) {
-        if (game.phasePipeline.isRunning()) error("Game has already started")
+        if (game.isRunning) error("Game has already started")
         if (!Bukkit.isPrimaryThread()) error("Game start cannot start asynchronously")
 
-        // 설정된 맵 없으면 랜덤 맵으로 설정
-        if (GameCore.currentMap == null) {
-            GameCore.unsafe.mapManager.currentMap = GameCore.unsafe.mapManager.getRandomMapCanUse()
-        }
-        // 맵 사용 가능 체크
-        if (GameCore.currentMap?.canUse == false) {
-            GameCore.unsafe.mapManager.currentMap = null
-        }
-        GameCore.currentMap?.let {
-            // 월드 로드
-            if (!it.isWorldLoaded()) {
-                it.loadWorld()
+        game.isRunning = true
+
+        BukkitAsyncScope.launch {
+            // 설정된 맵 없으면 랜덤 맵으로 설정
+            if (GameCore.currentMap == null) {
+                GameCore.unsafe.mapManager.currentMap = GameCore.unsafe.mapManager.getRandomMapCanUse()
             }
-        } ?: run {
-            // 맵 없으면 중단
-            Broadcaster.broadcastTitle(
-                "§c시작 실패",
-                "§c사용할 수 있는 맵이 없어 게임을 시작할 수 없습니다.",
-                5 * 20
-            )
-            Broadcaster.broadcastSound(XSound.ENTITY_ITEM_BREAK)
-            return
-        }
+            // 맵 사용 가능 체크
+            if (GameCore.currentMap?.canUse == false) {
+                GameCore.unsafe.mapManager.currentMap = null
+            }
+            GameCore.currentMap?.let {
+                // 월드 로드
+                if (!it.isWorldLoaded()) {
+                    it.loadWorld()
+                }
+            } ?: run {
+                // 맵 없으면 중단
+                Broadcaster.broadcastTitle(
+                    "§c시작 실패",
+                    "§c사용할 수 있는 맵이 없어 게임을 시작할 수 없습니다.",
+                    5 * 20
+                )
+                Broadcaster.broadcastSound(XSound.ENTITY_ITEM_BREAK)
+                return@launch
+            }
 
-        // 게임 정보 업데이트
-        game.gameId = UUID.randomUUID()
+            // 게임 정보 업데이트
+            game.gameId = UUID.randomUUID()
 
-        // 액션바 제거
-        Broadcaster.removeActionBar()
+            // 액션바 제거
+            Broadcaster.removeActionBar()
 
-        // 대기 퀵바 업데이트 (관전 슬롯 제거)
-        GameCore.unsafe.quickBarManager.waitingQuickBar.updateAsynchronously()
+            // 대기 퀵바 업데이트 (관전 슬롯 제거)
+            GameCore.unsafe.quickBarManager.waitingQuickBar.updateAsynchronously()
 
-        // 사이드바
-        if (GameCore.unsafe.sideBarManager.sideBar != null && !GameCore.unsafe.sideBarManager.isSideBarTimerRunning()) {
-            GameCore.unsafe.sideBarManager.startSideBarTimer()
-        }
+            // 사이드바
+            if (GameCore.unsafe.sideBarManager.sideBar != null && !GameCore.unsafe.sideBarManager.isSideBarTimerRunning()) {
+                GameCore.unsafe.sideBarManager.startSideBarTimer()
+            }
 
-        // Phase 시작
-        game.phasePipeline.runPhases()
+            // Phase 시작
+            game.phasePipeline.runPhases()
 
-        // 이벤트
-        Bukkit.getPluginManager().callEvent(GameStartEvent(starterSender))
+            // 이벤트
+            Bukkit.getPluginManager().callEvent(GameStartEvent(starterSender))
+        }.join()
     }
 
     /**
@@ -215,7 +224,7 @@ class GameManager {
      * 게임 자동 시작 가능 여부를 반환합니다.
      */
     fun canAutoStart(): Boolean {
-        return !GameCore.game.isRunning
+        return game.isInitialized && !GameCore.game.isRunning
                 && GameCore.unsafe.playerManager.getOnlineJoinedPlayers().size >= GameCore.gameConfig.startPlayerCount
     }
 
@@ -223,7 +232,7 @@ class GameManager {
      * 게임 종료 가능 여부를 반환합니다.
      */
     fun canEnd(): Boolean {
-        return game.isGameStarted && !game.isEnded
+        return game.isInitialized && game.isGameStarted && !game.isEnded
                 && GameCore.unsafe.teamManager.getNotDefeatedOnlineTeams().size < 2
     }
 

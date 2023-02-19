@@ -17,8 +17,8 @@ abstract class CompatPlugin<T : JavaPlugin, AT> {
     abstract val name: String
 
 
-    fun getPlugin(): T {
-        return Bukkit.getPluginManager().getPlugin(name) as T
+    fun getPlugin(): T? {
+        return Bukkit.getPluginManager().getPlugin(name) as T?
     }
 
     fun existsPlugin(): Boolean {

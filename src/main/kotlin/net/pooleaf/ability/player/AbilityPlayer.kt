@@ -1,6 +1,7 @@
 package net.pooleaf.ability.player
 
 import net.pooleaf.ability.ability.Ability
+import net.pooleaf.ability.ability.ClonableAbility
 import net.pooleaf.gamecore.player.GamePlayer
 import java.util.*
 
@@ -26,16 +27,13 @@ class AbilityPlayer(uuid: UUID) : GamePlayer(uuid) {
     /**
      * 플레이어에게 능력을 부여합니다.
      */
-    fun assignAbility(abilityClass: Class<out Ability>) {
-        ability = abilityClass.newInstance()
-        ability?.assign(this) ?: error("Failed to assign ability '${abilityClass.name}' to player '${name}'")
-    }
-
-    /**
-     * 플레이어에게 능력을 부여합니다.
-     */
     fun assignAbility(ability: Ability) {
-        this.ability = ability.clone()
+        if (ability is ClonableAbility) {
+            this.ability = ability.clone() as Ability
+        } else {
+            this.ability = ability.javaClass.newInstance()
+        }
+
         this.ability?.assign(this) ?: error("Failed to assign ability '${ability.name}' to player '${name}'")
     }
 

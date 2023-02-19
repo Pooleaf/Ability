@@ -12,7 +12,7 @@ import org.bukkit.event.Listener
 class FakeDeathListener: Listener {
 
 
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun onDeathDamage(event: PlayerDamageEvent) {
         val player = event.player
 

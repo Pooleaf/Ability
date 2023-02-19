@@ -16,6 +16,7 @@ class StartItemCommand {
     @Command(
         parent = ["", "게임"],
         name = ["시작아이템", "startItem"],
+        description = "시작 아이템 명령어를 확인합니다.",
         helpCommand = true,
         color = CommonChatColor.AQUA,
         permission = GameCorePermission.ADMIN

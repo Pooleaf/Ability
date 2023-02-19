@@ -1,7 +1,7 @@
-package net.pooleaf.ability.compat.bitability
+package net.pooleaf.ability.compat.physicalfighters
 
-import Xeon.VisualAbility.MainModule.AbilityBase
-import Xeon.VisualAbility.MainModule.EventManager
+import Physical.Fighters.MainModule.AbilityBase
+import Physical.Fighters.MainModule.EventManager
 import kotlinx.coroutines.launch
 import net.pooleaf.ability.ability.AbilityRank
 import net.pooleaf.ability.ability.AbilityType
@@ -13,7 +13,7 @@ import net.pooleaf.ability.compat.CompatAbility
 import net.pooleaf.core.modules.coroutine.bukkit.BukkitSyncScope
 import org.bukkit.event.Event
 
-class BitCompatAbility: CompatAbility<AbilityBase>(), Cooldownable, Durationable {
+class PhysicalFightersCompatAbility: CompatAbility<AbilityBase>(), Cooldownable, Durationable {
 
     private lateinit var _cooldownTimer: CoolDownTimer
     private lateinit var _durationTimer: DurationTimer
@@ -37,16 +37,18 @@ class BitCompatAbility: CompatAbility<AbilityBase>(), Cooldownable, Durationable
         // 랭크
         rank = when (abilityBase.GetRank()) {
             AbilityBase.Rank.GOD -> AbilityRank.SS
+            AbilityBase.Rank.SSS -> AbilityRank.S
             AbilityBase.Rank.SS -> AbilityRank.S
             AbilityBase.Rank.S -> AbilityRank.A
             AbilityBase.Rank.A -> AbilityRank.B
             AbilityBase.Rank.B,
             AbilityBase.Rank.C,
-            AbilityBase.Rank.D-> AbilityRank.C
+            AbilityBase.Rank.F,
+            AbilityBase.Rank.FF -> AbilityRank.C
         }
 
         // 정보
-        pluginName = "BitAbility"
+        pluginName = "PhysicalFighters"
         name = abilityBase.GetAbilityName()
         description = abilityBase.GetGuide().toList()
 
@@ -101,39 +103,33 @@ class BitCompatAbility: CompatAbility<AbilityBase>(), Cooldownable, Durationable
         }
     }
 
-    fun excute(event: Event, data: Int) {
-        if (!canUse()) return;
+    fun excute(event: Event, data: Int): Boolean {
+        if (!canUse()) return false;
 
         // 무적 해제
         EventManager.DamageGuard = false
 
         val cd = originalAbility!!.A_Condition(event, data)
-        if (cd == -1 || cd == -2) {
-            return
-        }
+        if (cd == -2) return true
+        if (cd == -1) return false
+
+        if (cooldownTimer.isRunning || durationTimer.isRunning) return true
 
         // Active_Continue
         if (durationMillis > 0 && cooldownMillis > 0) {
-            // 지속 시간 중이면
-            if (remainingDurationMillis > 0) {
-                originalAbility!!.A_Effect(event, cd)
-            }
-            // 쿨타임 체크
-            else if (remainingCooldownMillis < 1) {
-                durationTimer.start()
-            }
+            durationTimer.start()
         }
         // Active
         else if (cooldownMillis > 0) {
-            // 쿨타임 체크
-            if (remainingCooldownMillis > 0) return
-            cooldownTimer.start()
             originalAbility!!.A_Effect(event, cd)
+            cooldownTimer.start()
         }
         // Passive
         else {
             originalAbility!!.A_Effect(event, cd)
         }
+
+        return true
     }
 
 }

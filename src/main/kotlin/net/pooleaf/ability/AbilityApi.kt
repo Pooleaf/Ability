@@ -2,6 +2,7 @@ package net.pooleaf.ability
 
 import net.pooleaf.ability.ability.AbilityDrawer
 import net.pooleaf.ability.ability.AbilityManager
+import net.pooleaf.ability.ability.AbilityService
 import net.pooleaf.ability.compat.CompatPluginManager
 import net.pooleaf.ability.compat.CompatPluginService
 import net.pooleaf.ability.configs.AbilityGameConfig
@@ -21,6 +22,7 @@ object AbilityApi {
         lateinit var playerManager: AbilityPlayerManager
 
         lateinit var abilityManager: AbilityManager
+        lateinit var abilityService: AbilityService
 
         lateinit var compatPluginManager: CompatPluginManager
         lateinit var compatPluginService: CompatPluginService
@@ -29,6 +31,7 @@ object AbilityApi {
             playerManager = AbilityPlayerManager()
 
             abilityManager = AbilityManager()
+            abilityService = AbilityService()
 
             compatPluginManager = CompatPluginManager()
             compatPluginService = CompatPluginService()

@@ -26,6 +26,7 @@ class MapCommand {
         parent = ["", "게임"],
         name = ["맵", "map"],
         helpCommand = true,
+        description = "맵 명령어를 확인합니다.",
         color = CommonChatColor.AQUA,
         permission = GameCorePermission.ADMIN
     )

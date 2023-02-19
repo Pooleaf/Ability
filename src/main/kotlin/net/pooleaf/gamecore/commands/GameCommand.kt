@@ -19,6 +19,7 @@ class GameCommand {
 
     @Command(
         name = ["게임", "game"],
+        description = "게임 명령어를 확인합니다.",
         helpCommand = true,
         color = CommonChatColor.AQUA,
         permission = GameCorePermission.ADMIN

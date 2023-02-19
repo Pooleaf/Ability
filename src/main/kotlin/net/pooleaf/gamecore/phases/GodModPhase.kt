@@ -18,6 +18,10 @@ abstract class GodModPhase() : Phase() {
      */
     abstract fun getGodModSeconds(): Int
 
+    override fun onInit() {
+        remainingGodModSeconds = null
+    }
+
     override suspend fun onStart() {
         GameCore.game.isGodMode = true
 

@@ -1,7 +1,9 @@
 package net.pooleaf.gamecore.player
 
 import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import net.pooleaf.ability.AbilityPlugin
 import net.pooleaf.core.modules.coroutine.bukkit.BukkitSyncScope
 import net.pooleaf.core.modules.gui.GuiModule
 import net.pooleaf.gamecore.Broadcaster
@@ -106,8 +108,8 @@ class GamePlayerService {
             Broadcaster.broadcastWaitingActionBar(GameCore.unsafe.playerManager.getOnlineJoinedPlayers().size, GameCore.gameConfig.startPlayerCount)
 
             // 게임 시작
-            if (GameCore.unsafe.gameManager.canAutoStart()) {
-                BukkitSyncScope.launch {
+            BukkitSyncScope.launch {
+                if (GameCore.unsafe.gameManager.canAutoStart()) {
                     GameCore.unsafe.gameManager.startGame(null)
                 }
             }

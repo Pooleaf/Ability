@@ -20,6 +20,7 @@ class KitCommand {
     @Command(
         parent = ["", "게임"],
         name = ["킷", "kit"],
+        description = "킷 명령어를 확인합니다.",
         helpCommand = true,
         color = CommonChatColor.AQUA,
         permission = GameCorePermission.ADMIN

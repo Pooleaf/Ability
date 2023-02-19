@@ -9,7 +9,7 @@ import org.bukkit.entity.Player
 import org.bukkit.event.Listener
 import java.text.DecimalFormat
 
-open class Ability() : Cloneable {
+open class Ability() {
 
     // 플러그인 이름
     lateinit var pluginName: String
@@ -137,11 +137,7 @@ open class Ability() : Cloneable {
     }
 
     protected fun canUse(): Boolean {
-        return AbilityApi.game.isGameStarted && !AbilityApi.game.isGodMode && !AbilityApi.game.isEnded
-    }
-
-    public override fun clone(): Ability {
-        return super.clone() as Ability
+        return AbilityApi.unsafe.abilityService.canUseAbility()
     }
 
 }

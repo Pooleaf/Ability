@@ -1,11 +1,18 @@
 package net.pooleaf.ability.compat
 
 import net.pooleaf.ability.AbilityApi
+import net.pooleaf.ability.compat.bitability.BitAbilityCompatPlugin
+import net.pooleaf.ability.compat.physicalfighters.PhysicalFightersCompatPlugin
 import net.pooleaf.core.modules.support.bukkit.util.BukkitReflectionUtil
 import net.pooleaf.core.modules.support.common.logger.Logger
 import org.bukkit.plugin.java.JavaPlugin
 
 class CompatPluginService {
+
+    init {
+        AbilityApi.unsafe.compatPluginManager.add(BitAbilityCompatPlugin())
+        AbilityApi.unsafe.compatPluginManager.add(PhysicalFightersCompatPlugin())
+    }
 
     /**
      * 호환 플러그인을 활성화 시킵니다.
@@ -46,7 +53,9 @@ class CompatPluginService {
      * 모든 호환 플러그인을 활성화시킵니다.
      */
     fun enableAllCompatPlugins() {
-        AbilityApi.unsafe.compatPluginManager.values().forEach { enableCompatPlugin(it) }
+        AbilityApi.unsafe.compatPluginManager.values()
+            .filter { it.existsPlugin() }
+            .forEach { enableCompatPlugin(it) }
     }
 
 }

@@ -20,14 +20,16 @@ class AbilityPlugin: BukkitCorePlugin() {
         registerLoggerPrefix()
 
         GameCore.init(this, AbilityApi.game)
+        AbilityApi.init()
         GameCore.unsafe.playerManager = AbilityApi.unsafe.playerManager as GamePlayerManager<GamePlayer>
+
+        AbilityApi.unsafe.abilityManager.registerAbilities(this)
+        AbilityApi.unsafe.compatPluginService.enableAllCompatPlugins()
 
         registerEventListeners()
         registerCommonEventListeners()
         registerCommands()
 
-        AbilityApi.init()
-        AbilityApi.unsafe.abilityManager.registerAbilities(this)
 
         loadConfig()
     }
