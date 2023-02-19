@@ -12,7 +12,6 @@ class AbilityPlugin: BukkitCorePlugin() {
         lateinit var instance: AbilityPlugin
     }
 
-
     override fun onStart() {
         instance = this
 
@@ -21,14 +20,14 @@ class AbilityPlugin: BukkitCorePlugin() {
         registerLoggerPrefix()
 
         GameCore.init(this, AbilityApi.game)
-        GameCore.unsafe.playerManager = AbilityApi.playerManager as GamePlayerManager<GamePlayer>
+        GameCore.unsafe.playerManager = AbilityApi.unsafe.playerManager as GamePlayerManager<GamePlayer>
 
         registerEventListeners()
         registerCommonEventListeners()
         registerCommands()
 
         AbilityApi.init()
-        AbilityApi.abilityManager.registerAbilities(this)
+        AbilityApi.unsafe.abilityManager.registerAbilities(this)
 
         loadConfig()
     }
@@ -38,7 +37,8 @@ class AbilityPlugin: BukkitCorePlugin() {
     }
 
     override fun onConfigLoaded() {
-        GameCore.unsafe.loadConfig()
+        GameCore.loadConfig()
+        AbilityApi.loadConfig()
     }
 
 }

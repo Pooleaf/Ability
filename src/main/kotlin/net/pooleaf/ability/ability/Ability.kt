@@ -9,7 +9,7 @@ import org.bukkit.entity.Player
 import org.bukkit.event.Listener
 import java.text.DecimalFormat
 
-open class Ability(): Cloneable {
+open class Ability() : Cloneable {
 
     // 플러그인 이름
     lateinit var pluginName: String
@@ -117,7 +117,7 @@ open class Ability(): Cloneable {
         description.forEach { player?.sendMessage(it) }
 
         // 쿨타임
-        if (this is Cooldownable) {
+        if (this is Cooldownable && cooldownMillis > 0) {
             val cooldown = DecimalFormat("#.##").format(cooldownMillis.toFloat() / 1000)
             player?.sendMessage("")
             player?.sendMessage("§a§l쿨타임")
@@ -125,7 +125,7 @@ open class Ability(): Cloneable {
         }
 
         // 지속시간
-        if (this is Durationable) {
+        if (this is Durationable && durationMillis > 0) {
             val durationTime = DecimalFormat("#.##").format(durationMillis.toFloat() / 1000)
             player?.sendMessage("")
             player?.sendMessage("§a§l지속시간")
@@ -138,6 +138,10 @@ open class Ability(): Cloneable {
 
     protected fun canUse(): Boolean {
         return AbilityApi.game.isGameStarted && !AbilityApi.game.isGodMode && !AbilityApi.game.isEnded
+    }
+
+    public override fun clone(): Ability {
+        return super.clone() as Ability
     }
 
 }

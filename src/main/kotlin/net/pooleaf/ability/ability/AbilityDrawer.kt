@@ -28,7 +28,7 @@ class AbilityDrawer(
     suspend fun drawTo(
         player: Player,
         // 추첨할 능력
-        abilities: List<Ability> = AbilityApi.abilityManager.abilities,
+        abilities: List<Ability> = AbilityApi.unsafe.abilityManager.abilities,
         // 추첨 결과 능력 미리 설정
         ability: Ability? = null
     ): Ability? {
@@ -58,7 +58,7 @@ class AbilityDrawer(
             }
             // 중복 할당 비허용 능력 추첨
             else {
-                val assignedAbilityNames = AbilityApi.abilityManager.getAssignedAbilities().map { it.fullName }
+                val assignedAbilityNames = AbilityApi.unsafe.abilityManager.getAssignedAbilities().map { it.fullName }
                 tempAbility = abilities.filter { !assignedAbilityNames.contains(it.fullName) }.random()
             }
 
@@ -111,7 +111,7 @@ class AbilityDrawer(
     suspend fun drawWithYesNoMessage(
         abilityPlayer: AbilityPlayer,
         // 추첨할 능력
-        abilities: List<Ability> = AbilityApi.abilityManager.abilities,
+        abilities: List<Ability> = AbilityApi.unsafe.abilityManager.abilities,
         // 추첨 결과 능력 미리 설정
         ability: Ability? = null
     ): Ability? {

@@ -18,7 +18,7 @@ class AbilityDrawPhase: Phase() {
         delay(4000L)
 
         // 추첨할 능력이 없을 경우 게임 중단
-        if (AbilityApi.abilityManager.abilities.isEmpty()) {
+        if (AbilityApi.unsafe.abilityManager.abilities.isEmpty()) {
             BukkitAsyncScope.launch { AbilityApi.game.cancel(null, "능력이 부족하여 게임을 시작할 수 없습니다.") }
         }
 
@@ -26,15 +26,15 @@ class AbilityDrawPhase: Phase() {
         AbilityApi.game.abilityDrawStarted = true
 
         // 모든 플레이어 능력 추첨
-        AbilityApi.playerManager.getJoinedPlayers().forEach { abilityPlayer ->
+        AbilityApi.unsafe.playerManager.getJoinedPlayers().forEach { abilityPlayer ->
             BukkitAsyncScope.launch {
-                val tempAbility = AbilityApi.abilityManager.getRandomAbilityNoDuplicatedInTemp()
-                AbilityApi.abilityDrawer.drawWithYesNoMessage(abilityPlayer, AbilityApi.abilityManager.abilities, tempAbility)
+                val tempAbility = AbilityApi.unsafe.abilityManager.getRandomAbilityNoDuplicatedInTemp()
+                AbilityApi.abilityDrawer.drawWithYesNoMessage(abilityPlayer, AbilityApi.unsafe.abilityManager.abilities, tempAbility)
             }
         }
 
         // 모든 플레이어가 능력을 확정하면 Phase 종료
-        while (!AbilityApi.playerManager.getOnlineJoinedPlayers().all { it.abilityDrawComplete }) {
+        while (!AbilityApi.unsafe.playerManager.getOnlineJoinedPlayers().all { it.abilityDrawComplete }) {
             delay(100L)
         }
     }
@@ -44,7 +44,7 @@ class AbilityDrawPhase: Phase() {
         Broadcaster.broadcastSound(XSound.ENTITY_PLAYER_LEVELUP, 1F, 1F)
 
         Logger.nlog("§e[ 플레이어 능력 ]")
-        AbilityApi.playerManager.getJoinedPlayers().forEach {abilityPlayer ->
+        AbilityApi.unsafe.playerManager.getJoinedPlayers().forEach {abilityPlayer ->
             val abilityName = abilityPlayer.ability?.name ?: "없음"
             Logger.nlog("§e${abilityPlayer.name}(${abilityPlayer.uuid}): §f${abilityName}")
         }

@@ -30,7 +30,7 @@ class AbilityCommand {
         description = "보유 중인 능력을 확인합니다."
     )
     fun ability_help(player: Player, result: CommandResult) {
-        val abilityPlayer = AbilityApi.playerManager.get(player.uniqueId) ?: error("gamePlayer cannot be null")
+        val abilityPlayer = AbilityApi.unsafe.playerManager.get(player.uniqueId) ?: error("gamePlayer cannot be null")
         if (abilityPlayer.ability == null) {
             player.sendMessage("§c능력을 보유하고 있지 않습니다.")
             return
@@ -46,7 +46,7 @@ class AbilityCommand {
         description = "능력을 확정합니다."
     )
     fun ability_yes(player: Player, result: CommandResult) {
-        val abilityPlayer = AbilityApi.playerManager.get(player.uniqueId) ?: error("gamePlayer cannot be null")
+        val abilityPlayer = AbilityApi.unsafe.playerManager.get(player.uniqueId) ?: error("gamePlayer cannot be null")
 
         val currentPhase = AbilityApi.game.phasePipeline.currentPhase
         if (!(currentPhase is AbilityDrawPhase)) {
@@ -87,7 +87,7 @@ class AbilityCommand {
         description = "능력을 다시 뽑습니다."
     )
     fun ability_no(player: Player, result: CommandResult) {
-        val abilityPlayer = AbilityApi.playerManager.get(player.uniqueId) ?: error("gamePlayer cannot be null")
+        val abilityPlayer = AbilityApi.unsafe.playerManager.get(player.uniqueId) ?: error("gamePlayer cannot be null")
 
         val currentPhase = AbilityApi.game.phasePipeline.currentPhase
         if (currentPhase !is AbilityDrawPhase) {
@@ -112,8 +112,8 @@ class AbilityCommand {
         abilityPlayer.redrawCount++
 
         BukkitAsyncScope.launch {
-            val tempAbility = AbilityApi.abilityManager.getRandomAbilityNoDuplicatedInTemp()
-            AbilityApi.abilityDrawer.drawWithYesNoMessage(abilityPlayer, AbilityApi.abilityManager.abilities, tempAbility)
+            val tempAbility = AbilityApi.unsafe.abilityManager.getRandomAbilityNoDuplicatedInTemp()
+            AbilityApi.abilityDrawer.drawWithYesNoMessage(abilityPlayer, AbilityApi.unsafe.abilityManager.abilities, tempAbility)
             abilityPlayer.ability?.let { ability ->
                 player.sendMessage("")
                 player.sendMessage("${ability.name} §e능력을 확정했습니다.")

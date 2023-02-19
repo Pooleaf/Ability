@@ -44,10 +44,17 @@ class AbilityManager {
     }
 
     /**
+     * [Ability]들을 등록합니다.
+     */
+    fun registerAbilities(abilities: List<Ability>) {
+        abilities.forEach { registerAbility(it) }
+    }
+
+    /**
      * 플레이어에게 할당된 [Ability]들을 반환합니다.
      */
     fun getAssignedAbilities(): List<Ability> {
-        return AbilityApi.playerManager.getJoinedPlayers()
+        return AbilityApi.unsafe.playerManager.getJoinedPlayers()
             .filter { it.ability != null }
             .map { it.ability!! }
             .toList()
@@ -57,7 +64,7 @@ class AbilityManager {
      * 플레이어에게 임시로 할당된 [Ability]들을 반환합니다.
      */
     fun getTempAssignedAbilities(): List<Ability> {
-        return AbilityApi.playerManager.getJoinedPlayers()
+        return AbilityApi.unsafe.playerManager.getJoinedPlayers()
             .filter { it.tempAbility != null }
             .map { it.tempAbility!! }
             .toList()

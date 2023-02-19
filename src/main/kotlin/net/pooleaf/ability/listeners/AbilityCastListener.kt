@@ -26,7 +26,7 @@ class AbilityCastListener: Listener {
             else -> return
         }
 
-        val abilityPlayer = AbilityApi.playerManager.get(event.player.uniqueId)
+        val abilityPlayer = AbilityApi.unsafe.playerManager.get(event.player.uniqueId)
         val ability = abilityPlayer?.ability ?: return
 
         // 아이템으로 캐스팅하는 능력일 경우
