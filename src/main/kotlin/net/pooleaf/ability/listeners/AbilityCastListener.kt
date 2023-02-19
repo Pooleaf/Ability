@@ -3,6 +3,7 @@ package net.pooleaf.ability.listeners
 import net.pooleaf.ability.AbilityApi
 import net.pooleaf.ability.ability.Durationable
 import net.pooleaf.ability.ability.cast.CastByItemHandler
+import net.pooleaf.core.modules.support.common.logger.Logger
 import org.bukkit.Material
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -51,6 +52,7 @@ class AbilityCastListener: Listener {
                 }
 
                 abilityPlayer.sendMessageSafely("${ability.name} §e능력을 사용했습니다.")
+                Logger.log("${abilityPlayer.name} §e님께서 §f${ability.name} §e능력을 사용했습니다.")
             }
         }
     }

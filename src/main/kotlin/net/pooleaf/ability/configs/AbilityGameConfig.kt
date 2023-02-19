@@ -6,6 +6,9 @@ import java.io.File
 
 class AbilityGameConfig(file: File?) : SimpleAnnoConfig(file) {
 
+    @ConfigName("능력 중복 허용")
+    var allowAbilityDuplicate = false
+
     @ConfigName("능력 강제 확정 시간(초)")
     var drawSkipSeconds: Int = 90
 
