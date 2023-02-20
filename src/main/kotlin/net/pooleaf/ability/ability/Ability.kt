@@ -99,7 +99,7 @@ open class Ability() {
         }
     }
 
-    fun sendManual(player: Player) {
+    fun sendManual(player: Player?) {
         player?.sendMessage("§e§l====================================================")
 
         // 이름

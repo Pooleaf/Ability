@@ -9,14 +9,11 @@ import net.pooleaf.core.modules.support.common.util.toMillis
 import net.pooleaf.gamecore.Broadcaster
 import net.pooleaf.gamecore.GameCore
 import net.pooleaf.gamecore.phase.Phase
-import org.bukkit.Color
-import org.bukkit.FireworkEffect
+import net.pooleaf.gamecore.utils.FireworkUtil
 import org.bukkit.Location
-import org.bukkit.entity.EntityType
-import org.bukkit.entity.Firework
 import org.bukkit.entity.Player
 
-class EndPhase(): Phase() {
+open class EndPhase(): Phase() {
 
     override suspend fun onStart() {
         // 우승 가능 시간이 안될경우 중단
@@ -35,7 +32,7 @@ class EndPhase(): Phase() {
             Broadcaster.broadcastTitle("§e우승", "§f${winnerPlayerNames}", 10 * 20)
 
             // 사운드
-            Broadcaster.broadcastSound(XSound.ENTITY_PLAYER_LEVELUP, 1.0F, 0.5F)
+            Broadcaster.broadcastSound(XSound.ENTITY_PLAYER_LEVELUP, 0.4F, 0.5F)
 
             // 우승자 주변에 폭죽 날리기
             winnerPlayers.forEach { gamePlayer ->
@@ -81,44 +78,7 @@ class EndPhase(): Phase() {
         val location: Location = player.location
         location.add(Math.random() * 10 - 5, 0.0, Math.random() * 10 - 5)
 
-        val firework = location.world.spawnEntity(location, EntityType.FIREWORK) as Firework
-
-        val fireworkMeta = firework.fireworkMeta
-        fireworkMeta.power = 1
-        fireworkMeta.addEffect(
-            FireworkEffect.builder()
-                .withColor(getRandomColor())
-                .build()
-        )
-
-        firework.fireworkMeta = fireworkMeta
-    }
-
-    private fun getRandomColor(): Color? {
-        return getColor((Math.random() * 17 + 1).toInt())
-    }
-
-    private fun getColor(i: Int): Color? {
-        when (i) {
-            1 -> return Color.WHITE
-            2 -> return Color.SILVER
-            3 -> return Color.GRAY
-            4 -> return Color.BLACK
-            5 -> return Color.RED
-            6 -> return Color.MAROON
-            7 -> return Color.YELLOW
-            8 -> return Color.OLIVE
-            9 -> return Color.LIME
-            10 -> return Color.GREEN
-            11 -> return Color.AQUA
-            12 -> return Color.TEAL
-            13 -> return Color.BLUE
-            14 -> return Color.NAVY
-            15 -> return Color.FUCHSIA
-            16 -> return Color.PURPLE
-            17 -> return Color.ORANGE
-        }
-        return null
+        FireworkUtil.shootRandomFirework(location)
     }
 
 }

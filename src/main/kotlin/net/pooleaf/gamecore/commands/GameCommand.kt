@@ -62,7 +62,7 @@ class GameCommand {
 
         BukkitAsyncScope.launch {
             GameCore.game.cancel(sender.platformSender, "${sender.displayName} 님께서 게임을 중단시켰습니다.")
-            Broadcaster.broadcast("${sender.displayName} §c님께서 게임을 중단시켰습니다.")
+            Broadcaster.broadcastWarning("${sender.displayName} §c님께서 게임을 중단시켰습니다.")
         }
     }
 

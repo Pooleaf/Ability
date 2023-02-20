@@ -176,7 +176,13 @@ class MapCommand {
         permission = GameCorePermission.ADMIN
     )
     fun map_list(sender: CommonCommandSender<CommandSender>, result: CommandResult) {
-        object : PageableCommand<GameMap>(result.entered, ArrayList(GameCore.unsafe.mapManager.values()), 7) {
+        val maps = GameCore.unsafe.mapManager.values().toList()
+        if (maps.isEmpty()) {
+            sender.sendWarning("생성된 맵이 없습니다.")
+            return
+        }
+
+        object : PageableCommand<GameMap>(result.entered, maps, 7) {
             override fun getHeaderColor(): CommonChatColor {
                 return (GameCore.gamePlugin as CorePlugin).color
             }

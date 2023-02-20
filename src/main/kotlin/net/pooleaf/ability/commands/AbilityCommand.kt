@@ -1,6 +1,5 @@
 package net.pooleaf.ability.commands
 
-import com.cryptomorin.xseries.XSound
 import kotlinx.coroutines.launch
 import net.pooleaf.ability.AbilityApi
 import net.pooleaf.ability.phases.AbilityDrawPhase
@@ -8,7 +7,7 @@ import net.pooleaf.core.modules.annocommand.common.Command
 import net.pooleaf.core.modules.annocommand.common.CommandResult
 import net.pooleaf.core.modules.annocommand.common.HelpCommandResult
 import net.pooleaf.core.modules.coroutine.bukkit.BukkitAsyncScope
-import net.pooleaf.core.modules.gui.bukkit.title.DefaultTitleBuilder
+import net.pooleaf.core.modules.support.bukkit.messager.sendWarning
 import net.pooleaf.core.modules.support.bukkit.util.TeleportUtil
 import net.pooleaf.gamecore.GameCore
 import org.bukkit.command.CommandSender
@@ -17,7 +16,7 @@ import org.bukkit.entity.Player
 class AbilityCommand {
 
     @Command(
-        name = ["능력자", "ability", "va", "ha"],
+        name = ["능력자", "ability", "va", "ha", "ua"],
         description = "능력자 명령어 목록을 확인합니다.",
         helpCommand = true
     )
@@ -54,6 +53,11 @@ class AbilityCommand {
             return
         }
 
+        if (abilityPlayer.abilityDrawComplete) {
+            player.sendMessage("§c이미 능력을 확정했습니다.")
+            return
+        }
+
         if (abilityPlayer.tempAbility == null) {
             player.sendMessage("§c추첨된 능력이 없습니다.")
             return
@@ -64,21 +68,12 @@ class AbilityCommand {
             return
         }
 
-        abilityPlayer.abilityDrawComplete = true
-        abilityPlayer.assignAbility(abilityPlayer.tempAbility!!)
-        abilityPlayer.tempAbility = null
+        if (abilityPlayer.abilityDrawJob?.let { it.isActive } == true) {
+            player.sendWarning("능력 추첨이 끝날 때까지 기다려주세요.")
+            return
+        }
 
-        player.sendMessage("")
-        player.sendMessage("${abilityPlayer.ability!!.name} §e능력을 확정했습니다.")
-        player.sendMessage("/능력 §e명령어를 사용하여 능력을 다시 확인할 수 있습니다.")
-
-        DefaultTitleBuilder()
-            .title("§e${abilityPlayer.ability!!.name}")
-            .subtitle("§f능력을 확정했습니다.")
-            .build()
-            .send(player);
-
-        XSound.ENTITY_PLAYER_LEVELUP.play(player, 0.4F, 1.0F)
+        AbilityApi.unsafe.abilityService.decideAbility(abilityPlayer)
     }
 
     @Command(
@@ -100,8 +95,18 @@ class AbilityCommand {
             return
         }
 
+        if (abilityPlayer.tempAbility == null) {
+            player.sendMessage("§c추첨된 능력이 없습니다.")
+            return
+        }
+
         if (abilityPlayer.redrawCount >= abilityPlayer.maxRedrawCount) {
             player.sendMessage("§c더 이상 능력을 다시 뽑을 수 없습니다.")
+            return
+        }
+
+        if (abilityPlayer.abilityDrawJob?.let { it.isActive } == true) {
+            player.sendWarning("능력 추첨이 끝날 때까지 기다려주세요.")
             return
         }
 
@@ -109,24 +114,8 @@ class AbilityCommand {
             player.sendMessage("")
         }
 
-        abilityPlayer.redrawCount++
-
-        BukkitAsyncScope.launch {
-            val tempAbility = AbilityApi.unsafe.abilityManager.getRandomAbilityNoDuplicatedInTemp()
-            AbilityApi.abilityDrawer.drawWithYesNoMessage(abilityPlayer, AbilityApi.unsafe.abilityManager.abilities, tempAbility)
-            abilityPlayer.ability?.let { ability ->
-                player.sendMessage("")
-                player.sendMessage("${ability.name} §e능력을 확정했습니다.")
-                player.sendMessage("/능력 §e명령어를 사용하여 능력을 다시 확인할 수 있습니다.")
-
-                DefaultTitleBuilder()
-                    .title("§e${ability.name}")
-                    .subtitle("§f능력을 확정했습니다.")
-                    .build()
-                    .send(player);
-
-                XSound.ENTITY_PLAYER_LEVELUP.play(player, 0.4F, 1.0F)
-            }
+        abilityPlayer.abilityDrawJob = BukkitAsyncScope.launch {
+            AbilityApi.unsafe.abilityService.redrawAbility(abilityPlayer)
         }
     }
 

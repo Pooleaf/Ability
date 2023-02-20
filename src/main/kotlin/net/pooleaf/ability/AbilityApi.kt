@@ -1,6 +1,5 @@
 package net.pooleaf.ability
 
-import net.pooleaf.ability.ability.AbilityDrawer
 import net.pooleaf.ability.ability.AbilityManager
 import net.pooleaf.ability.ability.AbilityService
 import net.pooleaf.ability.compat.CompatPluginManager
@@ -38,13 +37,11 @@ object AbilityApi {
         }
     }
 
+
     val abilityGameConfig
         get() = unsafe.abilityGameConfig
 
     val game: AbilityGame = AbilityGame()
-
-    val abilityDrawer: AbilityDrawer = AbilityDrawer(false)
-    val hiddenAbilityDrawer: AbilityDrawer = AbilityDrawer(false, 7, 100L, 100L)
 
 
     fun init() {

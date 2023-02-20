@@ -6,7 +6,7 @@ import net.pooleaf.core.modules.support.common.CommonChatColor
 import net.pooleaf.gamecore.Broadcaster
 import net.pooleaf.gamecore.GameCore
 import net.pooleaf.gamecore.phase.Phase
-import net.pooleaf.gamecore.util.StringUtil
+import net.pooleaf.gamecore.utils.StringUtil
 
 abstract class GodModPhase() : Phase() {
 
@@ -30,9 +30,10 @@ abstract class GodModPhase() : Phase() {
 
         Broadcaster.broadcast("§e무적 시간이 시작되었습니다.")
         Broadcaster.broadcast("${godModTime} §e간 무적 상태가 지속됩니다.")
-        Broadcaster.broadcastActionBar("${godModTime} §e간 무적 상태가 지속됩니다.")
         Broadcaster.broadcastSound(XSound.UI_BUTTON_CLICK, 0.3F, 0.7F)
+    }
 
+    override suspend fun onRun() {
         // 카운트
         for (count in getGodModSeconds() downTo 1) {
             remainingGodModSeconds = count

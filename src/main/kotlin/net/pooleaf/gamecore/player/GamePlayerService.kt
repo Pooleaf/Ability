@@ -178,7 +178,6 @@ class GamePlayerService {
     suspend fun settingToPlaying(gamePlayer: GamePlayer) {
         if (!gamePlayer.isOnline) error("gamePlayer is not online")
 
-        resetPlayer(gamePlayer)
     }
 
     /**

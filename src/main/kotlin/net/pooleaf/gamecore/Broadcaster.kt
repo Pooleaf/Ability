@@ -1,6 +1,7 @@
 package net.pooleaf.gamecore
 
 import com.cryptomorin.xseries.XSound
+import net.md_5.bungee.api.chat.BaseComponent
 import net.pooleaf.core.modules.gui.bukkit.actionbar.removeActionBar
 import net.pooleaf.core.modules.gui.bukkit.actionbar.showActionBar
 import net.pooleaf.core.modules.gui.bukkit.actionbar.showActionBarForever
@@ -17,6 +18,14 @@ object Broadcaster {
 
     fun broadcast(message: String) {
         Bukkit.broadcastMessage(message)
+    }
+
+    fun broadcast(component: BaseComponent) {
+        Bukkit.broadcast(component)
+    }
+
+    fun broadcastWarning(message: String) {
+        broadcast("§c${message}")
     }
 
     fun broadcastTitle(title: Title) {

@@ -4,13 +4,13 @@ import com.cryptomorin.xseries.XSound
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import net.pooleaf.gamecore.util.StringUtil
 import net.pooleaf.core.modules.coroutine.bukkit.BukkitAsyncScope
 import net.pooleaf.core.modules.support.bukkit.particle.Particle
 import net.pooleaf.core.modules.support.common.CommonChatColor
 import net.pooleaf.gamecore.Broadcaster
 import net.pooleaf.gamecore.GameCore
 import net.pooleaf.gamecore.phase.Phase
+import net.pooleaf.gamecore.utils.StringUtil
 import org.bukkit.Location
 
 abstract class WorldBorderUpdatePhase(): Phase() {
@@ -64,17 +64,33 @@ abstract class WorldBorderUpdatePhase(): Phase() {
                 "줄어듭니다"
             }
 
+            val updateTime = StringUtil.buildTimeStringWithColor(getUpdateWaitSeconds() * 1000L, CommonChatColor.WHITE, CommonChatColor.YELLOW)
+
+            Broadcaster.broadcast("${updateTime} §e후 맵의 경계가 ${updateMessage}.")
+            Broadcaster.broadcastSound(XSound.UI_BUTTON_CLICK, 0.3F, 0.7F)
+
+            startParticleTimer()
+        } ?: error("currentMap cannot be null")
+    }
+
+    override suspend fun onRun() {
+        GameCore.currentMap?.let { currentMap ->
+            val currentWorldBorderSize = currentMap.currentWorldBorderSize
+            val updateMessage = if (getNewWorldBorderSize() > currentWorldBorderSize) {
+                "늘어납니다"
+            } else {
+                "줄어듭니다"
+            }
+
             // 경계선 변화 알림 메시지
             for (count in getUpdateWaitSeconds() downTo 1) {
                 updateRemainingSeconds = count
 
-                if (count == getUpdateWaitSeconds() || count <= 5) {
+                if (count <= 5) {
                     val updateTime = StringUtil.buildTimeStringWithColor(count * 1000L, CommonChatColor.WHITE, CommonChatColor.YELLOW)
 
                     Broadcaster.broadcast("${updateTime} §e후 맵의 경계가 ${updateMessage}.")
                     Broadcaster.broadcastSound(XSound.UI_BUTTON_CLICK, 0.3F, 0.7F)
-
-                    startParticleTimer()
                 }
 
                 GameCore.unsafe.sideBarManager.sideBar?.let { it.update() }
@@ -116,22 +132,23 @@ abstract class WorldBorderUpdatePhase(): Phase() {
 
                 while (!isEnded) {
                     GameCore.unsafe.playerManager.getOnlinePlayingPlayers().forEach { gamePlayer ->
-                        val playerLocation = gamePlayer.player.location
+                        val player = gamePlayer.player
+                        val playerLocation = player.location
 
                         for (x in startX .. endX) {
                             val startZLocation = Location(playerLocation.world, x.toDouble(), playerLocation.y, startZ.toDouble())
                             val endZLocation = Location(playerLocation.world, x.toDouble(), playerLocation.y, endZ.toDouble())
 
-                            Particle.SPELL_INSTANT.spawn(startZLocation, 0.0F, 1)
-                            Particle.SPELL_INSTANT.spawn(endZLocation, 0.0F, 1)
+                            Particle.SPELL_INSTANT.spawn(player, startZLocation, 0.0F, 1)
+                            Particle.SPELL_INSTANT.spawn(player, endZLocation, 0.0F, 1)
                         }
 
                         for (z in startZ .. endZ) {
                             val startXLocation = Location(playerLocation.world, startX.toDouble(), playerLocation.y, z.toDouble())
                             val endXLocation = Location(playerLocation.world, endX.toDouble(), playerLocation.y, z.toDouble())
 
-                            Particle.SPELL_INSTANT.spawn(startXLocation, 0.0F, 1)
-                            Particle.SPELL_INSTANT.spawn(endXLocation, 0.0F, 1)
+                            Particle.SPELL_INSTANT.spawn(player, startXLocation, 0.0F, 1)
+                            Particle.SPELL_INSTANT.spawn(player, endXLocation, 0.0F, 1)
                         }
                     }
 

@@ -2,11 +2,9 @@ package net.pooleaf.ability.ability
 
 import com.cryptomorin.xseries.XSound
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import net.pooleaf.ability.AbilityApi
 import net.pooleaf.ability.phases.AbilityDrawPhase
 import net.pooleaf.ability.player.AbilityPlayer
-import net.pooleaf.core.modules.coroutine.bukkit.BukkitAsyncScope
 import net.pooleaf.core.modules.gui.bukkit.title.DefaultTitleBuilder
 import net.pooleaf.core.modules.gui.bukkit.title.Title
 import net.pooleaf.core.modules.gui.bukkit.title.TitleBuilder
@@ -33,10 +31,10 @@ class AbilityService {
      * [endPollingPeriodMillis]: [pollingConstantly]가 true일 경우 지속 시간, false일 경우 최대 가속 시간
      */
     suspend fun drawAbility(abilityPlayer: AbilityPlayer,
-                            abilities: List<Ability>,
-                            temp: Boolean,
-                            allowDuplicate: Boolean,
-                            pollingConstantly: Boolean,
+                            abilities: List<Ability> = AbilityApi.unsafe.abilityManager.getDefaultDrawAbilities(),
+                            temp: Boolean = true,
+                            allowDuplicate: Boolean = AbilityApi.abilityGameConfig.allowAbilityDuplicate,
+                            pollingConstantly: Boolean = false,
                             pollingCount: Int = 12,
                             startPollingPeriodMillis: Long = 40L,
                             endPollingPeriodMillis: Long = 240L
@@ -44,11 +42,11 @@ class AbilityService {
         val ability = if (allowDuplicate) {
             abilities.randomOrNull()
         } else {
-            val assignedAbilities = AbilityApi.unsafe.abilityManager.getAssignedAbilities()
-            val tempAssignedAbilities = AbilityApi.unsafe.abilityManager.getTempAssignedAbilities()
+            val assignedAbilities = AbilityApi.unsafe.abilityManager.getAssignedAbilities().map { it.fullName }
+            val tempAssignedAbilities = AbilityApi.unsafe.abilityManager.getTempAssignedAbilities().map { it.fullName }
 
-            abilities.filter { !assignedAbilities.contains(it) }
-                .filter { !tempAssignedAbilities.contains(it) }
+            abilities.filter { !assignedAbilities.contains(it.fullName) }
+                .filter { !tempAssignedAbilities.contains(it.fullName) }
                 .randomOrNull()
         }
 
@@ -66,17 +64,27 @@ class AbilityService {
             endPollingPeriodMillis
         )
 
+        // 능력 정보 메시지
+        delay(2000L)
+
+        ability?.sendManual(abilityPlayer.player) ?: abilityPlayer.sendWarningSafely("능력이 부족하여 능력을 할당받지 못했습니다.")
+        abilityPlayer.playSoundSafely(XSound.ENTITY_ITEM_PICKUP, 0.4F, 1.0F)
+
         // 능력 추첨 페이즈일 때
         val currentPhase = AbilityApi.game.phasePipeline.currentPhase
         if (currentPhase is AbilityDrawPhase) {
-            // 재추첨 횟수가 남지 않았을 경우 능력 확정
-            if (abilityPlayer.redrawCount >= abilityPlayer.maxRedrawCount) {
+            // 능력을 할당 받지 못했을 경우 능력 확정 처리
+            if (abilityPlayer.tempAbility == null) {
                 abilityPlayer.abilityDrawComplete = true
-                abilityPlayer.assignAbility(abilityPlayer.tempAbility!!)
-                abilityPlayer.tempAbility = null
+                sendDrawWaitActionBar(abilityPlayer)
+            }
+            // 재추첨 횟수가 남지 않았을 경우 능력 확정
+            else if (abilityPlayer.redrawCount >= abilityPlayer.maxRedrawCount) {
+                decideAbility(abilityPlayer)
             }
             // 확정, 재추첨 버튼
             else {
+                abilityPlayer.sendMessageSafely("")
                 delay(1000L)
 
                 sendYesNoMessage(abilityPlayer)
@@ -104,50 +112,46 @@ class AbilityService {
         abilityPlayer: AbilityPlayer,
         ability: Ability?,
         abilities: List<Ability>,
-        pollingConstantly: Boolean,
+        pollingConstantly: Boolean = false,
         pollingCount: Int = 12,
         startPollingPeriodMillis: Long = 40L,
         endPollingPeriodMillis: Long = 240L
     ) {
-        BukkitAsyncScope.launch {
-            var pollingAbility = abilities.random()
+        val delayMillis = (endPollingPeriodMillis - startPollingPeriodMillis).toFloat() / (pollingCount - 1)
 
-            val delayMillis = (endPollingPeriodMillis - startPollingPeriodMillis).toFloat() / (pollingCount - 1)
-
-            // 폴링 추첨 효과
-            for (i in 1..pollingCount) {
-                // 랜덤 능력 타이틀
-                val pollingAbility = abilities.random()
-                val title = createAbilityTitle(pollingAbility)
-
-                abilityPlayer.sendTitleSafely(title)
-                abilityPlayer.playSoundSafely(XSound.UI_BUTTON_CLICK, 0.4F, 1.0F)
-
-                // 일정한 딜레이
-                if (pollingConstantly) {
-                    delay(delayMillis.toLong())
-                }
-                // 가속 딜레이
-                else {
-                    delay(startPollingPeriodMillis + (delayMillis * i).toLong())
-                }
-            }
-
-            // 추첨 결정 효과
-            val title = createAbilityTitle(ability, true)
+        // 폴링 추첨 효과
+        for (i in 1..pollingCount) {
+            // 랜덤 능력 타이틀
+            val pollingAbility = abilities.random()
+            val title = createAbilityTitle(pollingAbility)
 
             abilityPlayer.sendTitleSafely(title)
-            when (ability?.rank) {
-                AbilityRank.SS -> {
-                    abilityPlayer.playSoundSafely(XSound.ENTITY_IRON_GOLEM_DEATH, 0.6F, 1F)
-                    abilityPlayer.playSoundSafely(XSound.ENTITY_WITHER_SPAWN, 0.4F, 1F)
-                }
-                null -> abilityPlayer.playSoundSafely(XSound.ENTITY_VILLAGER_NO, 0.6F, 1.0F)
-                else -> {
-                    abilityPlayer.playSoundSafely(XSound.ENTITY_PLAYER_LEVELUP, 0.4F, 0.5F)
-                }
+            abilityPlayer.playSoundSafely(XSound.UI_BUTTON_CLICK, 0.4F, 1.0F)
+
+            // 일정한 딜레이
+            if (pollingConstantly) {
+                delay(delayMillis.toLong())
             }
-        }.join()
+            // 가속 딜레이
+            else {
+                delay(startPollingPeriodMillis + (delayMillis * i).toLong())
+            }
+        }
+
+        // 추첨 결정 효과
+        val title = createAbilityTitle(ability, true)
+
+        abilityPlayer.sendTitleSafely(title)
+        when (ability?.rank) {
+            AbilityRank.SS -> {
+                abilityPlayer.playSoundSafely(XSound.ENTITY_IRON_GOLEM_DEATH, 0.6F, 1F)
+                abilityPlayer.playSoundSafely(XSound.ENTITY_WITHER_SPAWN, 0.4F, 1F)
+            }
+            null -> abilityPlayer.playSoundSafely(XSound.ENTITY_VILLAGER_NO, 0.6F, 1.0F)
+            else -> {
+                abilityPlayer.playSoundSafely(XSound.ENTITY_PLAYER_LEVELUP, 0.4F, 0.5F)
+            }
+        }
     }
 
     /**
@@ -213,7 +217,7 @@ class AbilityService {
 
         abilityPlayer.sendTitleSafely(
             DefaultTitleBuilder()
-                .title("§e${abilityPlayer.ability!!.name}")
+                .title("§e${abilityPlayer.ability?.name}")
                 .subtitle("§f능력을 확정했습니다.")
                 .build()
         )
@@ -228,9 +232,9 @@ class AbilityService {
      */
     suspend fun redrawAbility(
         abilityPlayer: AbilityPlayer,
-        abilities: List<Ability>,
-        allowDuplicate: Boolean,
-        pollingConstantly: Boolean,
+        abilities: List<Ability> = AbilityApi.unsafe.abilityManager.getDefaultDrawAbilities(),
+        allowDuplicate: Boolean = AbilityApi.abilityGameConfig.allowAbilityDuplicate,
+        pollingConstantly: Boolean = false,
         pollingCount: Int = 12,
         startPollingPeriodMillis: Long = 40L,
         endPollingPeriodMillis: Long = 240L
@@ -239,6 +243,7 @@ class AbilityService {
         if (abilityPlayer.redrawCount >= abilityPlayer.maxRedrawCount) error("abilityPlayer already drawn max redraw count")
 
         abilityPlayer.redrawCount++
+        abilityPlayer.tempAbility = null
 
         // 재추첨
         drawAbility(
@@ -251,11 +256,6 @@ class AbilityService {
             startPollingPeriodMillis,
             endPollingPeriodMillis
         )
-
-        // 능력 최대 추첨 횟수 도달 시 능력 확정
-        if (abilityPlayer.redrawCount >= abilityPlayer.maxRedrawCount) {
-            decideAbility(abilityPlayer)
-        }
     }
 
     /**
@@ -272,11 +272,8 @@ class AbilityService {
     /**
      * 능력을 강제로 확정시킵니다.
      */
-    fun skipAbilityDrawPhase() {
-        val currentPhase = AbilityApi.game.phasePipeline.currentPhase
-        if (currentPhase !is AbilityDrawPhase) error("currentPhase is not AbilityDrawPhase")
-
-        AbilityApi.unsafe.playerManager.getOnlinePlayingPlayers().filter { !it.abilityDrawComplete }
+    fun skipAbilityDraw() {
+        AbilityApi.unsafe.playerManager.getPlayingPlayers().filter { !it.abilityDrawComplete }
             .map { decideAbility(it) }
     }
 

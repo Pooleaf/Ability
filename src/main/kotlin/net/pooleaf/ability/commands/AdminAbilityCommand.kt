@@ -22,16 +22,15 @@ class AdminAbilityCommand {
     )
     fun ability_drawSkip(sender: CommonCommandSender<CommandSender>, result: CommandResult) {
         val currentPhase = AbilityApi.game.phasePipeline.currentPhase
-        if (!(currentPhase is AbilityDrawPhase)) {
+        if (currentPhase !is AbilityDrawPhase) {
             sender.sendMessage("§c능력 추첨 중이 아닙니다.")
             return
         }
 
-        // 능력 추첨 페이즈 종료
-        currentPhase.end()
+        AbilityApi.unsafe.abilityService.skipAbilityDraw()
 
         Broadcaster.broadcast("${sender.displayName} §b님께서 모든 플레이어의 능력을 강제로 확정시켰습니다.")
-        Broadcaster.broadcastSound(XSound.ENTITY_ITEM_PICKUP, 1F, 1F)
+        Broadcaster.broadcastSound(XSound.ENTITY_ITEM_PICKUP, 0.4F, 0.4F)
     }
 
 

@@ -12,7 +12,7 @@ class StartItemListener: Listener {
         val gamePlayer = event.gamePlayer
 
         // 시작 아이템 미지급 시 지급
-        if (GameCore.game.isGameStarted && !gamePlayer.isReceiveStartItems) {
+        if (GameCore.game.isGameStarted && gamePlayer.isPlaying() && !gamePlayer.isReceiveStartItems) {
             gamePlayer.giveStartItem()
         }
     }

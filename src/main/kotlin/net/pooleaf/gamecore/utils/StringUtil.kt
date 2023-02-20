@@ -1,4 +1,4 @@
-package net.pooleaf.gamecore.util
+package net.pooleaf.gamecore.utils
 
 import net.pooleaf.core.modules.support.common.CommonChatColor
 import java.util.concurrent.TimeUnit

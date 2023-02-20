@@ -26,11 +26,19 @@ open class Phase() {
 
     /**
      * Phase가 시작될 때 실행됩니다.
+     * Phase 시작 메시지 등을 담당합니다.
      */
     protected open suspend fun onStart() {}
 
     /**
+     * Phase 시작 직후 실행됩니다.
+     * Phase 중 일어날 일들을 담당합니다.
+     */
+    protected open suspend fun onRun() {}
+
+    /**
      * Phase가 종료될 때 실행됩니다.
+     * Phase 종료 메시지 등을 담당합니다.
      */
     protected open fun onEnd() {}
 
@@ -63,6 +71,7 @@ open class Phase() {
 
         job = BukkitAsyncScope.launch {
             onStart()
+            onRun()
         }
         job?.join()
 

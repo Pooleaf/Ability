@@ -6,6 +6,7 @@ import net.pooleaf.gamecore.GameCore
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Material
+import kotlin.random.Random
 
 open class GameMap {
 
@@ -119,19 +120,32 @@ open class GameMap {
 
     /**
      * 맵 내의 랜덤 위치를 불러옵니다.
+     * [useCurrentWorldBorder]: true일 경우 현재 경계선 크기를 기준으로 하고 false일 경우 맵 최초 경계선 크기를 기준으로 합니다.
+     * Primary Thread에서만 실행할 수 있습니다.
      */
-    fun getRandomLocation(): Location? {
+    fun getRandomLocation(useCurrentWorldBorder: Boolean = false): Location? {
+        if (!Bukkit.isPrimaryThread()) error("getRandomLocation() can only be used in primary thread")
+
+        val referenceWorldBorderSize = if (useCurrentWorldBorder) currentWorldBorderSize else worldBorderSize
+
         return centerLocation?.let { centerLocation ->
             // 랜덤 x, z
-            val x = ((centerLocation.x - worldBorderSize / 2) + (Math.random() * worldBorderSize)).toInt()
-            val z = ((centerLocation.z - worldBorderSize / 2) + (Math.random() * worldBorderSize)).toInt()
+            val x = ((centerLocation.x - referenceWorldBorderSize / 2) + Random.nextInt(referenceWorldBorderSize)).toInt()
+            val z = ((centerLocation.z - referenceWorldBorderSize / 2) + Random.nextInt(referenceWorldBorderSize)).toInt()
 
             // 랜덤 위치에서 제일 높은 블럭 찾기
-            val block = centerLocation.world.getHighestBlockAt(x, z) ?: return getRandomLocation()
+            val highestY = centerLocation.world.getHighestBlockYAt(x, z) - 1
+            val block = centerLocation.world.getBlockAt(x, highestY, z)
 
             // 블럭이 없을 경우 다시 찾음
             when (block.type) {
-                Material.AIR, Material.WATER, Material.STATIONARY_WATER, Material.LAVA, Material.STATIONARY_LAVA, Material.BEDROCK, Material.BARRIER -> return getRandomLocation()
+                Material.AIR,
+                Material.WATER,
+                Material.STATIONARY_WATER,
+                Material.LAVA,
+                Material.STATIONARY_LAVA,
+                Material.BEDROCK,
+                Material.BARRIER -> return getRandomLocation(useCurrentWorldBorder)
             }
 
             // 블럭보다 한 칸 높게 반환

@@ -8,7 +8,7 @@ import net.pooleaf.gamecore.Broadcaster
 import net.pooleaf.gamecore.GameCore
 import net.pooleaf.gamecore.phase.Phase
 
-class StartCountPhase(
+open class StartCountPhase(
     val teleportToMap: Boolean = true
 ): Phase() {
 
@@ -17,7 +17,9 @@ class StartCountPhase(
 
         Broadcaster.broadcastActionBar("§e잠시 후 게임이 시작됩니다.")
         Broadcaster.broadcastSound(XSound.UI_BUTTON_CLICK, 0.3F, 0.7F)
+    }
 
+    override suspend fun onRun() {
         delay(5000L)
 
         // 카운트

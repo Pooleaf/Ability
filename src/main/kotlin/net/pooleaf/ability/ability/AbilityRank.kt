@@ -10,6 +10,7 @@ enum class AbilityRank(
     val displayItem: ItemStack
 ) {
 
+    HIDDEN(CommonChatColor.BLACK, ItemStack(Material.BEDROCK)),
     SS(CommonChatColor.DARK_PURPLE, ItemStack(Material.OBSIDIAN)),
     S(CommonChatColor.AQUA, ItemStack(Material.DIAMOND_BLOCK)),
     A(CommonChatColor.YELLOW, ItemStack(Material.GOLD_BLOCK)),

@@ -40,9 +40,6 @@ class GamePlayerListener: Listener {
                 gamePlayer.init()
             }
 
-            // 리셋
-            gamePlayer.reset()
-
             // 게임 중이 아니라면
             if (!GameCore.game.isGameStarted) {
                 // 게임에 참여

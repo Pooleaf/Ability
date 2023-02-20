@@ -15,7 +15,7 @@ class AbilityElement: GameSideBarPersonalNamedTextElement("§c능력") {
     }
 
     override fun isShow(gamePlayer: GamePlayer): Boolean {
-        return (gamePlayer as AbilityPlayer).ability != null
+        return (gamePlayer as AbilityPlayer).ability != null && gamePlayer.isPlaying()
     }
 
     override fun isUseSpace(): Boolean {

@@ -50,6 +50,13 @@ class AbilityManager {
         abilities.forEach { registerAbility(it) }
     }
 
+    fun getDefaultDrawAbilities(): List<Ability> {
+        return AbilityApi.unsafe.abilityManager.abilities
+            .filter { it.isInitialized }
+            .filter { !it.ban }
+            .filter { it.rank != AbilityRank.HIDDEN }
+    }
+
     /**
      * 플레이어에게 할당된 [Ability]들을 반환합니다.
      */

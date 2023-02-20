@@ -1,4 +1,4 @@
-package net.pooleaf.gamecore.startitem
+package net.pooleaf.gamecore.supply
 
 import net.pooleaf.core.modules.gui.bukkit.inventory.InventoryGui
 import net.pooleaf.core.modules.gui.bukkit.inventory.InventoryGuiClickAction
@@ -10,18 +10,20 @@ import net.pooleaf.core.modules.gui.bukkit.inventory.events.InventoryGuiPlayerIn
 import net.pooleaf.core.modules.gui.bukkit.sign.SignGui
 import net.pooleaf.core.modules.support.bukkit.messager.sendWarning
 import net.pooleaf.core.modules.support.bukkit.util.ItemBuilder
-import net.pooleaf.gamecore.GameCore
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 
-class StartItemEditGui : InventoryGui("시작 아이템 수정", 6) {
+class SupplyEditGui(
+    val supply: Supply,
+    val player: Player
+) : InventoryGui(supply.name, 6) {
 
-    val armorPanel: InventoryPanel
+    val settingPanel: InventoryPanel
     val itemPanel: InventoryPanel
 
     init {
-        armorPanel = createPanel("armorPanel", 1, 1, 9, 2)
+        settingPanel = createPanel("settingPanel", 1, 1, 9, 2)
         itemPanel = createPanel("itemPanel", 1, 3, 9, 4)
 
         // 구분선
@@ -33,55 +35,47 @@ class StartItemEditGui : InventoryGui("시작 아이템 수정", 6) {
             }
         }
 
-        for (x in 5..8) {
-            armorPanel.set(x, 1, decoIcon)
+        for (x in 2..9) {
+            settingPanel.set(x, 1, decoIcon)
         }
 
         for (x in 1..9) {
-            armorPanel.set(x, 2, decoIcon)
+            settingPanel.set(x, 2, decoIcon)
         }
 
-        // 갑옷 아이템 넣기
-        val startItem = GameCore.unsafe.startItemManager.startItem
-
-        armorPanel.set(1, 1, startItem.helmetItem)
-        armorPanel.set(2, 1, startItem.chestplatItem)
-        armorPanel.set(3, 1, startItem.leggingsItem)
-        armorPanel.set(4, 1, startItem.bootsItem)
-
-        // 시작 아이템 넣기
-        startItem.items.forEach { itemPanel.add(it) }
-
-        // 레벨
-        val levelIcon = object : InventoryIcon() {
+        // 확률 비율 아이콘
+        val probabilityRatioIcon = object : InventoryIcon() {
             override fun updateItem(): ItemStack {
-                return ItemBuilder(Material.EXP_BOTTLE)
-                    .displayName("§f${startItem.level} §e§l레벨")
-                    .lore("§f클릭 시 레벨을 수정합니다.")
+                return ItemBuilder(Material.DIAMOND)
+                    .displayName("§e§l확률 비율 §f${supply.probabilityRatio}")
+                    .lore("§f클릭 시 확률 비율을 수정합니다.")
                     .build()
             }
 
             override fun onClick(event: InventoryGuiClickEvent) {
                 // 표지판으로 입력
-                object : SignGui("", "", "^^^^^^^^^^", "레벨을 입력해 주세요") {
+                object : SignGui("", "", "^^^^^^^^^^", "확률 비율을 입력해 주세요") {
                     override fun onSignComplete(player: Player, lines: Array<String>) {
                         // 레벨 설정
-                        val level = lines[0].toIntOrNull()
-                        if (level == null) {
-                            player.sendWarning("레벨은 정수만 입력 가능합니다.")
+                        val probabilityRatio = lines[0].toIntOrNull()
+                        if (probabilityRatio == null) {
+                            player.sendWarning("확률 비율은 정수만 입력 가능합니다.")
                             return
                         }
 
-                        GameCore.unsafe.startItemManager.startItem.level = level
-                        player.sendMessage("§b시작 레벨을 §f${level}§b(으)로 설정했습니다.")
+                        supply.probabilityRatio = probabilityRatio
+                        player.sendMessage("§b확률 비율을 §f${probabilityRatio}§b(으)로 설정했습니다.")
 
                         // GUI 열기
-                        StartItemEditGui().open(player)
+                        SupplyEditGui(supply, player).open(player)
                     }
                 }.open(event.player)
             }
         }
-        armorPanel.set(9, 1, levelIcon)
+        settingPanel.set(1, 1, probabilityRatioIcon)
+
+        // 보급품 아이템 넣기
+        supply.items.forEach { itemPanel.add(it) }
 
         updateAsynchronously()
     }
@@ -107,37 +101,15 @@ class StartItemEditGui : InventoryGui("시작 아이템 수정", 6) {
     }
 
     override fun onClose(event: InventoryGuiCloseEvent) {
-        val startItem = GameCore.unsafe.startItemManager.startItem
+        supply.items.clear()
+        itemPanel.itemListInInventory.forEach { supply.items.add(it as ItemStack) }
 
-        // 갑옷
-        startItem.helmetItem = armorPanel.getItemInInventory(1, 1)
-        startItem.chestplatItem = armorPanel.getItemInInventory(2, 1)
-        startItem.leggingsItem = armorPanel.getItemInInventory(3, 1)
-        startItem.bootsItem = armorPanel.getItemInInventory(4, 1)
-
-        // 아이템
-        startItem.items.clear()
-        itemPanel.itemListInInventory.forEach { startItem.items.add(it as ItemStack) }
-
-        startItem.saveStartItemConfig()
-        event.player.sendMessage("§b시작 아이템을 저장했습니다.")
+        supply.saveSupplyConfig()
+        event.player.sendMessage("§b보급품 §f${supply.name}을(를) 저장했습니다.")
     }
 
     private fun calculateClickCancel(clickedPanel: InventoryPanel, x: Int, y: Int): Boolean {
-        // 갑옷 & 레벨
-        if (clickedPanel == armorPanel && y == 1) {
-            when (x) {
-                in 1..4 -> return false
-                9 -> return false
-            }
-        }
-
-        // 아이템 패널
-        if (clickedPanel == itemPanel) {
-            return false
-        }
-
-        return true
+        return clickedPanel == settingPanel && y == 1 && x != 1
     }
 
 }

@@ -8,12 +8,14 @@ import net.pooleaf.gamecore.Broadcaster
 import net.pooleaf.gamecore.GameCore
 import net.pooleaf.gamecore.phase.Phase
 
-class MapTeleportCountPhase: Phase() {
+open class MapTeleportCountPhase: Phase() {
 
     override suspend fun onStart() {
         Broadcaster.broadcastActionBar("§e잠시 후 맵으로 이동됩니다.")
         Broadcaster.broadcastSound(XSound.UI_BUTTON_CLICK, 0.3F, 0.7F)
+    }
 
+    override suspend fun onRun() {
         // 카운트
         for (count in 10 downTo 1) {
             when (count) {

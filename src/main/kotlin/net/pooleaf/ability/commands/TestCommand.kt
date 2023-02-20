@@ -8,13 +8,19 @@ import net.pooleaf.core.modules.annocommand.common.Command
 import net.pooleaf.core.modules.annocommand.common.CommandResult
 import net.pooleaf.core.modules.annocommand.common.HelpCommandResult
 import net.pooleaf.core.modules.gui.bukkit.title.TitleBuilder
+import net.pooleaf.core.modules.support.bukkit.messager.sendWarning
 import net.pooleaf.core.modules.support.bukkit.util.ItemBuilder
+import net.pooleaf.gamecore.GameCore
 import org.bukkit.Bukkit
+import org.bukkit.Material
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerInteractEvent
+import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.meta.MapMeta
+import org.bukkit.map.MapView.Scale
 
 class TestCommand: Listener {
 
@@ -114,6 +120,51 @@ class TestCommand: Listener {
                 XSound.ENTITY_IRON_GOLEM_DEATH.play(event.player)
                 XSound.ENTITY_WITHER_SPAWN.play(event.player, 0.7F, 1F)
             }
+        }
+    }
+
+    @Command(
+        parent = ["abtest"],
+        name = ["currentMapItem"]
+    )
+    fun abtest_currentMapItem(player: Player, result: CommandResult) {
+        val currentMap = GameCore.currentMap
+        if (currentMap == null) {
+            player.sendWarning("현재 맵이 없습니다.")
+            return
+        }
+
+        val mapView = Bukkit.createMap(player.world)
+        val mapId = mapView.id
+
+        mapView.centerX = currentMap.centerX.toInt()
+        mapView.centerZ = currentMap.centerZ.toInt()
+
+        val scale = getScale((currentMap.worldBorderSize.toFloat() / 2).toInt())
+        mapView.scale = scale
+
+        val mapItem = ItemStack(Material.MAP, 1, mapId)
+        val mapMeta = mapItem.itemMeta as MapMeta
+        player.inventory.addItem(mapItem)
+    }
+
+    fun getScale(size: Int): Scale {
+        return when {
+            size <= 128 -> Scale.CLOSEST
+            size <= 256 -> Scale.CLOSE
+            size <= 512 -> Scale.NORMAL
+            size <= 1024 -> Scale.FAR
+            else -> Scale.FARTHEST
+        }
+    }
+
+    fun getSize(scale: Scale): Int {
+        return when (scale) {
+            Scale.CLOSEST -> 128
+            Scale.CLOSE -> 256
+            Scale.NORMAL -> 512
+            Scale.FAR -> 1024
+            Scale.FARTHEST -> 2048
         }
     }
 

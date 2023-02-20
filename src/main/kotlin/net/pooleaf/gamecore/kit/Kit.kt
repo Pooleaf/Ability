@@ -5,7 +5,7 @@ import net.pooleaf.gamecore.GameCore
 import org.bukkit.inventory.ItemStack
 import java.util.concurrent.ConcurrentHashMap
 
-class Kit() {
+class Kit {
 
     @ConfigName("이름")
     lateinit var name: String

@@ -91,7 +91,9 @@ class KitCommand {
             return
         }
 
+        GameCore.unsafe.kitManager.remove(kitName)
         GameCore.unsafe.kitService.deleteKitConfig(kitName)
+
         sender.sendMessage("${kitName} §b킷을 삭제했습니다.")
     }
 
@@ -104,7 +106,13 @@ class KitCommand {
         permission = GameCorePermission.ADMIN
     )
     fun kit_list(sender: CommonCommandSender<CommandSender>, result: CommandResult) {
-        object : PageableCommand<Kit>(result.entered, ArrayList(GameCore.unsafe.kitManager.values()), 7) {
+        val kits = GameCore.unsafe.kitManager.values().toList()
+        if (kits.isEmpty()) {
+            sender.sendWarning("생성된 킷이 없습니다.")
+            return
+        }
+
+        object : PageableCommand<Kit>(result.entered, kits, 7) {
             override fun getHeaderColor(): CommonChatColor {
                 return CommonChatColor.AQUA
             }

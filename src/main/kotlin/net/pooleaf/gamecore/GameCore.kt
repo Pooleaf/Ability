@@ -20,6 +20,8 @@ import net.pooleaf.gamecore.quickbar.QuickBarManager
 import net.pooleaf.gamecore.sidebar.GameSideBarManager
 import net.pooleaf.gamecore.startitem.StartItemManager
 import net.pooleaf.gamecore.startitem.StartItemService
+import net.pooleaf.gamecore.supply.SupplyManager
+import net.pooleaf.gamecore.supply.SupplyService
 import net.pooleaf.gamecore.team.TeamManager
 import net.pooleaf.gamecore.team.TeamService
 import net.pooleaf.gamecore.vote.map.MapVoteManager
@@ -54,6 +56,9 @@ object GameCore {
 
         lateinit var startItemManager: StartItemManager
         lateinit var startItemService: StartItemService
+
+        lateinit var supplyManager: SupplyManager
+        lateinit var supplyService: SupplyService
 
 
         val gameConfig: GameConfig by lazy {
@@ -97,6 +102,9 @@ object GameCore {
             startItemManager = StartItemManager()
             startItemService = StartItemService()
 
+            supplyManager = SupplyManager()
+            supplyService = SupplyService()
+
             loadConfig()
         }
 
@@ -117,6 +125,7 @@ object GameCore {
 
             kitService.loadKitConfigs()
             startItemService.loadStartItemConfig()
+            supplyService.loadSupplyConfigs()
         }
     }
 

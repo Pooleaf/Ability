@@ -9,7 +9,7 @@ class RunnablePhase(
     val runnable: Runnable
 ): Phase() {
 
-    override suspend fun onStart() {
+    override suspend fun onRun() {
         runnable.run()
     }
 

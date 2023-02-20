@@ -10,7 +10,7 @@ class DelayPhase(
     val delaySeconds: Int,
 ): Phase() {
 
-    override suspend fun onStart() {
+    override suspend fun onRun() {
         delay(delaySeconds * 1000L)
     }
 
