@@ -1,0 +1,58 @@
+package net.pooleaf.gamecore.replay.data
+
+import net.pooleaf.core.modules.support.bukkit.util.BukkitReflectionUtil
+import net.pooleaf.gamecore.GameCore
+import net.pooleaf.gamecore.replay.replay.ReplayPlayer
+import org.bukkit.Bukkit
+import org.bukkit.Location
+import org.bukkit.event.EventHandler
+import org.bukkit.event.EventPriority
+import org.bukkit.event.Listener
+import org.bukkit.event.block.BlockPlaceEvent
+
+class BlockPlaceData : RecordData, Listener {
+
+    override val type: String = "blockPlace"
+
+    lateinit var worldName: String
+    var x: Double = 0.0
+    var y: Double = 0.0
+    var z: Double = 0.0
+    var blockTypeId: Int = 0
+    var blockData: Byte = 0
+
+
+    override fun play(replayPlayer: ReplayPlayer) {
+        val viewer = replayPlayer.viewer
+
+        val location = Location(Bukkit.getWorld(worldName), x, y, z)
+        viewer.sendBlockChange(location, blockTypeId, blockData)
+
+        val nmsBlock = BukkitReflectionUtil.getNmsBlock(blockTypeId)
+        val breakSound = BukkitReflectionUtil.getBlockPlaceSound(nmsBlock)
+        val volume = (BukkitReflectionUtil.getBlockSoundVolume(nmsBlock) + 1.0F) / 2.0F
+        val pitch = BukkitReflectionUtil.getBlockSoundPitch(nmsBlock) * 0.8F
+
+        viewer.playSound(location, breakSound, volume, pitch)
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    fun onBlockPlace(event: BlockPlaceEvent) {
+        if (!GameCore.unsafe.recordManager.isRecording()) return
+
+        val block = event.block
+        val location = block.location
+
+        val record = GameCore.unsafe.recordManager.record!!
+        val recordData = BlockPlaceData().apply {
+            worldName = location.world.name
+            x = location.x
+            y = location.y
+            z = location.z
+            blockTypeId = block.typeId
+            blockData = block.data
+        }
+        record.addRecordData(recordData)
+    }
+
+}

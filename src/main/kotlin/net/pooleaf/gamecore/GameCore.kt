@@ -1,5 +1,6 @@
 package net.pooleaf.gamecore
 
+import com.comphenix.protocol.ProtocolLibrary
 import net.pooleaf.gamecore.configs.GameConfig
 import net.pooleaf.gamecore.configs.QuickBarConfig
 import net.pooleaf.gamecore.configs.SpawnConfig
@@ -17,6 +18,12 @@ import net.pooleaf.gamecore.player.GamePlayer
 import net.pooleaf.gamecore.player.GamePlayerManager
 import net.pooleaf.gamecore.player.GamePlayerService
 import net.pooleaf.gamecore.quickbar.QuickBarManager
+import net.pooleaf.gamecore.replay.data.BlockDamageData
+import net.pooleaf.gamecore.replay.record.RecordManager
+import net.pooleaf.gamecore.replay.record.RecordService
+import net.pooleaf.gamecore.replay.replay.ReplayManager
+import net.pooleaf.gamecore.replay.replay.ReplayPlayerManager
+import net.pooleaf.gamecore.replay.replay.ReplayService
 import net.pooleaf.gamecore.sidebar.GameSideBarManager
 import net.pooleaf.gamecore.startitem.StartItemManager
 import net.pooleaf.gamecore.startitem.StartItemService
@@ -59,6 +66,13 @@ object GameCore {
 
         lateinit var supplyManager: SupplyManager
         lateinit var supplyService: SupplyService
+
+        lateinit var recordManager: RecordManager
+        lateinit var recordService: RecordService
+
+        lateinit var replayManager: ReplayManager
+        lateinit var replayPlayerManager: ReplayPlayerManager
+        lateinit var replayService: ReplayService
 
 
         val gameConfig: GameConfig by lazy {
@@ -104,6 +118,13 @@ object GameCore {
 
             supplyManager = SupplyManager()
             supplyService = SupplyService()
+
+            recordManager = RecordManager()
+            recordService = RecordService()
+
+            replayManager = ReplayManager()
+            replayPlayerManager = ReplayPlayerManager()
+            replayService = ReplayService()
 
             loadConfig()
         }
@@ -163,6 +184,8 @@ object GameCore {
 
         game.init()
         game.isInitialized = true
+
+        ProtocolLibrary.getProtocolManager().addPacketListener(BlockDamageData())
     }
 
     fun loadConfig() {
