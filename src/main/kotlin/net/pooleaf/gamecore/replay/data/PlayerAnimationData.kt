@@ -11,7 +11,7 @@ import org.bukkit.event.player.PlayerAnimationEvent
 import org.bukkit.event.player.PlayerAnimationType
 import java.util.*
 
-class PlayerAnimationData : RecordData, Listener {
+class PlayerAnimationData : RecordData {
 
     override val type: String = "playerAnimation"
 
@@ -19,7 +19,7 @@ class PlayerAnimationData : RecordData, Listener {
     lateinit var animationType: String
 
 
-    override fun play(replayPlayer: ReplayPlayer) {
+    override fun onPlay(replayPlayer: ReplayPlayer) {
         val citizensNpc = replayPlayer.npcs.get(playerUuid)?.citizensNpc ?: return
 
         val animationType = PlayerAnimationType.valueOf(animationType)
@@ -27,6 +27,10 @@ class PlayerAnimationData : RecordData, Listener {
             PlayerAnimation.ARM_SWING.play(citizensNpc.entity as Player)
         }
     }
+
+}
+
+class PlayerAnimationDataListener : Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     fun onPlayerAnimation(event: PlayerAnimationEvent) {

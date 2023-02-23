@@ -18,7 +18,7 @@ import net.pooleaf.gamecore.player.GamePlayer
 import net.pooleaf.gamecore.player.GamePlayerManager
 import net.pooleaf.gamecore.player.GamePlayerService
 import net.pooleaf.gamecore.quickbar.QuickBarManager
-import net.pooleaf.gamecore.replay.data.BlockDamageData
+import net.pooleaf.gamecore.replay.listeners.TestPacketListener
 import net.pooleaf.gamecore.replay.record.RecordManager
 import net.pooleaf.gamecore.replay.record.RecordService
 import net.pooleaf.gamecore.replay.replay.ReplayManager
@@ -126,6 +126,8 @@ object GameCore {
             replayPlayerManager = ReplayPlayerManager()
             replayService = ReplayService()
 
+            recordManager.registerRecordListeners()
+
             loadConfig()
         }
 
@@ -184,8 +186,6 @@ object GameCore {
 
         game.init()
         game.isInitialized = true
-
-        ProtocolLibrary.getProtocolManager().addPacketListener(BlockDamageData())
     }
 
     fun loadConfig() {

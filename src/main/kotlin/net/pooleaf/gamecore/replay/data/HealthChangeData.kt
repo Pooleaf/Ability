@@ -9,25 +9,29 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import java.util.*
 
-class HealthChangeData : RecordData, Listener {
+class HealthChangeData : RecordData {
 
     override val type: String = "healthChange"
 
     lateinit var playerUuid: UUID
     var health: Double = 0.0
 
-    override fun play(replayPlayer: ReplayPlayer) {
+    override fun onPlay(replayPlayer: ReplayPlayer) {
         val replayNpc = replayPlayer.npcs.get(playerUuid) ?: return
 
         replayNpc.health = health
     }
 
+}
+
+class HealthChangeDataListener : Listener {
+
     @Expose
     private val beforeHealths = hashMapOf<UUID, Double>()
 
     @EventHandler
-    fun onHeathChangeFromDamage(event: RecordTickEvent) {
-        event.record.recordTargetPlayer.forEach { uuid ->
+    fun onHeathChange(event: RecordTickEvent) {
+        event.record.recordTargetPlayers.forEach { uuid ->
             val player = Bukkit.getPlayer(uuid)
             if (player == null) return@forEach
 

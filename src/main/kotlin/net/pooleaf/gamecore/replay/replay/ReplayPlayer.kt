@@ -55,7 +55,7 @@ class ReplayPlayer(
         replayTask = object : BukkitRunnable() {
             override fun run() {
                 val tickRecordDatas = replay.recordDatas.get(currentTick.toLong())
-                tickRecordDatas?.forEach { it.play(this@ReplayPlayer) }
+                tickRecordDatas?.forEach { it.onPlay(this@ReplayPlayer) }
 
                 currentTick += playSpeed
 

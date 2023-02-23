@@ -11,7 +11,7 @@ interface RecordListener : Listener {
     }
 
     fun isRecordingTargetPlayer(player: Player): Boolean {
-        return GameCore.unsafe.recordManager.record!!.recordTargetPlayer.contains(player.uniqueId)
+        return GameCore.unsafe.recordManager.record!!.recordTargetPlayers.contains(player.uniqueId)
     }
 
 }

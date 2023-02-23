@@ -10,6 +10,10 @@ import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.block.BlockPlaceEvent
 
+/**
+ * 블럭 설치 사운드 재생용
+ * 블럭 변경은 [BlockChangeData]에서 담당
+ */
 class BlockPlaceData : RecordData, Listener {
 
     override val type: String = "blockPlace"
@@ -22,11 +26,10 @@ class BlockPlaceData : RecordData, Listener {
     var blockData: Byte = 0
 
 
-    override fun play(replayPlayer: ReplayPlayer) {
+    override fun onPlay(replayPlayer: ReplayPlayer) {
         val viewer = replayPlayer.viewer
 
         val location = Location(Bukkit.getWorld(worldName), x, y, z)
-        viewer.sendBlockChange(location, blockTypeId, blockData)
 
         val nmsBlock = BukkitReflectionUtil.getNmsBlock(blockTypeId)
         val breakSound = BukkitReflectionUtil.getBlockPlaceSound(nmsBlock)
@@ -39,6 +42,7 @@ class BlockPlaceData : RecordData, Listener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     fun onBlockPlace(event: BlockPlaceEvent) {
         if (!GameCore.unsafe.recordManager.isRecording()) return
+        if (!GameCore.unsafe.recordManager.isRecordingTargetPlayer(event.player)) return
 
         val block = event.block
         val location = block.location

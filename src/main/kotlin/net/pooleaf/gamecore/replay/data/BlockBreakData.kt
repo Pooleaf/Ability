@@ -10,7 +10,11 @@ import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.block.BlockBreakEvent
 
-class BlockBreakData : RecordData, Listener {
+/**
+ * 블럭 파괴 사운드 재생용
+ * 블럭 변경은 [BlockChangeData]에서 담당
+ */
+class BlockBreakData : RecordData {
 
     override val type: String = "blockBreak"
 
@@ -21,11 +25,10 @@ class BlockBreakData : RecordData, Listener {
     var blockTypeId: Int = 0
 
 
-    override fun play(replayPlayer: ReplayPlayer) {
+    override fun onPlay(replayPlayer: ReplayPlayer) {
         val viewer = replayPlayer.viewer
 
         val location = Location(Bukkit.getWorld(worldName), x, y, z)
-        viewer.sendBlockChange(location, 0, 0)
 
         val nmsBlock = BukkitReflectionUtil.getNmsBlock(blockTypeId)
         val breakSound = BukkitReflectionUtil.getBlockPlaceSound(nmsBlock)
@@ -35,9 +38,14 @@ class BlockBreakData : RecordData, Listener {
         viewer.playSound(location, breakSound, volume, pitch)
     }
 
+}
+
+class BlockBreakDataListener : Listener {
+
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     fun onBlockBreak(event: BlockBreakEvent) {
         if (!GameCore.unsafe.recordManager.isRecording()) return
+        if (!GameCore.unsafe.recordManager.isRecordingTargetPlayer(event.player)) return
 
         val block = event.block
         val location = block.location

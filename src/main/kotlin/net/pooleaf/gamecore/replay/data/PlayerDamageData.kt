@@ -15,8 +15,10 @@ class PlayerDamageData : RecordData, Listener {
     lateinit var playerUuid: UUID
 
 
-    override fun play(replayPlayer: ReplayPlayer) {
+    override fun onPlay(replayPlayer: ReplayPlayer) {
         TODO("Not yet implemented")
+//        PacketPlayOutEntityStatus
+//        PacketPlayOutEntityMetadata
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

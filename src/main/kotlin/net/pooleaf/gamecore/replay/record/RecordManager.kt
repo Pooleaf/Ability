@@ -1,8 +1,14 @@
 package net.pooleaf.gamecore.replay.record
 
+import com.comphenix.protocol.ProtocolLibrary
 import net.pooleaf.gamecore.GameCore
+import net.pooleaf.gamecore.events.replay.RecordStartEvent
+import net.pooleaf.gamecore.events.replay.RecordStopEvent
 import net.pooleaf.gamecore.events.replay.RecordTickEvent
+import net.pooleaf.gamecore.replay.data.BlockChangeDataListener
+import net.pooleaf.gamecore.replay.data.PlayerMetaDataListener
 import net.pooleaf.gamecore.replay.data.PlayerMoveData
+import net.pooleaf.gamecore.replay.listeners.TestPacketListener
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.scheduler.BukkitTask
@@ -15,6 +21,12 @@ class RecordManager {
 
     var recordTickCalculateTask: BukkitTask? = null
 
+
+    fun registerRecordListeners() {
+        ProtocolLibrary.getProtocolManager().addPacketListener(TestPacketListener()) // TODO remove
+        ProtocolLibrary.getProtocolManager().addPacketListener(BlockChangeDataListener())
+        ProtocolLibrary.getProtocolManager().addPacketListener(PlayerMetaDataListener())
+    }
 
     /**
      * 녹화 중 여부를 반환합니다.
@@ -61,6 +73,9 @@ class RecordManager {
                 // 틱 계산
                 record.currentTick++
             }, 0L, 1L)
+
+            // 이벤트
+            Bukkit.getPluginManager().callEvent(RecordStartEvent(record))
         }
     }
 
@@ -78,8 +93,12 @@ class RecordManager {
             recordTickCalculateTask?.cancel()
 
             // 저장
-            GameCore.unsafe.recordService.saveRecordToFile(record)
+            // TODO 저장
+//            GameCore.unsafe.recordService.saveRecordToFile(record)
             GameCore.unsafe.replayManager.set(record.replay.uuid, record.replay)
+
+            // 이벤트
+            Bukkit.getPluginManager().callEvent(RecordStopEvent(record))
         }
     }
 
@@ -87,7 +106,7 @@ class RecordManager {
      * 녹화 대상 플레이어인지를 반환합니다.
      */
     fun isRecordingTargetPlayer(player: Player): Boolean {
-        return record?.let { it.recordTargetPlayer.contains(player.uniqueId) } == true
+        return record?.let { it.recordTargetPlayers.contains(player.uniqueId) } == true
     }
 
 }

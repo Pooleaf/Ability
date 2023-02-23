@@ -6,14 +6,14 @@ import java.util.*
 
 class Record(
     uuid: UUID,
-    val recordTargetPlayer: List<UUID>
+    val recordTargetPlayers: List<UUID>
 ) {
 
     var isRecording: Boolean = false
 
     var currentTick: Float = 0.0F
 
-    val replay: Replay = Replay(uuid, recordTargetPlayer)
+    val replay: Replay = Replay(uuid, recordTargetPlayers)
 
 
     /**

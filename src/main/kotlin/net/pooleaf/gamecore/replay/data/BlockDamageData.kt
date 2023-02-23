@@ -1,18 +1,17 @@
 package net.pooleaf.gamecore.replay.data
 
-import com.comphenix.protocol.PacketType
-import com.comphenix.protocol.events.ListeningWhitelist
-import com.comphenix.protocol.events.PacketAdapter
-import com.comphenix.protocol.events.PacketEvent
-import com.comphenix.protocol.events.PacketListener
+import net.minecraft.server.v1_8_R3.BlockPosition
+import net.minecraft.server.v1_8_R3.EntityPlayer
+import net.minecraft.server.v1_8_R3.PacketPlayOutBlockBreakAnimation
+import net.pooleaf.core.modules.support.bukkit.util.BukkitReflectionUtil
 import net.pooleaf.gamecore.GameCore
+import net.pooleaf.gamecore.events.replay.RecordTickEvent
 import net.pooleaf.gamecore.replay.replay.ReplayPlayer
 import org.bukkit.Bukkit
-import org.bukkit.Location
+import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
-import org.bukkit.plugin.Plugin
 
-class BlockDamageData : PacketListener, RecordData, Listener {
+class BlockDamageData : RecordData  {
 
     override val type: String = "blockDamage"
 
@@ -20,47 +19,78 @@ class BlockDamageData : PacketListener, RecordData, Listener {
     var x: Int = 0
     var y: Int = 0
     var z: Int = 0
-    var damage: Int = 0
+    var state: Int = 0
 
 
-    override fun play(replayPlayer: ReplayPlayer) {
+    override fun onPlay(replayPlayer: ReplayPlayer) {
         val viewer = replayPlayer.viewer
 
-        val location = Location(Bukkit.getWorld(worldName), x.toDouble(), y.toDouble(), z.toDouble())
-        // TODO
+        val blockPosition = BlockPosition(x, y, z)
+        val packet = PacketPlayOutBlockBreakAnimation(viewer.entityId, blockPosition, state)
+        BukkitReflectionUtil.sendPacket(viewer, packet)
     }
 
-    override fun onPacketSending(event: PacketEvent) {
-        if (!GameCore.unsafe.recordManager.isRecording()) return
+}
 
-        val packet = event.packet
-        val position = packet.blockPositionModifier.read(0)
-        var blockDamage = packet.integers.read(1)
+class BlockDamageDataListener : Listener {
 
-        val recordData = BlockDamageData().apply {
-            x = position.x
-            y = position.y
-            z = position.z
-            damage = blockDamage
+    @EventHandler
+    fun onRecordTick(event: RecordTickEvent) {
+        event.record.recordTargetPlayers.forEach { uuid ->
+            val player = Bukkit.getPlayer(uuid)
+            if (player == null) return@forEach
+
+            val entityPlayer = BukkitReflectionUtil.getHandle(player) as EntityPlayer
+            val playerInteractManager = entityPlayer.playerInteractManager
+
+            // isDestroyingBlock
+            val dField = playerInteractManager::class.java.getDeclaredField("d")
+            dField.isAccessible = true
+            val isDestroyingBlock = dField.getBoolean(playerInteractManager)
+
+            // destroyPos
+            val fField = playerInteractManager::class.java.getDeclaredField("f")
+            fField.isAccessible = true
+            val destroyPos = fField.get(playerInteractManager) as BlockPosition
+
+            // hasDelayedDestroy
+            val hField = playerInteractManager::class.java.getDeclaredField("h")
+            hField.isAccessible = true
+            val hasDelayedDestroy = hField.getBoolean(playerInteractManager)
+
+            // delayedDestroyPos
+            val iField = playerInteractManager::class.java.getDeclaredField("i")
+            iField.isAccessible = true
+            val delayedDestroyPos = iField.get(playerInteractManager) as BlockPosition
+
+            // lastSentState
+            val kField = playerInteractManager::class.java.getDeclaredField("k")
+            kField.isAccessible = true
+            val lastSentState = kField.getInt(playerInteractManager)
+
+            if (!hasDelayedDestroy && !isDestroyingBlock) return@forEach
+
+            // 현재 블럭 상태 저장
+            if (hasDelayedDestroy) {
+                val recordData = BlockDamageData().apply {
+                    worldName = player.world.name
+                    x = delayedDestroyPos.x
+                    y = delayedDestroyPos.y
+                    z = delayedDestroyPos.z
+                    state = lastSentState
+                }
+                GameCore.unsafe.recordManager.record!!.addRecordData(recordData)
+            } else if (isDestroyingBlock) {
+                val recordData = BlockDamageData().apply {
+                    worldName = player.world.name
+                    x = destroyPos.x
+                    y = destroyPos.y
+                    z = destroyPos.z
+                    state = lastSentState
+                }
+                GameCore.unsafe.recordManager.record!!.addRecordData(recordData)
+            }
         }
-        GameCore.unsafe.recordManager.record!!.addRecordData(recordData)
-    }
-
-    override fun onPacketReceiving(event: PacketEvent?) {
-    }
-
-    override fun getSendingWhitelist(): ListeningWhitelist {
-        return ListeningWhitelist.newBuilder()
-            .types(PacketType.Play.Server.BLOCK_BREAK_ANIMATION)
-            .build()
-    }
-
-    override fun getReceivingWhitelist(): ListeningWhitelist {
-        return ListeningWhitelist.EMPTY_WHITELIST
-    }
-
-    override fun getPlugin(): Plugin {
-        return GameCore.gamePlugin
     }
 
 }

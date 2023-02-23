@@ -7,6 +7,8 @@ interface RecordData {
     val type: String
 
 
-    fun play(replayPlayer: ReplayPlayer)
+    fun onPlay(replayPlayer: ReplayPlayer)
+
+    // fun onReverse(replayPlayer: ReplayPlayer)
 
 }
