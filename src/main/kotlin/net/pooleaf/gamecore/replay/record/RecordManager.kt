@@ -6,7 +6,7 @@ import net.pooleaf.gamecore.events.replay.RecordStartEvent
 import net.pooleaf.gamecore.events.replay.RecordStopEvent
 import net.pooleaf.gamecore.events.replay.RecordTickEvent
 import net.pooleaf.gamecore.replay.data.BlockChangeDataListener
-import net.pooleaf.gamecore.replay.data.PlayerMetaDataListener
+import net.pooleaf.gamecore.replay.data.PlayerMetaDataDataListener
 import net.pooleaf.gamecore.replay.data.PlayerMoveData
 import net.pooleaf.gamecore.replay.listeners.TestPacketListener
 import org.bukkit.Bukkit
@@ -25,7 +25,7 @@ class RecordManager {
     fun registerRecordListeners() {
         ProtocolLibrary.getProtocolManager().addPacketListener(TestPacketListener()) // TODO remove
         ProtocolLibrary.getProtocolManager().addPacketListener(BlockChangeDataListener())
-        ProtocolLibrary.getProtocolManager().addPacketListener(PlayerMetaDataListener())
+        ProtocolLibrary.getProtocolManager().addPacketListener(PlayerMetaDataDataListener())
     }
 
     /**

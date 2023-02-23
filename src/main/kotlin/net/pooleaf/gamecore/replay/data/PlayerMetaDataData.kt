@@ -10,9 +10,13 @@ import net.pooleaf.gamecore.GameCore
 import net.pooleaf.gamecore.replay.replay.ReplayPlayer
 import java.util.*
 
+/**
+ * Entity Index 0만 녹화함
+ * https://wiki.vg/index.php?title=Entity_metadata&oldid=7415#Entity
+ */
 class PlayerMetaData : RecordData {
 
-    override val type: String = "playerMetadata"
+    override val type: String = "playerMetaData"
 
     lateinit var playerUuid: UUID
     var index: Int = 0
@@ -28,18 +32,17 @@ class PlayerMetaData : RecordData {
             1 -> citizensNpc.entity.fireTicks = 9999999
         }
 
-        println("metadata: ${index} / ${value}")
-
         val entityPlayer = BukkitReflectionUtil.getHandle(citizensNpc.entity) as EntityPlayer
         val dataWatcher = entityPlayer.dataWatcher
-        dataWatcher.watch(index, value)
+        dataWatcher.watch(index, value.toByte())
+
         val packet = PacketPlayOutEntityMetadata(citizensNpc.entity.entityId, dataWatcher, false)
         BukkitReflectionUtil.sendPacket(replayPlayer.viewer, packet)
     }
 
 }
 
-class PlayerMetaDataListener : PacketAdapter(GameCore.gamePlugin, PacketType.Play.Server.ENTITY_METADATA) {
+class PlayerMetaDataDataListener : PacketAdapter(GameCore.gamePlugin, PacketType.Play.Server.ENTITY_METADATA) {
 
     override fun onPacketSending(event: PacketEvent) {
         if (!GameCore.unsafe.recordManager.isRecording()) return
@@ -55,10 +58,15 @@ class PlayerMetaDataListener : PacketAdapter(GameCore.gamePlugin, PacketType.Pla
         val entityMetaData = packet.watchableCollectionModifier.read(0)
         if (entityMetaData.isEmpty()) return
 
+        val metaDataindex = entityMetaData.get(0).index
+        val metaDataValue = entityMetaData.get(0).value
+
+        if (metaDataindex != 0) return
+
         val recordData = PlayerMetaData().apply {
             playerUuid = event.player.uniqueId
-            index = entityMetaData.get(0).index
-            value = entityMetaData.get(0).value as Byte
+            index = metaDataindex
+            value = metaDataValue as Byte
         }
         GameCore.unsafe.recordManager.record!!.addRecordData(recordData)
     }

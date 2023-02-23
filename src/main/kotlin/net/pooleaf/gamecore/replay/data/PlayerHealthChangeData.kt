@@ -9,7 +9,7 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import java.util.*
 
-class HealthChangeData : RecordData {
+class PlayerHealthChangeData : RecordData {
 
     override val type: String = "healthChange"
 
@@ -24,7 +24,7 @@ class HealthChangeData : RecordData {
 
 }
 
-class HealthChangeDataListener : Listener {
+class PlayerHealthChangeDataListener : Listener {
 
     @Expose
     private val beforeHealths = hashMapOf<UUID, Double>()
@@ -39,7 +39,7 @@ class HealthChangeDataListener : Listener {
             val currentHealth = player.health
 
             if (beforeHealth != currentHealth) {
-                val recordData = HealthChangeData().apply {
+                val recordData = PlayerHealthChangeData().apply {
                     playerUuid = player.uniqueId
                     health = currentHealth
                 }

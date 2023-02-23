@@ -41,6 +41,21 @@ class TestPacketListener: PacketAdapter(GameCore.gamePlugin, ListenerPriority.NO
             println("entityMetadata: ${entityMetadata}")
         }
 
+        if (packet.type == PacketType.Play.Server.ANIMATION) {
+            val entityId = packet.integers.read(0)
+            val entity = packet.getEntityModifier(event.player.world).read(0)
+            val animation = packet.integers.read(1)
+
+            println("entityId: ${entityId}")
+            println("entity: ${entity}")
+            println("animatino: ${animation}")
+        }
+
+        if (packet.type == PacketType.Play.Server.NAMED_SOUND_EFFECT) {
+
+        }
+
+
         if (event.packet.type == PacketType.Play.Server.MULTI_BLOCK_CHANGE) {
 //            PacketPlayOutMultiBlockChange
         }

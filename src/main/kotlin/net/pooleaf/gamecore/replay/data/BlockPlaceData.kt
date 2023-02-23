@@ -14,7 +14,7 @@ import org.bukkit.event.block.BlockPlaceEvent
  * 블럭 설치 사운드 재생용
  * 블럭 변경은 [BlockChangeData]에서 담당
  */
-class BlockPlaceData : RecordData, Listener {
+class BlockPlaceData : RecordData {
 
     override val type: String = "blockPlace"
 
@@ -23,7 +23,6 @@ class BlockPlaceData : RecordData, Listener {
     var y: Double = 0.0
     var z: Double = 0.0
     var blockTypeId: Int = 0
-    var blockData: Byte = 0
 
 
     override fun onPlay(replayPlayer: ReplayPlayer) {
@@ -38,6 +37,10 @@ class BlockPlaceData : RecordData, Listener {
 
         viewer.playSound(location, breakSound, volume, pitch)
     }
+
+}
+
+class BlockPlaceDataListener : Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     fun onBlockPlace(event: BlockPlaceEvent) {
@@ -54,7 +57,6 @@ class BlockPlaceData : RecordData, Listener {
             y = location.y
             z = location.z
             blockTypeId = block.typeId
-            blockData = block.data
         }
         record.addRecordData(recordData)
     }

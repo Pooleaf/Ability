@@ -42,7 +42,7 @@ class PlayerMoveDataListener : Listener {
         val player = event.player
         if (!GameCore.unsafe.recordManager.isRecordingTargetPlayer(player)) return
 
-        val location = player.location
+        val location = event.to
 
         val record = GameCore.unsafe.recordManager.record!!
         val recordData = PlayerMoveData().apply {
