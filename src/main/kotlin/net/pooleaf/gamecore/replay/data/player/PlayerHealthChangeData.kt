@@ -1,8 +1,9 @@
-package net.pooleaf.gamecore.replay.data
+package net.pooleaf.gamecore.replay.data.player
 
 import com.google.gson.annotations.Expose
 import net.pooleaf.gamecore.GameCore
 import net.pooleaf.gamecore.events.replay.RecordTickEvent
+import net.pooleaf.gamecore.replay.data.RecordData
 import net.pooleaf.gamecore.replay.replay.ReplayPlayer
 import org.bukkit.Bukkit
 import org.bukkit.event.EventHandler

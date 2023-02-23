@@ -5,9 +5,11 @@ import net.pooleaf.gamecore.GameCore
 import net.pooleaf.gamecore.events.replay.RecordStartEvent
 import net.pooleaf.gamecore.events.replay.RecordStopEvent
 import net.pooleaf.gamecore.events.replay.RecordTickEvent
-import net.pooleaf.gamecore.replay.data.BlockChangeDataListener
-import net.pooleaf.gamecore.replay.data.PlayerMetaDataDataListener
-import net.pooleaf.gamecore.replay.data.PlayerMoveData
+import net.pooleaf.gamecore.replay.data.block.BlockChangeDataListener
+import net.pooleaf.gamecore.replay.data.entity.CollectDataListener
+import net.pooleaf.gamecore.replay.data.entity.SpawnEntityDataListener
+import net.pooleaf.gamecore.replay.data.player.PlayerMetaDataDataListener
+import net.pooleaf.gamecore.replay.data.player.PlayerMoveData
 import net.pooleaf.gamecore.replay.listeners.TestPacketListener
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
@@ -26,6 +28,8 @@ class RecordManager {
         ProtocolLibrary.getProtocolManager().addPacketListener(TestPacketListener()) // TODO remove
         ProtocolLibrary.getProtocolManager().addPacketListener(BlockChangeDataListener())
         ProtocolLibrary.getProtocolManager().addPacketListener(PlayerMetaDataDataListener())
+        ProtocolLibrary.getProtocolManager().addPacketListener(SpawnEntityDataListener())
+        ProtocolLibrary.getProtocolManager().addPacketListener(CollectDataListener())
     }
 
     /**

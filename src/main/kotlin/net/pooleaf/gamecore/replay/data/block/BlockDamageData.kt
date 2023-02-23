@@ -1,4 +1,4 @@
-package net.pooleaf.gamecore.replay.data
+package net.pooleaf.gamecore.replay.data.block
 
 import net.minecraft.server.v1_8_R3.BlockPosition
 import net.minecraft.server.v1_8_R3.EntityPlayer
@@ -6,12 +6,13 @@ import net.minecraft.server.v1_8_R3.PacketPlayOutBlockBreakAnimation
 import net.pooleaf.core.modules.support.bukkit.util.BukkitReflectionUtil
 import net.pooleaf.gamecore.GameCore
 import net.pooleaf.gamecore.events.replay.RecordTickEvent
+import net.pooleaf.gamecore.replay.data.RecordData
 import net.pooleaf.gamecore.replay.replay.ReplayPlayer
 import org.bukkit.Bukkit
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 
-class BlockDamageData : RecordData  {
+class BlockDamageData : RecordData {
 
     override val type: String = "blockDamage"
 

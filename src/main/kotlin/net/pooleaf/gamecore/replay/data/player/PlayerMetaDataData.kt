@@ -1,4 +1,4 @@
-package net.pooleaf.gamecore.replay.data
+package net.pooleaf.gamecore.replay.data.player
 
 import com.comphenix.protocol.PacketType
 import com.comphenix.protocol.events.PacketAdapter
@@ -7,6 +7,7 @@ import net.minecraft.server.v1_8_R3.EntityPlayer
 import net.minecraft.server.v1_8_R3.PacketPlayOutEntityMetadata
 import net.pooleaf.core.modules.support.bukkit.util.BukkitReflectionUtil
 import net.pooleaf.gamecore.GameCore
+import net.pooleaf.gamecore.replay.data.RecordData
 import net.pooleaf.gamecore.replay.replay.ReplayPlayer
 import java.util.*
 
@@ -58,15 +59,15 @@ class PlayerMetaDataDataListener : PacketAdapter(GameCore.gamePlugin, PacketType
         val entityMetaData = packet.watchableCollectionModifier.read(0)
         if (entityMetaData.isEmpty()) return
 
-        val metaDataindex = entityMetaData.get(0).index
-        val metaDataValue = entityMetaData.get(0).value
+        val packetIndex = entityMetaData.get(0).index
+        val packetValue = entityMetaData.get(0).value
 
-        if (metaDataindex != 0) return
+        if (packetIndex != 0) return
 
         val recordData = PlayerMetaData().apply {
             playerUuid = event.player.uniqueId
-            index = metaDataindex
-            value = metaDataValue as Byte
+            index = packetIndex
+            value = packetValue as Byte
         }
         GameCore.unsafe.recordManager.record!!.addRecordData(recordData)
     }

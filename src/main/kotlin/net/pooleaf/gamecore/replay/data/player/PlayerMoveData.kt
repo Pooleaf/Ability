@@ -1,18 +1,20 @@
-package net.pooleaf.gamecore.replay.data
+package net.pooleaf.gamecore.replay.data.player
 
 import net.pooleaf.gamecore.GameCore
+import net.pooleaf.gamecore.replay.data.RecordData
 import net.pooleaf.gamecore.replay.replay.ReplayPlayer
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
+import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.event.player.PlayerTeleportEvent
 import java.util.*
 
-class PlayerTeleportData : RecordData {
+class PlayerMoveData : RecordData {
 
-    override val type: String = "playerTeleport"
+    override val type: String = "playerMove"
 
     lateinit var playerUuid: UUID
     lateinit var worldName: String
@@ -32,10 +34,10 @@ class PlayerTeleportData : RecordData {
 
 }
 
-class PlayerTeleportDataListener : Listener {
+class PlayerMoveDataListener : Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    fun onPlayerTeleport(event: PlayerTeleportEvent) {
+    fun onPlayerMove(event: PlayerMoveEvent) {
         if (!GameCore.unsafe.recordManager.isRecording()) return
 
         val player = event.player
@@ -44,7 +46,7 @@ class PlayerTeleportDataListener : Listener {
         val location = event.to
 
         val record = GameCore.unsafe.recordManager.record!!
-        val recordData = PlayerTeleportData().apply {
+        val recordData = PlayerMoveData().apply {
             playerUuid = player.uniqueId
             worldName = location.world.name
             x = location.x

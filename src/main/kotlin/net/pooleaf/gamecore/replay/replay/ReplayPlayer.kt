@@ -6,6 +6,9 @@ import net.citizensnpcs.trait.Gravity
 import net.pooleaf.core.modules.commonsender.CommonSenderModule
 import net.pooleaf.core.modules.support.bukkit.util.TeleportUtil
 import net.pooleaf.gamecore.GameCore
+import net.pooleaf.gamecore.events.replay.ReplayPlayEvent
+import net.pooleaf.gamecore.events.replay.ReplayExitEvent
+import org.bukkit.Bukkit
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
 import org.bukkit.scheduler.BukkitRunnable
@@ -65,6 +68,9 @@ class ReplayPlayer(
                 }
             }
         }.runTaskTimer(GameCore.gamePlugin, 0L, 1L)
+
+        // 이벤트
+        Bukkit.getPluginManager().callEvent(ReplayPlayEvent(this))
     }
 
     fun pause() {
@@ -80,6 +86,9 @@ class ReplayPlayer(
 
         // 뷰어 텔레포트
         GameCore.spawnConfig.spawnLocation?.let { spawnLocation -> TeleportUtil.teleport(viewer, spawnLocation) }
+
+        // 이벤트
+        Bukkit.getPluginManager().callEvent(ReplayExitEvent(this))
     }
 
 }

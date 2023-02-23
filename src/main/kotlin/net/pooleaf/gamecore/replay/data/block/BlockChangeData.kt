@@ -1,9 +1,10 @@
-package net.pooleaf.gamecore.replay.data
+package net.pooleaf.gamecore.replay.data.block
 
 import com.comphenix.protocol.PacketType
 import com.comphenix.protocol.events.PacketAdapter
 import com.comphenix.protocol.events.PacketEvent
 import net.pooleaf.gamecore.GameCore
+import net.pooleaf.gamecore.replay.data.RecordData
 import net.pooleaf.gamecore.replay.replay.ReplayPlayer
 import org.bukkit.Bukkit
 import org.bukkit.Location
@@ -11,7 +12,7 @@ import org.bukkit.event.Listener
 
 class BlockChangeData : RecordData, Listener {
 
-    override val type: String = "blockPlace"
+    override val type: String = "blockChange"
 
     lateinit var worldName: String
     var x: Int = 0

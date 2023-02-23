@@ -1,22 +1,23 @@
-package net.pooleaf.gamecore.replay.data
+package net.pooleaf.gamecore.replay.data.block
 
 import net.pooleaf.core.modules.support.bukkit.util.BukkitReflectionUtil
 import net.pooleaf.gamecore.GameCore
+import net.pooleaf.gamecore.replay.data.RecordData
 import net.pooleaf.gamecore.replay.replay.ReplayPlayer
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
-import org.bukkit.event.block.BlockBreakEvent
+import org.bukkit.event.block.BlockPlaceEvent
 
 /**
- * 블럭 파괴 사운드 재생용
+ * 블럭 설치 사운드 재생용
  * 블럭 변경은 [BlockChangeData]에서 담당
  */
-class BlockBreakData : RecordData {
+class BlockPlaceData : RecordData {
 
-    override val type: String = "blockBreak"
+    override val type: String = "blockPlace"
 
     lateinit var worldName: String
     var x: Double = 0.0
@@ -40,10 +41,10 @@ class BlockBreakData : RecordData {
 
 }
 
-class BlockBreakDataListener : Listener {
+class BlockPlaceDataListener : Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    fun onBlockBreak(event: BlockBreakEvent) {
+    fun onBlockPlace(event: BlockPlaceEvent) {
         if (!GameCore.unsafe.recordManager.isRecording()) return
         if (!GameCore.unsafe.recordManager.isRecordingTargetPlayer(event.player)) return
 
@@ -51,7 +52,7 @@ class BlockBreakDataListener : Listener {
         val location = block.location
 
         val record = GameCore.unsafe.recordManager.record!!
-        val recordData = BlockBreakData().apply {
+        val recordData = BlockPlaceData().apply {
             worldName = location.world.name
             x = location.x
             y = location.y

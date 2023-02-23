@@ -1,4 +1,4 @@
-package net.pooleaf.gamecore.replay.data
+package net.pooleaf.gamecore.replay.data.player
 
 import net.citizensnpcs.api.trait.trait.Equipment
 import net.minecraft.server.v1_8_R3.PacketPlayOutEntityEquipment
@@ -6,6 +6,7 @@ import net.pooleaf.core.modules.support.bukkit.util.BukkitReflectionUtil
 import net.pooleaf.gamecore.GameCore
 import net.pooleaf.gamecore.events.replay.RecordStopEvent
 import net.pooleaf.gamecore.events.replay.RecordTickEvent
+import net.pooleaf.gamecore.replay.data.RecordData
 import net.pooleaf.gamecore.replay.replay.ReplayPlayer
 import org.bukkit.Bukkit
 import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack

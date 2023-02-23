@@ -1,11 +1,11 @@
-package net.pooleaf.gamecore.replay.data
+package net.pooleaf.gamecore.replay.data.player
 
 import com.comphenix.protocol.PacketType
 import com.comphenix.protocol.ProtocolLibrary
 import com.cryptomorin.xseries.XSound
-import net.minecraft.server.v1_8_R3.PacketPlayOutAnimation
 import net.pooleaf.core.modules.eventsupport.bukkit.events.damage.PlayerDamageEvent
 import net.pooleaf.gamecore.GameCore
+import net.pooleaf.gamecore.replay.data.RecordData
 import net.pooleaf.gamecore.replay.replay.ReplayPlayer
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
@@ -22,8 +22,6 @@ class PlayerDamageData : RecordData {
     override fun onPlay(replayPlayer: ReplayPlayer) {
         val citizensNpc = replayPlayer.npcs.get(playerUuid)?.citizensNpc ?: return
 
-//        PacketPlayOutEntityStatus
-//        PacketPlayOutEntityMetadata
         val packet = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.ANIMATION)
         packet.integers.write(0, citizensNpc.entity.entityId)
         packet.integers.write(1, 1)
