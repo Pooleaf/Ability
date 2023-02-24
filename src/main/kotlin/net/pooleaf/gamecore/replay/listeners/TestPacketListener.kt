@@ -31,6 +31,19 @@ class TestPacketListener: PacketAdapter(GameCore.gamePlugin, ListenerPriority.NO
 //            PacketPlayOutBlockChange
         }
 
+        if (event.packet.type == PacketType.Play.Server.MULTI_BLOCK_CHANGE) {
+            val chunk = packet.chunkCoordIntPairs.read(0)
+            val multiBlockChangeInfo = packet.multiBlockChangeInfoArrays.read(0)
+
+            println("chunk: ${chunk}")
+            println("multiBlockChangeInfo: ${multiBlockChangeInfo.map { it.chunk }}")
+        }
+
+        if (event.packet.type == PacketType.Play.Server.MAP_CHUNK) {
+
+        }
+
+
         if (packet.type == PacketType.Play.Server.ENTITY_METADATA) {
             val entityId = packet.integers.read(0)
             val entity = packet.getEntityModifier(event.player.world).read(0)

@@ -13,8 +13,8 @@ import org.bukkit.event.Listener
 import org.bukkit.event.block.SignChangeEvent
 
 /**
- * 블럭 설치 사운드 재생용
- * 블럭 변경은 [BlockChangeData]에서 담당
+ * 표지판 업데이트 데이터
+ * 관리자에게만 전송
  */
 class UpdateSignData : RecordData {
 

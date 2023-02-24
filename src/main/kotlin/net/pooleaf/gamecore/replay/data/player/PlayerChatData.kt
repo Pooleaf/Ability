@@ -11,7 +11,8 @@ import org.bukkit.event.player.AsyncPlayerChatEvent
 import java.util.*
 
 /**
- * 채팅 데이터는 관리자에게만 보임
+ * 채팅 데이터
+ * 관리자에게만 전송
  */
 class PlayerChatData : RecordData {
 

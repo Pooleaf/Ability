@@ -49,14 +49,13 @@ class BlockBreakDataListener : Listener {
         val block = event.block
         val location = block.location
 
-        val record = GameCore.unsafe.recordManager.record!!
         val recordData = BlockBreakData().apply {
             x = location.x
             y = location.y
             z = location.z
             blockTypeId = block.typeId
         }
-        record.addRecordData(recordData)
+        GameCore.unsafe.recordManager.record!!.addRecordData(recordData)
     }
 
 }

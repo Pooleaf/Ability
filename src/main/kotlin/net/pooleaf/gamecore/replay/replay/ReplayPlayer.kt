@@ -35,6 +35,9 @@ class ReplayPlayer(
     // 다른 Entity와 Id가 겹치지 않도록
     val entityIdOffset = 10000 + Random.nextInt(10000)
 
+    // 임시 데이터 (뒤로감기를 위함)
+    val tempDatas = hashMapOf<String, Any>()
+
 
     fun isRunning(): Boolean {
         return replayTask != null
