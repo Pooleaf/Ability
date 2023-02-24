@@ -5,6 +5,7 @@ import com.comphenix.protocol.ProtocolLibrary
 import com.comphenix.protocol.events.PacketAdapter
 import com.comphenix.protocol.events.PacketEvent
 import net.pooleaf.gamecore.GameCore
+import net.pooleaf.gamecore.events.replay.RecordStopEvent
 import net.pooleaf.gamecore.events.replay.ReplayExitEvent
 import net.pooleaf.gamecore.replay.data.RecordData
 import net.pooleaf.gamecore.replay.replay.ReplayPlayer
@@ -91,10 +92,16 @@ class SpawnEntityDataListener : PacketAdapter(GameCore.gamePlugin, PacketType.Pl
     }
 
     @EventHandler
+    fun onRecordStop(event: RecordStopEvent) {
+        spawnedEntityIds.clear()
+    }
+
+    @EventHandler
     fun onReplayExit(event: ReplayExitEvent) {
-        val packet = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.ENTITY_DESTROY)
+        // TODO
+        /*val packet = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.ENTITY_DESTROY)
         packet.integerArrays.write(0, spawnedEntityIds.toIntArray())
-        ProtocolLibrary.getProtocolManager().sendServerPacket(event.replayPlayer.viewer, packet)
+        ProtocolLibrary.getProtocolManager().sendServerPacket(event.replayPlayer.viewer, packet)*/
     }
 
 }

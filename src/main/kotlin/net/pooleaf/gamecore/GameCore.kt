@@ -1,6 +1,5 @@
 package net.pooleaf.gamecore
 
-import com.comphenix.protocol.ProtocolLibrary
 import net.pooleaf.gamecore.configs.GameConfig
 import net.pooleaf.gamecore.configs.QuickBarConfig
 import net.pooleaf.gamecore.configs.SpawnConfig
@@ -18,7 +17,6 @@ import net.pooleaf.gamecore.player.GamePlayer
 import net.pooleaf.gamecore.player.GamePlayerManager
 import net.pooleaf.gamecore.player.GamePlayerService
 import net.pooleaf.gamecore.quickbar.QuickBarManager
-import net.pooleaf.gamecore.replay.listeners.TestPacketListener
 import net.pooleaf.gamecore.replay.record.RecordManager
 import net.pooleaf.gamecore.replay.record.RecordService
 import net.pooleaf.gamecore.replay.replay.ReplayManager

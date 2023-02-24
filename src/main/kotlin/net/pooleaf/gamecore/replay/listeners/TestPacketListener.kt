@@ -38,7 +38,7 @@ class TestPacketListener: PacketAdapter(GameCore.gamePlugin, ListenerPriority.NO
 
             println("entityId: ${entityId}")
             println("entity: ${entity}")
-            println("entityMetadata: ${entityMetadata}")
+            println("entityMetadata: ${entityMetadata.get(0).value} / ${entityMetadata.get(0).value.javaClass.canonicalName}")
         }
 
 

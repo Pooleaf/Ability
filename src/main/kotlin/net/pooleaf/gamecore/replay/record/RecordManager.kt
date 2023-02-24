@@ -7,6 +7,8 @@ import net.pooleaf.gamecore.events.replay.RecordStopEvent
 import net.pooleaf.gamecore.events.replay.RecordTickEvent
 import net.pooleaf.gamecore.replay.data.block.BlockChangeDataListener
 import net.pooleaf.gamecore.replay.data.entity.CollectDataListener
+import net.pooleaf.gamecore.replay.data.entity.EntityDestoryDataListener
+import net.pooleaf.gamecore.replay.data.entity.ItemMetaDataDataListener
 import net.pooleaf.gamecore.replay.data.entity.SpawnEntityDataListener
 import net.pooleaf.gamecore.replay.data.player.PlayerMetaDataDataListener
 import net.pooleaf.gamecore.replay.data.player.PlayerMoveData
@@ -29,7 +31,9 @@ class RecordManager {
         ProtocolLibrary.getProtocolManager().addPacketListener(BlockChangeDataListener())
         ProtocolLibrary.getProtocolManager().addPacketListener(PlayerMetaDataDataListener())
         ProtocolLibrary.getProtocolManager().addPacketListener(SpawnEntityDataListener())
+        ProtocolLibrary.getProtocolManager().addPacketListener(EntityDestoryDataListener())
         ProtocolLibrary.getProtocolManager().addPacketListener(CollectDataListener())
+        ProtocolLibrary.getProtocolManager().addPacketListener(ItemMetaDataDataListener())
     }
 
     /**

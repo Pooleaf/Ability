@@ -15,7 +15,7 @@ import java.util.*
  * Entity Index 0만 녹화함
  * https://wiki.vg/index.php?title=Entity_metadata&oldid=7415#Entity
  */
-class PlayerMetaData : RecordData {
+class PlayerMetaDataData : RecordData {
 
     override val type: String = "playerMetaData"
 
@@ -35,7 +35,7 @@ class PlayerMetaData : RecordData {
 
         val entityPlayer = BukkitReflectionUtil.getHandle(citizensNpc.entity) as EntityPlayer
         val dataWatcher = entityPlayer.dataWatcher
-        dataWatcher.watch(index, value.toByte())
+        dataWatcher.watch(index, value)
 
         val packet = PacketPlayOutEntityMetadata(citizensNpc.entity.entityId, dataWatcher, false)
         BukkitReflectionUtil.sendPacket(replayPlayer.viewer, packet)
@@ -64,7 +64,7 @@ class PlayerMetaDataDataListener : PacketAdapter(GameCore.gamePlugin, PacketType
 
         if (packetIndex != 0) return
 
-        val recordData = PlayerMetaData().apply {
+        val recordData = PlayerMetaDataData().apply {
             playerUuid = event.player.uniqueId
             index = packetIndex
             value = packetValue as Byte
