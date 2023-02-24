@@ -6,7 +6,6 @@ import com.comphenix.protocol.events.PacketEvent
 import net.pooleaf.gamecore.GameCore
 import net.pooleaf.gamecore.replay.data.RecordData
 import net.pooleaf.gamecore.replay.replay.ReplayPlayer
-import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.event.Listener
 
@@ -14,7 +13,6 @@ class BlockChangeData : RecordData, Listener {
 
     override val type: String = "blockChange"
 
-    lateinit var worldName: String
     var x: Int = 0
     var y: Int = 0
     var z: Int = 0
@@ -25,7 +23,7 @@ class BlockChangeData : RecordData, Listener {
     override fun onPlay(replayPlayer: ReplayPlayer) {
         val viewer = replayPlayer.viewer
 
-        val location = Location(Bukkit.getWorld(worldName), x.toDouble(), y.toDouble(), z.toDouble())
+        val location = Location(viewer.world, x.toDouble(), y.toDouble(), z.toDouble())
         viewer.sendBlockChange(location, blockTypeId, blockData)
     }
 
@@ -41,7 +39,6 @@ class BlockChangeDataListener : PacketAdapter(GameCore.gamePlugin, PacketType.Pl
         val packetBlockData = event.packet.blockData.read(0)
 
         val recordData = BlockChangeData().apply {
-            worldName = event.player.world.name
             x = position.x
             y = position.y
             z = position.z

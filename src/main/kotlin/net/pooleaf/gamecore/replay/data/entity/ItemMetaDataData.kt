@@ -36,7 +36,7 @@ class ItemMetaDataData : RecordData {
         wrappedDataWatcher.setObject(10, value)
 
         val packet = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.ENTITY_METADATA)
-        packet.integers.write(0, entityId)
+        packet.integers.write(0, entityId + replayPlayer.entityIdOffset)
         packet.watchableCollectionModifier.write(0, wrappedDataWatcher.watchableObjects)
         ProtocolLibrary.getProtocolManager().sendServerPacket(replayPlayer.viewer, packet)
     }

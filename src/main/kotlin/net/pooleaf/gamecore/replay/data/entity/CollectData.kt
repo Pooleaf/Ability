@@ -4,12 +4,14 @@ import com.comphenix.protocol.PacketType
 import com.comphenix.protocol.ProtocolLibrary
 import com.comphenix.protocol.events.PacketAdapter
 import com.comphenix.protocol.events.PacketEvent
+import com.cryptomorin.xseries.XSound
 import net.pooleaf.gamecore.GameCore
 import net.pooleaf.gamecore.replay.data.RecordData
 import net.pooleaf.gamecore.replay.replay.ReplayPlayer
 import org.bukkit.Bukkit
 import org.bukkit.event.Listener
 import java.util.*
+import kotlin.random.Random
 
 class CollectData : RecordData, Listener {
 
@@ -21,13 +23,14 @@ class CollectData : RecordData, Listener {
 
     override fun onPlay(replayPlayer: ReplayPlayer) {
         val viewer = replayPlayer.viewer
-        val citizensNpc = replayPlayer.npcs.get(collectorPlayerUuid)?.citizensNpc
-        if (citizensNpc == null) return
+        val citizensNpc = replayPlayer.npcs.get(collectorPlayerUuid)?.citizensNpc ?: return
 
         val packet = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.COLLECT)
-        packet.integers.write(0, collectedEntityId)
+        packet.integers.write(0, collectedEntityId + replayPlayer.entityIdOffset)
         packet.integers.write(1, citizensNpc.entity.entityId)
         ProtocolLibrary.getProtocolManager().sendServerPacket(viewer, packet)
+
+        XSound.ENTITY_ITEM_PICKUP.play(viewer, 0.2F, ((Random.nextFloat() - Random.nextFloat()) * 0.7F + 1.0F) * 2.0F)
     }
 
 }

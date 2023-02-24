@@ -33,7 +33,7 @@ class SpawnEntityData : RecordData, Listener {
         val viewer = replayPlayer.viewer
 
         val packet = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.SPAWN_ENTITY)
-        packet.integers.write(0, entityId)
+        packet.integers.write(0, entityId + replayPlayer.entityIdOffset)
         packet.integers.write(1, x)
         packet.integers.write(2, y)
         packet.integers.write(3, z)

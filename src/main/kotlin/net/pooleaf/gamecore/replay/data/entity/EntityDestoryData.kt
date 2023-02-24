@@ -20,7 +20,7 @@ class EntityDestoryData : RecordData, Listener {
         val viewer = replayPlayer.viewer
 
         val packet = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.ENTITY_DESTROY)
-        packet.integerArrays.write(0, entityIds.toIntArray())
+        packet.integerArrays.write(0, entityIds.map { it + replayPlayer.entityIdOffset }.toIntArray())
         ProtocolLibrary.getProtocolManager().sendServerPacket(viewer, packet)
     }
 

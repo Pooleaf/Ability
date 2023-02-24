@@ -16,7 +16,6 @@ class BlockDamageData : RecordData {
 
     override val type: String = "blockDamage"
 
-    lateinit var worldName: String
     var x: Int = 0
     var y: Int = 0
     var z: Int = 0
@@ -74,7 +73,6 @@ class BlockDamageDataListener : Listener {
             // 현재 블럭 상태 저장
             if (hasDelayedDestroy) {
                 val recordData = BlockDamageData().apply {
-                    worldName = player.world.name
                     x = delayedDestroyPos.x
                     y = delayedDestroyPos.y
                     z = delayedDestroyPos.z
@@ -83,7 +81,6 @@ class BlockDamageDataListener : Listener {
                 GameCore.unsafe.recordManager.record!!.addRecordData(recordData)
             } else if (isDestroyingBlock) {
                 val recordData = BlockDamageData().apply {
-                    worldName = player.world.name
                     x = destroyPos.x
                     y = destroyPos.y
                     z = destroyPos.z

@@ -6,14 +6,15 @@ import net.citizensnpcs.trait.Gravity
 import net.pooleaf.core.modules.commonsender.CommonSenderModule
 import net.pooleaf.core.modules.support.bukkit.util.TeleportUtil
 import net.pooleaf.gamecore.GameCore
-import net.pooleaf.gamecore.events.replay.ReplayPlayEvent
 import net.pooleaf.gamecore.events.replay.ReplayExitEvent
+import net.pooleaf.gamecore.events.replay.ReplayPlayEvent
 import org.bukkit.Bukkit
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
 import org.bukkit.scheduler.BukkitRunnable
 import org.bukkit.scheduler.BukkitTask
 import java.util.*
+import kotlin.random.Random
 
 /**
  * 리플레이 재생기
@@ -30,6 +31,9 @@ class ReplayPlayer(
 
     // 플레이어 UUID, 리플레이 NPC
     val npcs = HashMap<UUID, ReplayNpc>()
+
+    // 다른 Entity와 Id가 겹치지 않도록
+    val entityIdOffset = 10000 + Random.nextInt(10000)
 
 
     fun isRunning(): Boolean {
