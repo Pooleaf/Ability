@@ -5,6 +5,7 @@ import com.comphenix.protocol.events.PacketAdapter
 import com.comphenix.protocol.events.PacketEvent
 import net.pooleaf.gamecore.GameCore
 import net.pooleaf.gamecore.replay.data.RecordData
+import net.pooleaf.gamecore.replay.replay.RecordDataReplayHandler
 import net.pooleaf.gamecore.replay.replay.ReplayPlayer
 import org.bukkit.Location
 import org.bukkit.event.Listener
@@ -46,6 +47,25 @@ class BlockChangeDataListener : PacketAdapter(GameCore.gamePlugin, PacketType.Pl
             blockData = packetBlockData.data.toByte()
         }
         GameCore.unsafe.recordManager.record!!.addRecordData(recordData)
+    }
+
+}
+
+class BlockChangeDataReplayHandler : RecordDataReplayHandler<BlockChangeData> {
+
+    override fun onPlay(replayPlayer: ReplayPlayer, recordData: BlockChangeData, tick: Long) {
+        val viewer = replayPlayer.viewer
+
+        val location = Location(viewer.world, recordData.x.toDouble(), recordData.y.toDouble(), recordData.z.toDouble())
+        viewer.sendBlockChange(location, recordData.blockTypeId, recordData.blockData)
+    }
+
+    override fun onReversePlay(replayPlayer: ReplayPlayer, recordData: BlockChangeData, tick: Long) {
+        TODO("Not yet implemented")
+    }
+
+    private fun getBeforeBlockData(replayPlayer: ReplayPlayer, location: Location, currentTick: Long) {
+        // TODO
     }
 
 }

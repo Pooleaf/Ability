@@ -19,6 +19,7 @@ import net.pooleaf.gamecore.player.GamePlayerService
 import net.pooleaf.gamecore.quickbar.QuickBarManager
 import net.pooleaf.gamecore.replay.record.RecordManager
 import net.pooleaf.gamecore.replay.record.RecordService
+import net.pooleaf.gamecore.replay.replay.RecordDataReplayHandlerManager
 import net.pooleaf.gamecore.replay.replay.ReplayManager
 import net.pooleaf.gamecore.replay.replay.ReplayPlayerManager
 import net.pooleaf.gamecore.replay.replay.ReplayService
@@ -72,6 +73,8 @@ object GameCore {
         lateinit var replayPlayerManager: ReplayPlayerManager
         lateinit var replayService: ReplayService
 
+        lateinit var recordDataReplayHandlerManager: RecordDataReplayHandlerManager
+
 
         val gameConfig: GameConfig by lazy {
             GameConfig(File(GameCore.gamePlugin.dataFolder, "game-config.yml"))
@@ -124,7 +127,10 @@ object GameCore {
             replayPlayerManager = ReplayPlayerManager()
             replayService = ReplayService()
 
+            recordDataReplayHandlerManager = RecordDataReplayHandlerManager()
+
             recordManager.registerRecordListeners()
+            recordDataReplayHandlerManager.registerHandlers()
 
             loadConfig()
         }

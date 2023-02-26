@@ -3,6 +3,7 @@ package net.pooleaf.gamecore.replay.data.block
 import net.pooleaf.core.modules.support.bukkit.util.BukkitReflectionUtil
 import net.pooleaf.gamecore.GameCore
 import net.pooleaf.gamecore.replay.data.RecordData
+import net.pooleaf.gamecore.replay.replay.RecordDataReplayHandler
 import net.pooleaf.gamecore.replay.replay.ReplayPlayer
 import org.bukkit.Location
 import org.bukkit.event.EventHandler
@@ -39,7 +40,7 @@ class BlockPlaceData : RecordData {
 
 }
 
-class BlockPlaceDataListener : Listener {
+class BlockPlaceDataRecordListener : Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     fun onBlockPlace(event: BlockPlaceEvent) {
@@ -57,6 +58,26 @@ class BlockPlaceDataListener : Listener {
             blockTypeId = block.typeId
         }
         record.addRecordData(recordData)
+    }
+
+}
+
+class BlockPlaceDataReplayHandler : RecordDataReplayHandler<BlockPlaceData> {
+
+    override fun onPlay(replayPlayer: ReplayPlayer, recordData: BlockPlaceData, tick: Long) {
+        val viewer = replayPlayer.viewer
+
+        val location = Location(viewer.world, recordData.x, recordData.y, recordData.z)
+
+        val nmsBlock = BukkitReflectionUtil.getNmsBlock(recordData.blockTypeId)
+        val breakSound = BukkitReflectionUtil.getBlockPlaceSound(nmsBlock)
+        val volume = (BukkitReflectionUtil.getBlockSoundVolume(nmsBlock) + 1.0F) / 2.0F
+        val pitch = BukkitReflectionUtil.getBlockSoundPitch(nmsBlock) * 0.8F
+
+        viewer.playSound(location, breakSound, volume, pitch)
+    }
+
+    override fun onReversePlay(replayPlayer: ReplayPlayer, recordData: BlockPlaceData, tick: Long) {
     }
 
 }
