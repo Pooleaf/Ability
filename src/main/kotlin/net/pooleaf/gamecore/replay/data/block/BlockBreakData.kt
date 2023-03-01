@@ -4,8 +4,8 @@ import net.pooleaf.core.modules.support.bukkit.util.BukkitReflectionUtil
 import net.pooleaf.gamecore.GameCore
 import net.pooleaf.gamecore.replay.data.RecordData
 import net.pooleaf.gamecore.replay.replay.RecordDataReplayHandler
-import net.pooleaf.gamecore.replay.replay.ReplayPlayer
 import org.bukkit.Location
+import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
@@ -15,28 +15,14 @@ import org.bukkit.event.block.BlockBreakEvent
  * 블럭 파괴 사운드 재생용
  * 블럭 변경은 [BlockChangeData]에서 담당
  */
-class BlockBreakData : RecordData {
+data class BlockBreakData(
+    var x: Double = 0.0,
+    var y: Double = 0.0,
+    var z: Double = 0.0,
+    var blockTypeId: Int = 0
+) : RecordData {
 
     override val type: String = "blockBreak"
-
-    var x: Double = 0.0
-    var y: Double = 0.0
-    var z: Double = 0.0
-    var blockTypeId: Int = 0
-
-
-    override fun onPlay(replayPlayer: ReplayPlayer) {
-        val viewer = replayPlayer.viewer
-
-        val location = Location(viewer.world, x, y, z)
-
-        val nmsBlock = BukkitReflectionUtil.getNmsBlock(blockTypeId)
-        val breakSound = BukkitReflectionUtil.getBlockPlaceSound(nmsBlock)
-        val volume = (BukkitReflectionUtil.getBlockSoundVolume(nmsBlock) + 1.0F) / 2.0F
-        val pitch = BukkitReflectionUtil.getBlockSoundPitch(nmsBlock) * 0.8F
-
-        viewer.playSound(location, breakSound, volume, pitch)
-    }
 
 }
 
@@ -63,9 +49,7 @@ class BlockBreakDataRecordListener : Listener {
 
 class BlockBreakDataReplayHandler : RecordDataReplayHandler<BlockBreakData> {
 
-    override fun onPlay(replayPlayer: ReplayPlayer, recordData: BlockBreakData, tick: Long) {
-        val viewer = replayPlayer.viewer
-
+    override fun onPlay(recordData: BlockBreakData, viewer: Player) {
         val location = Location(viewer.world, recordData.x, recordData.y, recordData.z)
 
         val nmsBlock = BukkitReflectionUtil.getNmsBlock(recordData.blockTypeId)
@@ -74,9 +58,6 @@ class BlockBreakDataReplayHandler : RecordDataReplayHandler<BlockBreakData> {
         val pitch = BukkitReflectionUtil.getBlockSoundPitch(nmsBlock) * 0.8F
 
         viewer.playSound(location, breakSound, volume, pitch)
-    }
-
-    override fun onReversePlay(replayPlayer: ReplayPlayer, recordData: BlockBreakData, tick: Long) {
     }
 
 }

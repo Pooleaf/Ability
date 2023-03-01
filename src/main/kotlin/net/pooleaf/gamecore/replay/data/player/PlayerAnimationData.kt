@@ -3,7 +3,7 @@ package net.pooleaf.gamecore.replay.data.player
 import net.citizensnpcs.util.PlayerAnimation
 import net.pooleaf.gamecore.GameCore
 import net.pooleaf.gamecore.replay.data.RecordData
-import net.pooleaf.gamecore.replay.replay.ReplayPlayer
+import net.pooleaf.gamecore.replay.replay.RecordDataReplayHandler
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
@@ -12,26 +12,16 @@ import org.bukkit.event.player.PlayerAnimationEvent
 import org.bukkit.event.player.PlayerAnimationType
 import java.util.*
 
-class PlayerAnimationData : RecordData {
+data class PlayerAnimationData(
+    var playerUuid: UUID? = null,
+    var animationType: String? = null
+) : RecordData {
 
     override val type: String = "playerAnimation"
 
-    lateinit var playerUuid: UUID
-    lateinit var animationType: String
-
-
-    override fun onPlay(replayPlayer: ReplayPlayer) {
-        val citizensNpc = replayPlayer.npcs.get(playerUuid)?.citizensNpc ?: return
-
-        val animationType = PlayerAnimationType.valueOf(animationType)
-        if (animationType == PlayerAnimationType.ARM_SWING) {
-            PlayerAnimation.ARM_SWING.play(citizensNpc.entity as Player)
-        }
-    }
-
 }
 
-class PlayerAnimationDataListener : Listener {
+class PlayerAnimationDataRecordListener : Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     fun onPlayerAnimation(event: PlayerAnimationEvent) {
@@ -40,12 +30,26 @@ class PlayerAnimationDataListener : Listener {
         val player = event.player
         if (!GameCore.unsafe.recordManager.isRecordingTargetPlayer(player)) return
 
-        val record = GameCore.unsafe.recordManager.record!!
         val recordData = PlayerAnimationData().apply {
             playerUuid = player.uniqueId
             animationType = event.animationType.name
         }
-        record.addRecordData(recordData)
+        GameCore.unsafe.recordManager.record!!.addRecordData(recordData)
+    }
+
+}
+
+class PlayerAnimationDataReplayHandler : RecordDataReplayHandler<PlayerAnimationData> {
+
+    override fun onPlay(recordData: PlayerAnimationData, viewer: Player) {
+        val replayPlayer = GameCore.unsafe.replayPlayerManager.get(viewer.uniqueId)
+
+        val citizensNpc = replayPlayer.virtualPlayerManager.get(recordData.playerUuid)?.citizensNpc ?: return
+
+        val animationType = PlayerAnimationType.valueOf(recordData.animationType!!)
+        if (animationType == PlayerAnimationType.ARM_SWING) {
+            PlayerAnimation.ARM_SWING.play(citizensNpc.entity as Player)
+        }
     }
 
 }

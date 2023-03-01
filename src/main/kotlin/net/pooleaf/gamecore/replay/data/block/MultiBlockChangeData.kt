@@ -10,34 +10,19 @@ import com.comphenix.protocol.wrappers.WrappedBlockData
 import net.pooleaf.core.modules.support.bukkit.util.ItemUtil
 import net.pooleaf.gamecore.GameCore
 import net.pooleaf.gamecore.replay.data.RecordData
-import net.pooleaf.gamecore.replay.replay.ReplayPlayer
+import net.pooleaf.gamecore.replay.replay.RecordDataReplayHandler
+import net.pooleaf.gamecore.replay.replay.virtual.block.VirtualBlock
 import org.bukkit.Location
+import org.bukkit.entity.Player
 import org.bukkit.event.Listener
 
-class MultiBlockChangeData : RecordData, Listener {
+data class MultiBlockChangeData(
+    var chunkX: Int = 0,
+    var chunkZ: Int = 0,
+    var blockChangeInfos: List<BlockChangeInfo> = arrayListOf()
+) : RecordData, Listener {
 
     override val type: String = "multiBlockChange"
-
-    var chunkX: Int = 0
-    var chunkZ: Int = 0
-    lateinit var blockChangeInfos: List<BlockChangeInfo>
-
-
-    override fun onPlay(replayPlayer: ReplayPlayer) {
-        val viewer = replayPlayer.viewer
-
-        val chunk = ChunkCoordIntPair(chunkX, chunkZ)
-        val multiBlockChangeInfos = blockChangeInfos.map {
-            val location = Location(viewer.location.world, it.x.toDouble(), it.y.toDouble(), it.z.toDouble())
-            val wrappedBlockData = WrappedBlockData.createData(ItemUtil.getMaterial(it.blockTypeId), it.blockData)
-            MultiBlockChangeInfo(location, wrappedBlockData)
-        }.toTypedArray()
-
-        val packet = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.MULTI_BLOCK_CHANGE)
-        packet.chunkCoordIntPairs.write(0, chunk)
-        packet.multiBlockChangeInfoArrays.write(0, multiBlockChangeInfos)
-        ProtocolLibrary.getProtocolManager().sendServerPacket(viewer, packet)
-    }
 
 }
 
@@ -49,7 +34,7 @@ class BlockChangeInfo() {
     var blockData: Int = 0
 }
 
-class MultiBlockChangeDataListener : PacketAdapter(GameCore.gamePlugin, PacketType.Play.Server.MULTI_BLOCK_CHANGE) {
+class MultiBlockChangeDataRecordListener : PacketAdapter(GameCore.gamePlugin, PacketType.Play.Server.MULTI_BLOCK_CHANGE) {
 
     override fun onPacketSending(event: PacketEvent) {
         if (!GameCore.unsafe.recordManager.isRecording()) return
@@ -75,6 +60,25 @@ class MultiBlockChangeDataListener : PacketAdapter(GameCore.gamePlugin, PacketTy
             this.blockChangeInfos = blockChangeInfos
         }
         GameCore.unsafe.recordManager.record!!.addRecordData(recordData)
+    }
+
+}
+
+class MultiBlockChangeDataReplayHandler : RecordDataReplayHandler<MultiBlockChangeData> {
+
+    override fun onPlay(recordData: MultiBlockChangeData, viewer: Player) {
+        val replayPlayer = GameCore.unsafe.replayPlayerManager.get(viewer.uniqueId)
+
+        val virtualBlocks = arrayListOf<VirtualBlock>()
+        recordData.blockChangeInfos.forEach { blockChangeInfo ->
+            val virtualBlock = replayPlayer.virtualBlockManager.getByXyz(blockChangeInfo.x, blockChangeInfo.y, blockChangeInfo.z)!!
+            virtualBlock.typeId = blockChangeInfo.blockTypeId
+            virtualBlock.typeData = blockChangeInfo.blockData.toByte()
+
+            virtualBlocks.add(virtualBlock)
+        }
+
+        replayPlayer.virtualBlockManager.showToBulk(virtualBlocks, viewer)
     }
 
 }

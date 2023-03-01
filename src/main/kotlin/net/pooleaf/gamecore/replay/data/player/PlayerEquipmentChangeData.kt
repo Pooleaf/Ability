@@ -7,7 +7,7 @@ import net.pooleaf.gamecore.GameCore
 import net.pooleaf.gamecore.events.replay.RecordStopEvent
 import net.pooleaf.gamecore.events.replay.RecordTickEvent
 import net.pooleaf.gamecore.replay.data.RecordData
-import net.pooleaf.gamecore.replay.replay.ReplayPlayer
+import net.pooleaf.gamecore.replay.replay.RecordDataReplayHandler
 import org.bukkit.Bukkit
 import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack
 import org.bukkit.entity.Player
@@ -16,37 +16,17 @@ import org.bukkit.event.Listener
 import org.bukkit.inventory.ItemStack
 import java.util.*
 
-class PlayerEquipmentChangeData : RecordData, Listener {
+data class PlayerEquipmentChangeData(
+    var playerUuid: UUID? = null,
+    var equipmentType: Int = 0,
+    var item: ItemStack? = null
+) : RecordData {
 
     override val type: String = "playerEquipmentChange"
 
-    lateinit var playerUuid: UUID
-    var equipmentType: Int = 0
-    var item: ItemStack?= null
-
-
-    override fun onPlay(replayPlayer: ReplayPlayer) {
-        val citizensNpc = replayPlayer.npcs.get(playerUuid)?.citizensNpc ?: return
-
-        val equipmentSlot = when(equipmentType) {
-            0 -> Equipment.EquipmentSlot.HAND
-            4 -> Equipment.EquipmentSlot.HELMET
-            3 -> Equipment.EquipmentSlot.CHESTPLATE
-            2 -> Equipment.EquipmentSlot.LEGGINGS
-            1 -> Equipment.EquipmentSlot.BOOTS
-            else -> return
-        }
-
-        citizensNpc.getOrAddTrait(Equipment::class.java).set(equipmentSlot, item)
-
-        // 시티즌 API만 사용하면 즉시 반영이 안되므로 패킷으로 한번 더 보내줌
-        val packet = PacketPlayOutEntityEquipment(citizensNpc.entity.entityId, equipmentType, CraftItemStack.asNMSCopy(item))
-        BukkitReflectionUtil.sendPacket(replayPlayer.viewer, packet)
-    }
-
 }
 
-class PlayerEquipmentChangeDataListener : Listener {
+class PlayerEquipmentChangeDataRecordListener : Listener {
 
     val beforeHands = hashMapOf<Player, ItemStack>()
     val beforeHelmets = hashMapOf<Player, ItemStack>()
@@ -124,6 +104,31 @@ class PlayerEquipmentChangeDataListener : Listener {
         beforeChestplates.clear()
         beforeLeggingses.clear()
         beforeBootses.clear()
+    }
+
+}
+
+class PlayerEquipmentChangeDataReplayHandler : RecordDataReplayHandler<PlayerEquipmentChangeData> {
+
+    override fun onPlay(recordData: PlayerEquipmentChangeData, viewer: Player) {
+        val replayPlayer = GameCore.unsafe.replayPlayerManager.get(viewer.uniqueId)
+
+        val citizensNpc = replayPlayer.virtualPlayerManager.get(recordData.playerUuid)?.citizensNpc ?: return
+
+        val equipmentSlot = when(recordData.equipmentType) {
+            0 -> Equipment.EquipmentSlot.HAND
+            4 -> Equipment.EquipmentSlot.HELMET
+            3 -> Equipment.EquipmentSlot.CHESTPLATE
+            2 -> Equipment.EquipmentSlot.LEGGINGS
+            1 -> Equipment.EquipmentSlot.BOOTS
+            else -> return
+        }
+
+        citizensNpc.getOrAddTrait(Equipment::class.java).set(equipmentSlot, recordData.item)
+
+        // 시티즌 API만 사용하면 즉시 반영이 안되므로 패킷으로 한번 더 보내줌
+        val packet = PacketPlayOutEntityEquipment(citizensNpc.entity.entityId, recordData.equipmentType, CraftItemStack.asNMSCopy(recordData.item))
+        BukkitReflectionUtil.sendPacket(replayPlayer.viewer, packet)
     }
 
 }

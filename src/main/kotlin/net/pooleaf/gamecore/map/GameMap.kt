@@ -146,6 +146,7 @@ open class GameMap {
                 Material.STATIONARY_LAVA,
                 Material.BEDROCK,
                 Material.BARRIER -> return getRandomLocation(useCurrentWorldBorder)
+                else -> {}
             }
 
             // 블럭보다 한 칸 높게 반환

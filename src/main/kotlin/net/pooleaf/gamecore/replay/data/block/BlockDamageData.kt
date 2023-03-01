@@ -7,32 +7,24 @@ import net.pooleaf.core.modules.support.bukkit.util.BukkitReflectionUtil
 import net.pooleaf.gamecore.GameCore
 import net.pooleaf.gamecore.events.replay.RecordTickEvent
 import net.pooleaf.gamecore.replay.data.RecordData
-import net.pooleaf.gamecore.replay.replay.ReplayPlayer
+import net.pooleaf.gamecore.replay.replay.RecordDataReplayHandler
 import org.bukkit.Bukkit
+import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 
-class BlockDamageData : RecordData {
+data class BlockDamageData(
+    var x: Int = 0,
+    var y: Int = 0,
+    var z: Int = 0,
+    var state: Int = 0
+) : RecordData {
 
     override val type: String = "blockDamage"
 
-    var x: Int = 0
-    var y: Int = 0
-    var z: Int = 0
-    var state: Int = 0
-
-
-    override fun onPlay(replayPlayer: ReplayPlayer) {
-        val viewer = replayPlayer.viewer
-
-        val blockPosition = BlockPosition(x, y, z)
-        val packet = PacketPlayOutBlockBreakAnimation(viewer.entityId, blockPosition, state)
-        BukkitReflectionUtil.sendPacket(viewer, packet)
-    }
-
 }
 
-class BlockDamageDataListener : Listener {
+class BlockDamageDataRecordListener : Listener {
 
     @EventHandler
     fun onRecordTick(event: RecordTickEvent) {
@@ -89,6 +81,16 @@ class BlockDamageDataListener : Listener {
                 GameCore.unsafe.recordManager.record!!.addRecordData(recordData)
             }
         }
+    }
+
+}
+
+class BlockDamageDataReplayHandler : RecordDataReplayHandler<BlockDamageData> {
+
+    override fun onPlay(recordData: BlockDamageData, viewer: Player) {
+        val blockPosition = BlockPosition(recordData.x, recordData.y, recordData.z)
+        val packet = PacketPlayOutBlockBreakAnimation(viewer.entityId, blockPosition, recordData.state)
+        BukkitReflectionUtil.sendPacket(viewer, packet)
     }
 
 }

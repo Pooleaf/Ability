@@ -6,27 +6,17 @@ import com.comphenix.protocol.events.PacketEvent
 import net.pooleaf.gamecore.GameCore
 import net.pooleaf.gamecore.replay.data.RecordData
 import net.pooleaf.gamecore.replay.replay.RecordDataReplayHandler
-import net.pooleaf.gamecore.replay.replay.ReplayPlayer
-import org.bukkit.Location
-import org.bukkit.event.Listener
+import org.bukkit.entity.Player
 
-class BlockChangeData : RecordData, Listener {
+data class BlockChangeData(
+    var x: Int = 0,
+    var y: Int = 0,
+    var z: Int = 0,
+    var blockTypeId: Int = 0,
+    var blockData: Byte = 0
+) : RecordData {
 
     override val type: String = "blockChange"
-
-    var x: Int = 0
-    var y: Int = 0
-    var z: Int = 0
-    var blockTypeId: Int = 0
-    var blockData: Byte = 0
-
-
-    override fun onPlay(replayPlayer: ReplayPlayer) {
-        val viewer = replayPlayer.viewer
-
-        val location = Location(viewer.world, x.toDouble(), y.toDouble(), z.toDouble())
-        viewer.sendBlockChange(location, blockTypeId, blockData)
-    }
 
 }
 
@@ -53,19 +43,14 @@ class BlockChangeDataListener : PacketAdapter(GameCore.gamePlugin, PacketType.Pl
 
 class BlockChangeDataReplayHandler : RecordDataReplayHandler<BlockChangeData> {
 
-    override fun onPlay(replayPlayer: ReplayPlayer, recordData: BlockChangeData, tick: Long) {
-        val viewer = replayPlayer.viewer
+    override fun onPlay(recordData: BlockChangeData, viewer: Player) {
+        val replayPlayer = GameCore.unsafe.replayPlayerManager.get(viewer.uniqueId)
 
-        val location = Location(viewer.world, recordData.x.toDouble(), recordData.y.toDouble(), recordData.z.toDouble())
-        viewer.sendBlockChange(location, recordData.blockTypeId, recordData.blockData)
-    }
+        val virtualBlock = replayPlayer.virtualBlockManager.getByXyz(recordData.x, recordData.y, recordData.z)!!
+        virtualBlock.typeId = recordData.blockTypeId
+        virtualBlock.typeData = recordData.blockData
 
-    override fun onReversePlay(replayPlayer: ReplayPlayer, recordData: BlockChangeData, tick: Long) {
-        TODO("Not yet implemented")
-    }
-
-    private fun getBeforeBlockData(replayPlayer: ReplayPlayer, location: Location, currentTick: Long) {
-        // TODO
+        virtualBlock.showTo(viewer)
     }
 
 }

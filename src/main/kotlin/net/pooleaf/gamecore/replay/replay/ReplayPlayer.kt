@@ -5,16 +5,28 @@ import net.citizensnpcs.api.trait.trait.Owner
 import net.citizensnpcs.trait.Gravity
 import net.pooleaf.core.modules.commonsender.CommonSenderModule
 import net.pooleaf.core.modules.support.bukkit.util.TeleportUtil
+import net.pooleaf.gamecore.Broadcaster
 import net.pooleaf.gamecore.GameCore
 import net.pooleaf.gamecore.events.replay.ReplayExitEvent
+import net.pooleaf.gamecore.events.replay.ReplayInitEvent
+import net.pooleaf.gamecore.events.replay.ReplayJumpToEvent
 import net.pooleaf.gamecore.events.replay.ReplayPlayEvent
+import net.pooleaf.gamecore.replay.data.block.*
+import net.pooleaf.gamecore.replay.data.entity.*
+import net.pooleaf.gamecore.replay.data.player.*
+import net.pooleaf.gamecore.replay.replay.virtual.VirtualLocation
+import net.pooleaf.gamecore.replay.replay.virtual.block.VirtualBlock
+import net.pooleaf.gamecore.replay.replay.virtual.block.VirtualBlockManager
+import net.pooleaf.gamecore.replay.replay.virtual.entity.VirtualEntity
+import net.pooleaf.gamecore.replay.replay.virtual.entity.VirtualEntityManager
+import net.pooleaf.gamecore.replay.replay.virtual.player.VirtualPlayer
+import net.pooleaf.gamecore.replay.replay.virtual.player.VirtualPlayerManager
 import org.bukkit.Bukkit
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
 import org.bukkit.scheduler.BukkitRunnable
 import org.bukkit.scheduler.BukkitTask
 import java.util.*
-import kotlin.random.Random
 
 /**
  * 리플레이 재생기
@@ -24,26 +36,141 @@ class ReplayPlayer(
     val replay: Replay
 ) {
 
+    companion object {
+        // 실제 Entity와 ID가 겹치지 않도록 사용하는 Offset
+        val ENTITY_ID_OFFSET = 10000000
+    }
+
+
     var currentTick: Float = 0.0F
+        private set
+
+    private var lastPlayedTick: Long = 0
+
     var playSpeed: Float = 1.0F
 
-    var replayTask: BukkitTask? = null
+    private var replayTask: BukkitTask? = null
 
-    // 플레이어 UUID, 리플레이 NPC
-    val npcs = HashMap<UUID, ReplayNpc>()
+    // 커스텀 데이터
+    val etcDatas = hashMapOf<String, Any>()
 
-    // 다른 Entity와 Id가 겹치지 않도록
-    val entityIdOffset = 10000 + Random.nextInt(10000)
+    // 가상 블럭 관리자
+    val virtualBlockManager: VirtualBlockManager = VirtualBlockManager()
 
-    // 임시 데이터 (뒤로감기를 위함)
-    val tempDatas = hashMapOf<String, Any>()
+    // 가상 엔티티 관리자
+    val virtualEntityManager: VirtualEntityManager = VirtualEntityManager()
+
+    // 가상 플레이어 관리자
+    val virtualPlayerManager: VirtualPlayerManager = VirtualPlayerManager()
 
 
     fun isRunning(): Boolean {
         return replayTask != null
     }
 
+    /**
+     * 초기화 및 캐싱
+     */
     fun init() {
+        // 블럭 데이터 캐싱
+        replay.recordDatas.forEach { tick, datas ->
+            datas.filter {
+                it is BlockChangeData
+                        || it is BlockDamageData
+                        || it is EntityChangeBlockData
+                        || it is EntityExplodeData
+                        || it is MultiBlockChangeData
+            }.forEach { data ->
+                val virtualLocations = when (data) {
+                    is BlockChangeData -> listOf(VirtualLocation(data.x.toDouble(), data.y.toDouble(), data.z.toDouble()))
+                    is BlockDamageData -> listOf(VirtualLocation(data.x.toDouble(), data.y.toDouble(), data.z.toDouble()))
+                    is EntityChangeBlockData -> listOf(VirtualLocation(data.x.toDouble(), data.y.toDouble(), data.z.toDouble()))
+                    is EntityExplodeData -> data.blockInfos.map { VirtualLocation(it.x.toDouble(), it.y.toDouble(), it.z.toDouble()) }
+                    is MultiBlockChangeData -> data.blockChangeInfos.map { VirtualLocation(it.x.toDouble(), it.y.toDouble(), it.z.toDouble()) }
+                    else -> return@forEach
+                }
+
+                virtualLocations.forEachIndexed { index, virtualLocation ->
+                    // FakeBlock 생성
+                    var fakeBlock = virtualBlockManager.get(virtualLocation)
+                    if (fakeBlock == null) {
+                        fakeBlock = VirtualBlock(virtualLocation)
+                        virtualBlockManager.set(virtualLocation, fakeBlock)
+                    }
+
+                    // FakeBlock 기록 생성
+                    var virtualBlockHistory = fakeBlock.histories.get(tick)
+
+                    if (virtualBlockHistory == null) {
+                        virtualBlockHistory = VirtualBlock(virtualLocation)
+                        fakeBlock.histories.put(tick, virtualBlockHistory)
+                    }
+
+                    // 데이터별 기록 생성
+                    when (data) {
+                        is BlockChangeData -> {
+                            virtualBlockHistory.typeId = data.blockTypeId
+                            virtualBlockHistory.typeData = data.blockData
+                        }
+                        is BlockDamageData -> {
+                            virtualBlockHistory.damageState = data.state
+                        }
+                        is EntityChangeBlockData -> {
+                            virtualBlockHistory.typeId = data.blockTypeId
+                            virtualBlockHistory.typeData = data.blockData
+                        }
+                        is EntityExplodeData -> {
+                            virtualBlockHistory.typeId = 0
+                            virtualBlockHistory.typeData = 0
+                        }
+                        is MultiBlockChangeData -> {
+                            virtualBlockHistory.typeId = data.blockChangeInfos.get(index).blockTypeId
+                            virtualBlockHistory.typeData = data.blockChangeInfos.get(index).blockData.toByte()
+                        }
+                        else -> return@forEach
+                    }
+                }
+            }
+
+        }
+
+        // 엔티티 데이터 캐싱
+        replay.recordDatas.forEach { tick, datas ->
+            datas.filter {
+                it is CollectData
+                        || it is EntityDestroyData
+                        || it is EntityTeleportData
+                        || it is EntityVelocityData
+                        || it is ItemMetaDataData
+                        || it is SpawnEntityData
+            }.forEach { data ->
+                val entityIds: List<Int> = when (data) {
+                    is CollectData -> listOf(data.collectedEntityId)
+                    is EntityDestroyData -> data.entityIds.toList()
+                    is EntityTeleportData -> listOf(data.entityId)
+                    is EntityVelocityData -> listOf(data.entityId)
+                    is ItemMetaDataData -> listOf(data.entityId)
+                    is SpawnEntityData -> listOf(data.entityId)
+                    else -> return@forEach
+                }
+
+                entityIds.forEach { entityId ->
+                    var virtualEntity = virtualEntityManager.get(entityId)
+
+                    if (virtualEntity == null) {
+                        virtualEntity = VirtualEntity(entityId)
+                        virtualEntityManager.set(entityId, virtualEntity)
+                    }
+
+                    val histories = virtualEntity.histories.getOrElse(tick) { arrayListOf() }
+                    virtualEntity.histories.set(tick, histories)
+
+                    histories.add(data)
+                }
+            }
+        }
+
+        // 가상 플레이어 NPC 생성
         replay.recordedPlayers.forEach { uuid ->
             val commonPlayer = CommonSenderModule.getPlayer(uuid)
 
@@ -54,23 +181,73 @@ class ReplayPlayer(
             citizensNpc.getOrAddTrait(Gravity::class.java).toggle()
             citizensNpc.spawn(viewer.location)
 
-            val replayNpc = ReplayNpc(citizensNpc)
-            npcs.put(uuid, replayNpc)
+            val virtualPlayer = VirtualPlayer(uuid, citizensNpc)
+            virtualPlayerManager.set(uuid, virtualPlayer)
         }
+
+        // 가상 플레이어 캐싱
+        replay.recordDatas.forEach { tick, datas ->
+            datas.filter {
+                it is PlayerAnimationData
+                        || it is PlayerChatData
+                        || it is PlayerDamageData
+                        || it is PlayerEquipmentChangeData
+                        || it is PlayerHealthChangeData
+                        || it is PlayerMetaDataData
+                        || it is PlayerMoveData
+                        || it is PlayerTeleportData
+            }.forEach { data ->
+                val playerUuid: UUID = when (data) {
+                    is PlayerAnimationData -> data.playerUuid!!
+                    is PlayerChatData -> data.playerUuid!!
+                    is PlayerDamageData -> data.playerUuid!!
+                    is PlayerEquipmentChangeData -> data.playerUuid!!
+                    is PlayerHealthChangeData -> data.playerUuid!!
+                    is PlayerMetaDataData -> data.playerUuid!!
+                    is PlayerMoveData -> data.playerUuid!!
+                    is PlayerTeleportData -> data.playerUuid!!
+                    else -> return@forEach
+                }
+
+                var virtualPlayer = virtualPlayerManager.get(playerUuid)
+
+                val histories = virtualPlayer.histories.getOrElse(tick) { arrayListOf() }
+                virtualPlayer.histories.set(tick, histories)
+
+                histories.add(data)
+            }
+        }
+
+        // 이벤트
+        Bukkit.getPluginManager().callEvent(ReplayInitEvent(this))
     }
 
+    /**
+     * 재생
+     */
     fun play() {
         if (isRunning()) error("Replay already running")
 
         replayTask = object : BukkitRunnable() {
             override fun run() {
-                val tickRecordDatas = replay.recordDatas.get(currentTick.toLong())
-                tickRecordDatas?.forEach { it.onPlay(this@ReplayPlayer) }
+                if (currentTick.toInt() % 20 == 0) { // TODO remove
+                    Broadcaster.broadcast("§b리플레이: §f${(currentTick.toFloat() / 20).toLong()}§b초")
+                }
+
+                val toTick = currentTick.toLong()
+                for (tick in (lastPlayedTick + 1)..toTick) {
+                    val tickRecordDatas = replay.recordDatas.get(tick)
+                    tickRecordDatas?.forEach { recordData ->
+                        val recordDataReplayHandler = GameCore.unsafe.recordDataReplayHandlerManager.get(recordData.javaClass)
+                        recordDataReplayHandler?.onPlay(recordData, viewer)
+                    }
+
+                    lastPlayedTick = tick
+                }
 
                 currentTick += playSpeed
 
                 if (currentTick >= replay.endTick) {
-                    exit()
                     pause()
                 }
             }
@@ -80,6 +257,9 @@ class ReplayPlayer(
         Bukkit.getPluginManager().callEvent(ReplayPlayEvent(this))
     }
 
+    /**
+     * 정지
+     */
     fun pause() {
         if (!isRunning()) error("Replay not running")
 
@@ -87,9 +267,67 @@ class ReplayPlayer(
         replayTask = null
     }
 
+//    /**
+//     * 뒤로가기
+//     */
+//    fun goBack(tick: Long) {
+//        for (i in 0 until tick) {
+//            val tickRecordDatas = replay.recordDatas.get(currentTick.toLong())
+//            tickRecordDatas?.forEach { recordData ->
+//                val recordDataReplayHandler = GameCore.unsafe.recordDataReplayHandlerManager.get(recordData.javaClass)
+//                recordDataReplayHandler?.onReversePlay(this@ReplayPlayer, recordData as Nothing, currentTick.toLong())
+//            }
+//
+//            currentTick--
+//        }
+//    }
+
+    /**
+     * 시간 이동
+     */
+    fun jumpTo(tick: Long) {
+        if (tick < 0) error("jumpTo tick cannot lower than 0")
+        if (tick > replay.endTick) error("jumpTo tick cannot higher than endTick")
+
+        val beforeTick = currentTick
+        currentTick = tick.toFloat()
+        lastPlayedTick = tick
+
+        // 블럭
+        virtualBlockManager.values().forEach {
+            it.timeMachine(tick)
+        }
+
+        virtualBlockManager.showToBulk(virtualBlockManager.values().toList(), viewer)
+
+        // 청크 업데이트
+//        for (x in 0..Bukkit.getViewDistance()) {
+//            for (z in 0..Bukkit.getViewDistance()) {
+//                viewer.world.refreshChunk(viewer.location.chunk.x + x, viewer.location.chunk.z + z)
+//                viewer.world.refreshChunk(viewer.location.chunk.x - x, viewer.location.chunk.z - z)
+//            }
+//        }
+
+        // 엔티티
+        virtualEntityManager.values().forEach {
+            it.timeMachine(beforeTick.toLong(), tick, viewer)
+        }
+
+        // 플레이어
+        virtualPlayerManager.values().forEach {
+            it.timeMachine(tick, viewer)
+        }
+
+        // 이벤트
+        Bukkit.getPluginManager().callEvent(ReplayJumpToEvent(this, beforeTick, tick))
+    }
+
+    /**
+     * 종료
+     */
     fun exit() {
         // NPC 제거
-        npcs.values.forEach { it.citizensNpc.destroy() }
+        virtualPlayerManager.values().forEach { it.citizensNpc.destroy() }
 
         // 뷰어 텔레포트
         GameCore.spawnConfig.spawnLocation?.let { spawnLocation -> TeleportUtil.teleport(viewer, spawnLocation) }

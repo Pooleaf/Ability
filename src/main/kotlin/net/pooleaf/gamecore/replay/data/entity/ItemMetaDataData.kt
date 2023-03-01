@@ -5,49 +5,34 @@ import com.comphenix.protocol.ProtocolLibrary
 import com.comphenix.protocol.events.PacketAdapter
 import com.comphenix.protocol.events.PacketEvent
 import com.comphenix.protocol.wrappers.WrappedDataWatcher
-import com.comphenix.protocol.wrappers.WrappedDataWatcher.WrappedDataWatcherObject
-import com.comphenix.protocol.wrappers.WrappedWatchableObject
 import net.minecraft.server.v1_8_R3.EntityItem
 import net.pooleaf.gamecore.GameCore
 import net.pooleaf.gamecore.replay.data.RecordData
+import net.pooleaf.gamecore.replay.replay.RecordDataReplayHandler
 import net.pooleaf.gamecore.replay.replay.ReplayPlayer
 import org.bukkit.craftbukkit.v1_8_R3.CraftWorld
 import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack
 import org.bukkit.entity.Item
+import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 
 /**
  * 아이템 Entity Index 10
  * https://wiki.vg/index.php?title=Entity_metadata&oldid=7415#Entity
  */
-class ItemMetaDataData : RecordData {
+data class ItemMetaDataData(
+    var entityId: Int = 0,
+    var value: ItemStack? = null
+) : RecordData {
 
     override val type: String = "itemMetaData"
 
-    var entityId: Int = 0
-    lateinit var value: ItemStack
-
-
-    override fun onPlay(replayPlayer: ReplayPlayer) {
-        val location = replayPlayer.viewer.location
-        val entityItem = EntityItem((location.world as CraftWorld).handle, location.x, location.y, location.z, CraftItemStack.asNMSCopy(value.clone()))
-
-        val wrappedDataWatcher = WrappedDataWatcher(entityItem.dataWatcher)
-        wrappedDataWatcher.setObject(10, value)
-
-        val packet = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.ENTITY_METADATA)
-        packet.integers.write(0, entityId + replayPlayer.entityIdOffset)
-        packet.watchableCollectionModifier.write(0, wrappedDataWatcher.watchableObjects)
-        ProtocolLibrary.getProtocolManager().sendServerPacket(replayPlayer.viewer, packet)
-    }
-
 }
 
-class ItemMetaDataDataListener : PacketAdapter(GameCore.gamePlugin, PacketType.Play.Server.ENTITY_METADATA) {
+class ItemMetaDataDataRecordListener : PacketAdapter(GameCore.gamePlugin, PacketType.Play.Server.ENTITY_METADATA) {
 
     override fun onPacketSending(event: PacketEvent) {
         if (!GameCore.unsafe.recordManager.isRecording()) return
-        if (!GameCore.unsafe.recordManager.isRecordingTargetPlayer(event.player)) return
 
         val packet = event.packet
         val entityId = packet.integers.read(0)
@@ -67,6 +52,25 @@ class ItemMetaDataDataListener : PacketAdapter(GameCore.gamePlugin, PacketType.P
             this.value = value as ItemStack
         }
         GameCore.unsafe.recordManager.record!!.addRecordData(recordData)
+    }
+
+}
+
+class ItemMetaDataDataReplayHandler : RecordDataReplayHandler<ItemMetaDataData> {
+
+    override fun onPlay(recordData: ItemMetaDataData, viewer: Player) {
+        val replayPlayer = GameCore.unsafe.replayPlayerManager.get(viewer.uniqueId)
+
+        val location = replayPlayer.viewer.location
+        val entityItem = EntityItem((location.world as CraftWorld).handle, location.x, location.y, location.z, CraftItemStack.asNMSCopy(recordData.value!!.clone()))
+
+        val wrappedDataWatcher = WrappedDataWatcher(entityItem.dataWatcher)
+        wrappedDataWatcher.setObject(10, recordData.value)
+
+        val packet = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.ENTITY_METADATA)
+        packet.integers.write(0, recordData.entityId + ReplayPlayer.ENTITY_ID_OFFSET)
+        packet.watchableCollectionModifier.write(0, wrappedDataWatcher.watchableObjects)
+        ProtocolLibrary.getProtocolManager().sendServerPacket(replayPlayer.viewer, packet)
     }
 
 }

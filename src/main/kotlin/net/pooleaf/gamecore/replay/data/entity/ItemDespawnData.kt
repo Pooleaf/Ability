@@ -1,0 +1,46 @@
+package net.pooleaf.gamecore.replay.data.entity
+
+import com.comphenix.protocol.PacketType
+import com.comphenix.protocol.ProtocolLibrary
+import net.pooleaf.gamecore.GameCore
+import net.pooleaf.gamecore.replay.data.RecordData
+import net.pooleaf.gamecore.replay.replay.RecordDataReplayHandler
+import net.pooleaf.gamecore.replay.replay.ReplayPlayer
+import org.bukkit.entity.Player
+import org.bukkit.event.EventHandler
+import org.bukkit.event.Listener
+import org.bukkit.event.entity.ItemDespawnEvent
+
+data class ItemDespawnData(
+    var entityId: Int = 0
+) : RecordData {
+
+    override val type: String = "itemDespawn"
+
+}
+
+class ItemDespawnDataRecordListener : Listener {
+
+    @EventHandler
+    fun onItemDespawn(event: ItemDespawnEvent) {
+        if (!GameCore.unsafe.recordManager.isRecording()) return
+
+        val recordData = ItemDespawnData().apply {
+            entityId = event.entity.entityId
+        }
+        GameCore.unsafe.recordManager.record!!.addRecordData(recordData)
+    }
+
+}
+
+class ItemDespawnDataReplayHandler : RecordDataReplayHandler<ItemDespawnData> {
+
+    override fun onPlay(recordData: ItemDespawnData, viewer: Player) {
+        val replayPlayer = GameCore.unsafe.replayPlayerManager.get(viewer.uniqueId)
+
+        val packet = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.ENTITY_DESTROY)
+        packet.integerArrays.write(0, arrayOf(recordData.entityId + ReplayPlayer.ENTITY_ID_OFFSET).toIntArray())
+        ProtocolLibrary.getProtocolManager().sendServerPacket(viewer, packet)
+    }
+
+}

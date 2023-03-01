@@ -2,7 +2,7 @@ package net.pooleaf.gamecore.replay.replay
 
 import net.pooleaf.gamecore.GameCore
 import org.bukkit.entity.Player
-import java.util.UUID
+import java.util.*
 
 class ReplayService {
 
@@ -14,6 +14,8 @@ class ReplayService {
         val replayPlayer = ReplayPlayer(viewer, replay)
         replayPlayer.init()
         replayPlayer.play()
+
+        GameCore.unsafe.replayPlayerManager.set(viewer.uniqueId, replayPlayer)
     }
 
     fun exitReplay(viewer: Player) {

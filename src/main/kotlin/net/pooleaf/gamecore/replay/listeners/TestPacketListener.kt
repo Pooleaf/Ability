@@ -62,7 +62,7 @@ class TestPacketListener: PacketAdapter(GameCore.gamePlugin, ListenerPriority.NO
 
             println("entityId: ${entityId}")
             println("entity: ${entity}")
-            println("animatino: ${animation}")
+            println("animation: ${animation}")
         }
 
         if (packet.type == PacketType.Play.Server.WORLD_BORDER) {

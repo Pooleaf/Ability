@@ -6,37 +6,25 @@ import com.comphenix.protocol.events.PacketAdapter
 import com.comphenix.protocol.events.PacketEvent
 import net.pooleaf.gamecore.GameCore
 import net.pooleaf.gamecore.replay.data.RecordData
+import net.pooleaf.gamecore.replay.replay.RecordDataReplayHandler
 import net.pooleaf.gamecore.replay.replay.ReplayPlayer
-import org.bukkit.event.Listener
+import org.bukkit.entity.Player
 
-class EntityVelocityData : RecordData, Listener {
+data class EntityVelocityData(
+    var entityId: Int = 0,
+    var velocityX: Int = 0,
+    var velocityY: Int = 0,
+    var velocityZ: Int = 0
+) : RecordData {
 
     override val type: String = "entityVelocity"
 
-    var entityId: Int = 0
-    var velocityX: Int = 0
-    var velocityY: Int = 0
-    var velocityZ: Int = 0
-
-
-    override fun onPlay(replayPlayer: ReplayPlayer) {
-        val viewer = replayPlayer.viewer
-
-        val packet = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.ENTITY_VELOCITY)
-        packet.integers.write(0, entityId + replayPlayer.entityIdOffset)
-        packet.integers.write(1, velocityX)
-        packet.integers.write(2, velocityY)
-        packet.integers.write(3, velocityZ)
-        ProtocolLibrary.getProtocolManager().sendServerPacket(viewer, packet)
-    }
-
 }
 
-class EntityVelocityDataListener : PacketAdapter(GameCore.gamePlugin, PacketType.Play.Server.ENTITY_VELOCITY), Listener {
+class EntityVelocityDataRecordListener : PacketAdapter(GameCore.gamePlugin, PacketType.Play.Server.ENTITY_VELOCITY) {
 
     override fun onPacketSending(event: PacketEvent) {
         if (!GameCore.unsafe.recordManager.isRecording()) return
-        if (!GameCore.unsafe.recordManager.isRecordingTargetPlayer(event.player)) return
 
         val packet = event.packet
 
@@ -52,6 +40,19 @@ class EntityVelocityDataListener : PacketAdapter(GameCore.gamePlugin, PacketType
             velocityZ = packetVelocityZ
         }
         GameCore.unsafe.recordManager.record!!.addRecordData(recordData)
+    }
+
+}
+
+class EntityVelocityDataReplayHandler : RecordDataReplayHandler<EntityVelocityData> {
+
+    override fun onPlay(recordData: EntityVelocityData, viewer: Player) {
+        val packet = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.ENTITY_VELOCITY)
+        packet.integers.write(0, recordData.entityId + ReplayPlayer.ENTITY_ID_OFFSET)
+        packet.integers.write(1, recordData.velocityX)
+        packet.integers.write(2, recordData.velocityY)
+        packet.integers.write(3, recordData.velocityZ)
+        ProtocolLibrary.getProtocolManager().sendServerPacket(viewer, packet)
     }
 
 }

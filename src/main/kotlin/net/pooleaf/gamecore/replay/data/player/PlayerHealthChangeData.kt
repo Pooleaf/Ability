@@ -4,28 +4,23 @@ import com.google.gson.annotations.Expose
 import net.pooleaf.gamecore.GameCore
 import net.pooleaf.gamecore.events.replay.RecordTickEvent
 import net.pooleaf.gamecore.replay.data.RecordData
-import net.pooleaf.gamecore.replay.replay.ReplayPlayer
+import net.pooleaf.gamecore.replay.replay.RecordDataReplayHandler
 import org.bukkit.Bukkit
+import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import java.util.*
 
-class PlayerHealthChangeData : RecordData {
+data class PlayerHealthChangeData(
+    var playerUuid: UUID? = null,
+    var health: Double = 0.0
+) : RecordData {
 
     override val type: String = "healthChange"
 
-    lateinit var playerUuid: UUID
-    var health: Double = 0.0
-
-    override fun onPlay(replayPlayer: ReplayPlayer) {
-        val replayNpc = replayPlayer.npcs.get(playerUuid) ?: return
-
-        replayNpc.health = health
-    }
-
 }
 
-class PlayerHealthChangeDataListener : Listener {
+class PlayerHealthChangeDataRecordListener : Listener {
 
     @Expose
     private val beforeHealths = hashMapOf<UUID, Double>()
@@ -49,6 +44,17 @@ class PlayerHealthChangeDataListener : Listener {
 
             beforeHealths.put(player.uniqueId, currentHealth)
         }
+    }
+
+}
+
+class PlayerHealthChangeDataReplayHandler : RecordDataReplayHandler<PlayerHealthChangeData> {
+
+    override fun onPlay(recordData: PlayerHealthChangeData, viewer: Player) {
+        val replayPlayer = GameCore.unsafe.replayPlayerManager.get(viewer.uniqueId)
+
+        val replayNpc = replayPlayer.virtualPlayerManager.get(recordData.playerUuid) ?: return
+        replayNpc.health = recordData.health
     }
 
 }

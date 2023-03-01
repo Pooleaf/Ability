@@ -1,15 +1,13 @@
 package net.pooleaf.gamecore.replay.replay
 
 import net.pooleaf.gamecore.replay.data.RecordData
+import org.bukkit.entity.Player
 
-interface RecordDataReplayHandler<T : RecordData> {
+interface RecordDataReplayHandler<out T: RecordData> {
 
-    fun onPlay(replayPlayer: ReplayPlayer, recordData: T, tick: Long)
-
-    fun onReversePlay(replayPlayer: ReplayPlayer, recordData: T, tick: Long)
-
-    fun onReplayStart(replay: Replay) {}
-
-    fun onReplayExit(replay: Replay) {}
+    /**
+     * 해당 녹화 데이터 재생 시 호출됩니다.
+     */
+    fun onPlay(recordData: @UnsafeVariance T, viewer: Player)
 
 }

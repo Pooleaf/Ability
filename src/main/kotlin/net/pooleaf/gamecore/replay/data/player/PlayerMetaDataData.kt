@@ -8,42 +8,25 @@ import net.minecraft.server.v1_8_R3.PacketPlayOutEntityMetadata
 import net.pooleaf.core.modules.support.bukkit.util.BukkitReflectionUtil
 import net.pooleaf.gamecore.GameCore
 import net.pooleaf.gamecore.replay.data.RecordData
-import net.pooleaf.gamecore.replay.replay.ReplayPlayer
+import net.pooleaf.gamecore.replay.replay.RecordDataReplayHandler
+import org.bukkit.entity.Player
 import java.util.*
 
 /**
  * Entity Index 0만 녹화함
  * https://wiki.vg/index.php?title=Entity_metadata&oldid=7415#Entity
  */
-class PlayerMetaDataData : RecordData {
+class PlayerMetaDataData(
+    var playerUuid: UUID? = null,
+    var index: Int = 0,
+    var value: Byte = 0
+) : RecordData {
 
     override val type: String = "playerMetaData"
 
-    lateinit var playerUuid: UUID
-    var index: Int = 0
-    var value: Byte = 0
-
-
-    override fun onPlay(replayPlayer: ReplayPlayer) {
-        val citizensNpc = replayPlayer.npcs.get(playerUuid)?.citizensNpc ?: return
-
-        // 불 처리
-        when (value % 2) {
-            0 -> citizensNpc.entity.fireTicks = 0
-            1 -> citizensNpc.entity.fireTicks = 9999999
-        }
-
-        val entityPlayer = BukkitReflectionUtil.getHandle(citizensNpc.entity) as EntityPlayer
-        val dataWatcher = entityPlayer.dataWatcher
-        dataWatcher.watch(index, value)
-
-        val packet = PacketPlayOutEntityMetadata(citizensNpc.entity.entityId, dataWatcher, false)
-        BukkitReflectionUtil.sendPacket(replayPlayer.viewer, packet)
-    }
-
 }
 
-class PlayerMetaDataDataListener : PacketAdapter(GameCore.gamePlugin, PacketType.Play.Server.ENTITY_METADATA) {
+class PlayerMetaDataDataRecordListener : PacketAdapter(GameCore.gamePlugin, PacketType.Play.Server.ENTITY_METADATA) {
 
     override fun onPacketSending(event: PacketEvent) {
         if (!GameCore.unsafe.recordManager.isRecording()) return
@@ -70,6 +53,29 @@ class PlayerMetaDataDataListener : PacketAdapter(GameCore.gamePlugin, PacketType
             value = packetValue as Byte
         }
         GameCore.unsafe.recordManager.record!!.addRecordData(recordData)
+    }
+
+}
+
+class PlayerMetaDataDataReplayHandler : RecordDataReplayHandler<PlayerMetaDataData> {
+
+    override fun onPlay(recordData: PlayerMetaDataData, viewer: Player) {
+        val replayPlayer = GameCore.unsafe.replayPlayerManager.get(viewer.uniqueId)
+
+        val citizensNpc = replayPlayer.virtualPlayerManager.get(recordData.playerUuid)?.citizensNpc ?: return
+
+        // 불 처리
+        when (recordData.value % 2) {
+            0 -> citizensNpc.entity.fireTicks = 0
+            1 -> citizensNpc.entity.fireTicks = 9999999
+        }
+
+        val entityPlayer = BukkitReflectionUtil.getHandle(citizensNpc.entity) as EntityPlayer
+        val dataWatcher = entityPlayer.dataWatcher
+        dataWatcher.watch(recordData.index, recordData.value)
+
+        val packet = PacketPlayOutEntityMetadata(citizensNpc.entity.entityId, dataWatcher, false)
+        BukkitReflectionUtil.sendPacket(replayPlayer.viewer, packet)
     }
 
 }

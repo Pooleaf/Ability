@@ -4,44 +4,29 @@ import com.comphenix.protocol.PacketType
 import com.comphenix.protocol.ProtocolLibrary
 import com.comphenix.protocol.events.PacketAdapter
 import com.comphenix.protocol.events.PacketEvent
-import net.minecraft.server.v1_8_R3.PacketPlayOutEntityTeleport
 import net.pooleaf.gamecore.GameCore
 import net.pooleaf.gamecore.replay.data.RecordData
+import net.pooleaf.gamecore.replay.replay.RecordDataReplayHandler
 import net.pooleaf.gamecore.replay.replay.ReplayPlayer
-import org.bukkit.event.Listener
+import org.bukkit.entity.Player
 
-class EntityTeleportData : RecordData, Listener {
+data class EntityTeleportData(
+    var entityId: Int = 0,
+    var x: Int = 0,
+    var y: Int = 0,
+    var z: Int = 0,
+    var yaw: Byte = 0,
+    var pitch: Byte = 0
+) : RecordData {
 
     override val type: String = "entityTeleport"
 
-    var entityId: Int = 0
-    var x: Int = 0
-    var y: Int = 0
-    var z: Int = 0
-    var yaw: Byte = 0
-    var pitch: Byte = 0
-
-
-    override fun onPlay(replayPlayer: ReplayPlayer) {
-        val viewer = replayPlayer.viewer
-
-        val packet = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.ENTITY_TELEPORT)
-        packet.integers.write(0, entityId + replayPlayer.entityIdOffset)
-        packet.integers.write(1, x)
-        packet.integers.write(2, y)
-        packet.integers.write(3, z)
-        packet.bytes.write(0, yaw)
-        packet.bytes.write(1, pitch)
-        ProtocolLibrary.getProtocolManager().sendServerPacket(viewer, packet)
-    }
-
 }
 
-class EntityTeleportDataListener : PacketAdapter(GameCore.gamePlugin, PacketType.Play.Server.ENTITY_TELEPORT), Listener {
+class EntityTeleportDataRecordListener : PacketAdapter(GameCore.gamePlugin, PacketType.Play.Server.ENTITY_TELEPORT) {
 
     override fun onPacketSending(event: PacketEvent) {
         if (!GameCore.unsafe.recordManager.isRecording()) return
-        if (!GameCore.unsafe.recordManager.isRecordingTargetPlayer(event.player)) return
 
         val packet = event.packet
 
@@ -61,6 +46,21 @@ class EntityTeleportDataListener : PacketAdapter(GameCore.gamePlugin, PacketType
             pitch = packetPitch
         }
         GameCore.unsafe.recordManager.record!!.addRecordData(recordData)
+    }
+
+}
+
+class EntityTeleportDataReplayHandler : RecordDataReplayHandler<EntityTeleportData> {
+
+    override fun onPlay(recordData: EntityTeleportData, viewer: Player) {
+        val packet = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.ENTITY_TELEPORT)
+        packet.integers.write(0, recordData.entityId + ReplayPlayer.ENTITY_ID_OFFSET)
+        packet.integers.write(1, recordData.x)
+        packet.integers.write(2, recordData.y)
+        packet.integers.write(3, recordData.z)
+        packet.bytes.write(0, recordData.yaw)
+        packet.bytes.write(1, recordData.pitch)
+        ProtocolLibrary.getProtocolManager().sendServerPacket(viewer, packet)
     }
 
 }

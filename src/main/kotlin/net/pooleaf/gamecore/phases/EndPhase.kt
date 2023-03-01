@@ -26,7 +26,7 @@ open class EndPhase(): Phase() {
 
         winnerTeam?.let { winnerTeam ->
             val winnerPlayers = winnerTeam?.players
-            val winnerPlayerNames = winnerPlayers.joinToString { it.displayName }
+            val winnerPlayerNames = winnerPlayers?.joinToString { it.displayName } ?: "?"
 
             // 우승 타이틀
             Broadcaster.broadcastTitle("§e우승", "§f${winnerPlayerNames}", 10 * 20)
@@ -35,7 +35,7 @@ open class EndPhase(): Phase() {
             Broadcaster.broadcastSound(XSound.ENTITY_PLAYER_LEVELUP, 0.4F, 0.5F)
 
             // 우승자 주변에 폭죽 날리기
-            winnerPlayers.forEach { gamePlayer ->
+            winnerPlayers?.forEach { gamePlayer ->
                 BukkitSyncScope.launch {
                     gamePlayer.player?.let { player ->
                         for (i in 1..5) {

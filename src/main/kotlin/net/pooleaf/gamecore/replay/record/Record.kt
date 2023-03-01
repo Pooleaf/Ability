@@ -28,6 +28,9 @@ class Record(
             replay.recordDatas.put(currentTick.toLong(), tickRecordDatas)
         }
 
+        // 중복 체크 (패킷을 여러 플레이어에게 보내면 데이터가 중복됨)
+        if (tickRecordDatas.contains(recordData)) return
+
         // 현재 틱에 녹화 데이터 추가
         tickRecordDatas.add(recordData)
     }

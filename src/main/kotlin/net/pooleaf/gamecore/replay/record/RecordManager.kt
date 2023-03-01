@@ -6,11 +6,10 @@ import net.pooleaf.gamecore.events.replay.RecordStartEvent
 import net.pooleaf.gamecore.events.replay.RecordStopEvent
 import net.pooleaf.gamecore.events.replay.RecordTickEvent
 import net.pooleaf.gamecore.replay.data.block.BlockChangeDataListener
-import net.pooleaf.gamecore.replay.data.block.MultiBlockChangeDataListener
+import net.pooleaf.gamecore.replay.data.block.MultiBlockChangeDataRecordListener
 import net.pooleaf.gamecore.replay.data.entity.*
-import net.pooleaf.gamecore.replay.data.player.PlayerMetaDataDataListener
+import net.pooleaf.gamecore.replay.data.player.PlayerMetaDataDataRecordListener
 import net.pooleaf.gamecore.replay.data.player.PlayerMoveData
-import net.pooleaf.gamecore.replay.listeners.TestPacketListener
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.scheduler.BukkitTask
@@ -25,15 +24,21 @@ class RecordManager {
 
 
     fun registerRecordListeners() {
-        ProtocolLibrary.getProtocolManager().addPacketListener(TestPacketListener()) // TODO remove
+//        ProtocolLibrary.getProtocolManager().addPacketListener(TestPacketListener()) // TODO remove
+
+        // Block
         ProtocolLibrary.getProtocolManager().addPacketListener(BlockChangeDataListener())
-        ProtocolLibrary.getProtocolManager().addPacketListener(PlayerMetaDataDataListener())
-        ProtocolLibrary.getProtocolManager().addPacketListener(SpawnEntityDataListener())
-        ProtocolLibrary.getProtocolManager().addPacketListener(EntityDestoryDataListener())
-        ProtocolLibrary.getProtocolManager().addPacketListener(CollectDataListener())
-        ProtocolLibrary.getProtocolManager().addPacketListener(ItemMetaDataDataListener())
-        ProtocolLibrary.getProtocolManager().addPacketListener(EntityVelocityDataListener())
-        ProtocolLibrary.getProtocolManager().addPacketListener(MultiBlockChangeDataListener())
+        ProtocolLibrary.getProtocolManager().addPacketListener(MultiBlockChangeDataRecordListener())
+
+        // Entity
+        ProtocolLibrary.getProtocolManager().addPacketListener(CollectDataRecordListener())
+        ProtocolLibrary.getProtocolManager().addPacketListener(EntityDestroyDataRecordListener())
+        ProtocolLibrary.getProtocolManager().addPacketListener(EntityVelocityDataRecordListener())
+        ProtocolLibrary.getProtocolManager().addPacketListener(ItemMetaDataDataRecordListener())
+        ProtocolLibrary.getProtocolManager().addPacketListener(SpawnEntityDataRecordListener())
+
+        // Player
+        ProtocolLibrary.getProtocolManager().addPacketListener(PlayerMetaDataDataRecordListener())
     }
 
     /**
@@ -54,6 +59,7 @@ class RecordManager {
             record.isRecording = true
             record.replay.startedAt = LocalDateTime.now()
 
+            // 플레이어 초기 데이터
             recordTargetPlayers.forEach { uuid ->
                 val player = Bukkit.getPlayer(uuid)
                 if (player == null) return@forEach
