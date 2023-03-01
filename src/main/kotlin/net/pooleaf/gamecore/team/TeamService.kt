@@ -44,7 +44,7 @@ class TeamService {
                     return@forEach
                 }
 
-                tempTeam = Team()
+                tempTeam = Team(GameCore.unsafe.teamManager.teams.size)
                 GameCore.unsafe.teamManager.add(tempTeam!!)
             }
 

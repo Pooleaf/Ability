@@ -13,6 +13,8 @@ import net.pooleaf.gamecore.Broadcaster
 import net.pooleaf.gamecore.GameCore
 import net.pooleaf.gamecore.events.game.*
 import net.pooleaf.gamecore.phases.EndPhase
+import net.pooleaf.gamecore.sql.dtos.game.GameWinnerDto
+import net.pooleaf.gamecore.sql.dtos.game.toDto
 import net.pooleaf.gamecore.team.Team
 import org.bukkit.Bukkit
 import org.bukkit.GameMode
@@ -40,6 +42,7 @@ class GameManager {
         game.isTeleportedToMap = false
         game.isGodMode = true
         game.isEnded = false
+        game.isCancelled = false
 
         game.startedAt = null
         game.endedAt = null
@@ -123,6 +126,14 @@ class GameManager {
         // 보급품 데이터 삭제
         GameCore.unsafe.supplyManager.createdSupply.clear()
 
+        // 보급품 타이머 중단
+        if (GameCore.unsafe.supplyManager.isSupplyCreateTimerRunning()) {
+            GameCore.unsafe.supplyManager.stopSupplyCreateTimer()
+        }
+        if (GameCore.unsafe.supplyManager.isSupplyParticleTimerRunning()) {
+            GameCore.unsafe.supplyManager.stopSupplyParticleTimer()
+        }
+
         // 이벤트
         Bukkit.getPluginManager().callEvent(GameResetEvent())
 
@@ -197,6 +208,14 @@ class GameManager {
         // 게임 정보 업데이트
         game.isGameStarted = true
         game.startedAt = LocalDateTime.now()
+
+        // 저장
+        BukkitAsyncScope.launch {
+            GameCore.unsafe.sqlManager.gameDao.insertGame(game.toDto())
+        }
+
+        val participantDtos = GameCore.unsafe.playerManager.getJoinedPlayers().map { it.toDto() }
+        GameCore.unsafe.sqlManager.gameDao.insertGameParticipants(participantDtos)
 
         // 액션바 제거
         Broadcaster.removeActionBar()
@@ -328,6 +347,18 @@ class GameManager {
         // 우승자 계산
         val winnerTeam = GameCore.unsafe.teamManager.getNotDefeatedOnlineTeams().firstOrNull()
 
+        // 저장
+        val gameDto = game.toDto()
+        val gameId = game.gameId
+        BukkitAsyncScope.launch {
+            GameCore.unsafe.sqlManager.gameDao.insertGame(gameDto)
+
+            if (winnerTeam != null) {
+                val winnerDtos = winnerTeam.players.map { GameWinnerDto(gameId.toString(), winnerTeam.id, it.uuid.toString()) }
+                GameCore.unsafe.sqlManager.gameDao.insertGameWinner(winnerDtos)
+            }
+        }
+
         // 게임 종료 이벤트
         Bukkit.getPluginManager().callEvent(GameEndEvent(winnerTeam))
 
@@ -340,6 +371,15 @@ class GameManager {
     suspend fun cancelGame(cancelSender: CommandSender?, cancelCause: String = "게임이 중단되었습니다.") {
         if (!GameCore.game.isRunning) error("Game is not started")
 
+        // 게임 정보 업데이트
+        game.isEnded = true
+        game.isCancelled = true
+        game.endedAt = LocalDateTime.now()
+
+        // 저장
+        GameCore.unsafe.sqlManager.gameDao.insertGame(game.toDto())
+
+        // 리셋
         resetGame()
 
         // 타이틀

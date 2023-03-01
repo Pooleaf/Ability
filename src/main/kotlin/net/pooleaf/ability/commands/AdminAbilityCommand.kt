@@ -27,6 +27,11 @@ class AdminAbilityCommand {
             return
         }
 
+        if (!AbilityApi.unsafe.playerManager.getPlayingPlayers().any { it.tempAbility != null }) {
+            sender.sendMessage("§c능력 추첨 중이 아닙니다.")
+            return
+        }
+
         AbilityApi.unsafe.abilityService.skipAbilityDraw()
 
         Broadcaster.broadcast("${sender.displayName} §b님께서 모든 플레이어의 능력을 강제로 확정시켰습니다.")

@@ -9,7 +9,9 @@ import org.bukkit.Location
  * [GamePlayer]끼리 팀으로 묶어 우승을 함께하도록 만듭니다.
  * 팀간 PVP가 금지됩니다.
  */
-class Team {
+class Team(
+    val id: Int
+) {
 
     // 팀 소속 플레이어
     val players: ArrayList<GamePlayer> = ArrayList<GamePlayer>()

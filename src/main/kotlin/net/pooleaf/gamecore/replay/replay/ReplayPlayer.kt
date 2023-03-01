@@ -91,19 +91,19 @@ class ReplayPlayer(
                 }
 
                 virtualLocations.forEachIndexed { index, virtualLocation ->
-                    // FakeBlock 생성
-                    var fakeBlock = virtualBlockManager.get(virtualLocation)
-                    if (fakeBlock == null) {
-                        fakeBlock = VirtualBlock(virtualLocation)
-                        virtualBlockManager.set(virtualLocation, fakeBlock)
+                    // VirtualBlock 생성
+                    var virtualBlock = virtualBlockManager.get(virtualLocation)
+                    if (virtualBlock == null) {
+                        virtualBlock = VirtualBlock(virtualLocation)
+                        virtualBlockManager.set(virtualLocation, virtualBlock)
                     }
 
-                    // FakeBlock 기록 생성
-                    var virtualBlockHistory = fakeBlock.histories.get(tick)
+                    // VirtualBlock 기록 생성
+                    var virtualBlockHistory = virtualBlock.histories.get(tick)
 
                     if (virtualBlockHistory == null) {
                         virtualBlockHistory = VirtualBlock(virtualLocation)
-                        fakeBlock.histories.put(tick, virtualBlockHistory)
+                        virtualBlock.histories.put(tick, virtualBlockHistory)
                     }
 
                     // 데이터별 기록 생성

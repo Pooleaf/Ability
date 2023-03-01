@@ -30,9 +30,9 @@ class VirtualBlockManager : AbstractManager<VirtualLocation, VirtualBlock>() {
     fun showToBulk(virtualBlocks: List<VirtualBlock>, viewer: Player) {
         var chunkBlocks = hashMapOf<ChunkCoordIntPair, ArrayList<MultiBlockChangeInfo>>()
 
-        virtualBlocks.forEach { fakeBlock ->
-            val chunk = fakeBlock.location.getChunk()
-            val bukkitLocation = fakeBlock.location.toBukkitLocation(viewer.world)
+        virtualBlocks.forEach { virtualBlock ->
+            val chunk = virtualBlock.location.getChunk()
+            val bukkitLocation = virtualBlock.location.toBukkitLocation(viewer.world)
 
             var blocks = chunkBlocks.get(chunk)
             if (blocks == null) {
@@ -40,11 +40,11 @@ class VirtualBlockManager : AbstractManager<VirtualLocation, VirtualBlock>() {
                 chunkBlocks.put(chunk, blocks)
             }
 
-            var typeId = fakeBlock.typeId
-            var typeData = fakeBlock.typeData
+            var typeId = virtualBlock.typeId
+            var typeData = virtualBlock.typeData
 
             // 데이터가 없을 경우 실제 블럭 데이터를 보냄
-            if (fakeBlock.typeId == -1) {
+            if (virtualBlock.typeId == -1) {
                 val block = bukkitLocation.world.getBlockAt(bukkitLocation)
                 typeId = block.typeId
                 typeData = block.data

@@ -50,10 +50,17 @@ class SupplyManager : AbstractSyncManager<String, Supply>() {
     }
 
     /**
+     * 보급품 생성 타이머 작동 여부를 반환합니다.
+     */
+    fun isSupplyCreateTimerRunning(): Boolean {
+        return supplyCreateJob?.let { it.isActive } == true
+    }
+
+    /**
      * 보급품 생성 타이머를 시작합니다.
      */
     fun startSupplyCreateTimer() {
-        if (supplyCreateJob?.let { it.isActive } == true) error("supplyCreateJob is already started")
+        if (isSupplyCreateTimerRunning()) error("supplyCreateJob is already started")
 
         supplyCreateJob = BukkitAsyncScope.launch {
             while (GameCore.game.isGameStarted) {
@@ -70,17 +77,24 @@ class SupplyManager : AbstractSyncManager<String, Supply>() {
      * 보급품 생성 타이머를 중단합니다.
      */
     fun stopSupplyCreateTimer() {
-        if (supplyCreateJob?.let { it.isActive } == false) error("supplyCreateJob is not started")
+        if (!isSupplyCreateTimerRunning()) error("supplyCreateJob is not started")
 
         supplyCreateJob?.cancel()
         supplyCreateJob = null
     }
 
     /**
-     * 보급품 생성 타이머를 시작합니다.
+     * 보급품 파티클 타이머 작동 여부를 반환합니다.
+     */
+    fun isSupplyParticleTimerRunning(): Boolean {
+        return supplyParticleJob?.let { it.isActive } == true
+    }
+
+    /**
+     * 보급품 파티클 타이머를 시작합니다.
      */
     fun startSupplyParticleTimer() {
-        if (supplyParticleJob?.let { it.isActive } == true) error("supplyParticleJob is already started")
+        if (isSupplyParticleTimerRunning()) error("supplyParticleJob is already started")
 
         supplyParticleJob = BukkitAsyncScope.launch {
             while (GameCore.game.isGameStarted) {
@@ -95,10 +109,10 @@ class SupplyManager : AbstractSyncManager<String, Supply>() {
     }
 
     /**
-     * 보급품 생성 타이머를 중단합니다.
+     * 보급품 파티클 타이머를 중단합니다.
      */
     fun stopSupplyParticleTimer() {
-        if (supplyParticleJob?.let { it.isActive } == false) error("supplyCreateJob is not started")
+        if (!isSupplyParticleTimerRunning()) error("supplyCreateJob is not started")
 
         supplyParticleJob?.cancel()
         supplyParticleJob = null

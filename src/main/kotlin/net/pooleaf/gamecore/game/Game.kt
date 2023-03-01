@@ -42,6 +42,10 @@ abstract class Game {
     var isEnded: Boolean = false
         internal set
 
+    // 게임 취소 여부
+    var isCancelled: Boolean = false
+        internal set
+
     // 시작 시간
     var startedAt: LocalDateTime? = null
         internal set
