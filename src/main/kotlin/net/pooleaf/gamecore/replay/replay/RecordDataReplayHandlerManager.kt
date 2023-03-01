@@ -6,7 +6,7 @@ import net.pooleaf.gamecore.replay.data.RecordData
 import net.pooleaf.gamecore.replay.data.block.*
 import net.pooleaf.gamecore.replay.data.entity.*
 import net.pooleaf.gamecore.replay.data.player.*
-import net.pooleaf.gamecore.replay.listeners.FakeChunkLoadListener
+import net.pooleaf.gamecore.replay.listeners.VirtualChunkLoadListener
 
 class RecordDataReplayHandlerManager : AbstractManager<Class<out RecordData>, RecordDataReplayHandler<out RecordData>>() {
 
@@ -41,7 +41,7 @@ class RecordDataReplayHandlerManager : AbstractManager<Class<out RecordData>, Re
         set(PlayerTeleportData::class.java, PlayerTeleportDataReplayHandler())
 
         // Chunk
-        ProtocolLibrary.getProtocolManager().addPacketListener(FakeChunkLoadListener())
+        ProtocolLibrary.getProtocolManager().addPacketListener(VirtualChunkLoadListener())
     }
 
 }
