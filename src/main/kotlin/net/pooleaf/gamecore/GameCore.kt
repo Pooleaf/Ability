@@ -18,8 +18,7 @@ import net.pooleaf.gamecore.player.GamePlayerManager
 import net.pooleaf.gamecore.player.GamePlayerService
 import net.pooleaf.gamecore.quickbar.QuickBarManager
 import net.pooleaf.gamecore.replay.record.RecordManager
-import net.pooleaf.gamecore.replay.record.RecordService
-import net.pooleaf.gamecore.replay.replay.RecordDataReplayHandlerManager
+import net.pooleaf.gamecore.replay.replay.RecordDataManager
 import net.pooleaf.gamecore.replay.replay.ReplayManager
 import net.pooleaf.gamecore.replay.replay.ReplayPlayerManager
 import net.pooleaf.gamecore.replay.replay.ReplayService
@@ -68,13 +67,12 @@ object GameCore {
         lateinit var supplyService: SupplyService
 
         lateinit var recordManager: RecordManager
-        lateinit var recordService: RecordService
 
         lateinit var replayManager: ReplayManager
         lateinit var replayPlayerManager: ReplayPlayerManager
         lateinit var replayService: ReplayService
 
-        lateinit var recordDataReplayHandlerManager: RecordDataReplayHandlerManager
+        lateinit var recordDataManager: RecordDataManager
 
         lateinit var sqlManager: GameSqlManager
 
@@ -124,16 +122,15 @@ object GameCore {
             supplyService = SupplyService()
 
             recordManager = RecordManager()
-            recordService = RecordService()
 
             replayManager = ReplayManager()
             replayPlayerManager = ReplayPlayerManager()
             replayService = ReplayService()
 
-            recordDataReplayHandlerManager = RecordDataReplayHandlerManager()
+            recordDataManager = RecordDataManager()
 
             recordManager.registerRecordListeners()
-            recordDataReplayHandlerManager.registerHandlers()
+            recordDataManager.registerHandlers()
 
             sqlManager = GameSqlManager()
 

@@ -1,6 +1,5 @@
 package net.pooleaf.gamecore.replay.record
 
-import net.pooleaf.core.modules.support.common.util.GsonUtil.GsonExclude
 import net.pooleaf.gamecore.replay.data.RecordData
 import net.pooleaf.gamecore.replay.replay.Replay
 import java.util.*
@@ -10,10 +9,8 @@ class Record(
     val recordTargetPlayers: List<UUID>
 ) {
 
-    @GsonExclude
     var isRecording: Boolean = false
 
-    @GsonExclude
     var currentTick: Float = 0.0F
 
     val replay: Replay = Replay(uuid, recordTargetPlayers)

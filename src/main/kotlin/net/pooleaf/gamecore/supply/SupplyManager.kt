@@ -59,12 +59,12 @@ class SupplyManager : AbstractSyncManager<String, Supply>() {
     /**
      * 보급품 생성 타이머를 시작합니다.
      */
-    fun startSupplyCreateTimer() {
+    fun startSupplyCreateTimer(supplyCreateIntervalSeconds: Int) {
         if (isSupplyCreateTimerRunning()) error("supplyCreateJob is already started")
 
         supplyCreateJob = BukkitAsyncScope.launch {
             while (GameCore.game.isGameStarted) {
-                delay(GameCore.gameConfig.supplyCreateIntervalSeconds * 1000L)
+                delay(supplyCreateIntervalSeconds * 1000L)
 
                 BukkitSyncScope.launch {
                     GameCore.unsafe.supplyService.createRandomSupplyRandomLocation()

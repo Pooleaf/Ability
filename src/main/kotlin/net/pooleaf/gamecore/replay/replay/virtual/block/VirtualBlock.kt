@@ -35,7 +35,7 @@ data class VirtualBlock(
             viewer.sendBlockChange(bukkitLocation, typeId, typeData)
 
             if (damageState != 0) {
-                val blockDamageHandler = GameCore.unsafe.recordDataReplayHandlerManager.get(BlockDamageData::class.java) ?: return
+                val blockDamageHandler = GameCore.unsafe.recordDataManager.get(BlockDamageData::class.java) ?: return
 
                 val blockDamageData = BlockDamageData()
                 blockDamageData.x = location.x.toInt()

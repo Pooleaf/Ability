@@ -26,6 +26,14 @@ class AbilityPhasePipeline: PhasePipeline() {
 
         addPhase(DelayPhase(2))
 
+        // 보급품 타이머 시작
+        addPhase(RunnablePhase() {
+            if (AbilityApi.abilityGameConfig.useSupply) {
+                GameCore.unsafe.supplyManager.startSupplyCreateTimer(AbilityApi.abilityGameConfig.supplyCreateIntervalSeconds)
+                GameCore.unsafe.supplyManager.startSupplyParticleTimer()
+            }
+        })
+
         // 무적 시간
         addPhase(object : GodModPhase() {
             override fun getGodModSeconds(): Int = AbilityApi.abilityGameConfig.godModSeconds

@@ -239,12 +239,6 @@ class GameManager {
         // 시작 아이템 지급
         GameCore.unsafe.playerManager.getOnlinePlayingPlayers().forEach { it.giveStartItem() }
 
-        // 보급품 타이머 시작
-        if (GameCore.gameConfig.useSupply) {
-            GameCore.unsafe.supplyManager.startSupplyCreateTimer()
-            GameCore.unsafe.supplyManager.startSupplyParticleTimer()
-        }
-
         // 이벤트
         Bukkit.getPluginManager().callEvent(GameStartedEvent())
     }

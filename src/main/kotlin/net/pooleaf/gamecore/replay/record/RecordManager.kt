@@ -57,7 +57,7 @@ class RecordManager {
         record = Record(gameUuid, recordTargetPlayers)
         record?.let { record ->
             record.isRecording = true
-            record.replay.startedAt = LocalDateTime.now()
+            record.replay.createdAt = LocalDateTime.now()
 
             // 플레이어 초기 데이터
             recordTargetPlayers.forEach { uuid ->
@@ -102,13 +102,12 @@ class RecordManager {
         record?.let { record ->
             record.isRecording = false
             record.replay.endTick = record.currentTick.toLong()
-            record.replay.endedAt = LocalDateTime.now()
 
             recordTickCalculateTask?.cancel()
 
             // 저장
-            GameCore.unsafe.recordService.saveRecordToFile(record)
-            GameCore.unsafe.replayManager.set(record.replay.uuid, record.replay)
+            GameCore.unsafe.replayService.saveReplay(record.replay)
+            GameCore.unsafe.replayManager.set(record.replay.gameId, record.replay)
 
             // 이벤트
             Bukkit.getPluginManager().callEvent(RecordStopEvent(record))

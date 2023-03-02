@@ -38,7 +38,7 @@ class VirtualPlayer(
         getCurrentData(PlayerTeleportData::class.java, tick)?.let { datas.addAll(it) }
 
         datas.forEach { data ->
-            val playerHandler = GameCore.unsafe.recordDataReplayHandlerManager.get(data.javaClass) ?: return
+            val playerHandler = GameCore.unsafe.recordDataManager.get(data.javaClass) ?: return
             playerHandler.onPlay(data, viewer)
         }
     }

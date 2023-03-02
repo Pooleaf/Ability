@@ -9,7 +9,7 @@ class VirtualWorldBorder : VirtualHistory() {
 
     fun timeMachine(tick: Long, viewer: Player) {
         getLastData(GameWorldBorderChangeData::class.java, tick)?.let { data ->
-            val playerHandler = GameCore.unsafe.recordDataReplayHandlerManager.get(data.javaClass) ?: return
+            val playerHandler = GameCore.unsafe.recordDataManager.get(data.javaClass) ?: return
             playerHandler.onPlay(data, viewer)
         }
     }

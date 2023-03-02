@@ -255,7 +255,7 @@ class ReplayPlayer(
                 for (tick in (lastPlayedTick + 1)..toTick) {
                     val tickRecordDatas = replay.recordDatas.get(tick)
                     tickRecordDatas?.forEach { recordData ->
-                        val recordDataReplayHandler = GameCore.unsafe.recordDataReplayHandlerManager.get(recordData.javaClass)
+                        val recordDataReplayHandler = GameCore.unsafe.recordDataManager.get(recordData.javaClass)
                         recordDataReplayHandler?.onPlay(recordData, viewer)
                     }
 

@@ -26,7 +26,7 @@ data class VirtualEntity(
         val spawnEntityData = histories.values.flatten()
             .filterIsInstance<SpawnEntityData>()
             .firstOrNull() ?: return
-        val spawnEntityHandler = GameCore.unsafe.recordDataReplayHandlerManager.get(SpawnEntityData::class.java) ?: return
+        val spawnEntityHandler = GameCore.unsafe.recordDataManager.get(SpawnEntityData::class.java) ?: return
 
         spawnEntityHandler.onPlay(spawnEntityData, viewer)
     }
@@ -35,7 +35,7 @@ data class VirtualEntity(
         var entityDestroyData = histories.values.flatten()
             .filterIsInstance<EntityDestroyData>()
             .firstOrNull()
-        val entityDestroyHandler = GameCore.unsafe.recordDataReplayHandlerManager.get(EntityDestroyData::class.java) ?: return
+        val entityDestroyHandler = GameCore.unsafe.recordDataManager.get(EntityDestroyData::class.java) ?: return
 
         if (entityDestroyData == null) {
             entityDestroyData = EntityDestroyData()
@@ -54,7 +54,7 @@ data class VirtualEntity(
             ?.value
             ?.filterIsInstance<EntityTeleportData>()
             ?.firstOrNull() ?: return
-        val entityTeleportHandler = GameCore.unsafe.recordDataReplayHandlerManager.get(EntityTeleportData::class.java) ?: return
+        val entityTeleportHandler = GameCore.unsafe.recordDataManager.get(EntityTeleportData::class.java) ?: return
 
         entityTeleportHandler.onPlay(entityTeleportData, viewer)
     }
@@ -82,7 +82,7 @@ data class VirtualEntity(
         getLastData(ItemMetaDataData::class.java, newTick)?.let { datas.add(it) }
 
         datas.forEach { data ->
-            val playerHandler = GameCore.unsafe.recordDataReplayHandlerManager.get(data.javaClass) ?: return
+            val playerHandler = GameCore.unsafe.recordDataManager.get(data.javaClass) ?: return
             playerHandler.onPlay(data, viewer)
         }
     }

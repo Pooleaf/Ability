@@ -33,4 +33,10 @@ class AbilityGameConfig(file: File?) : SimpleAnnoConfig(file) {
     @ConfigName("경계선 축소.세번째.초당 축소 크기")
     var thirdWorldBorderReduceSizePerSeconds: Int = 5
 
+    @ConfigName("보급품.사용")
+    var useSupply: Boolean = true
+
+    @ConfigName("보급품.생성 간격")
+    var supplyCreateIntervalSeconds: Int = 5 * 60
+
 }

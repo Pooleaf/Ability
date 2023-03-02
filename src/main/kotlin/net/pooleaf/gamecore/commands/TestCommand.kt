@@ -75,29 +75,43 @@ class TestCommand {
         val record = GameCore.unsafe.recordManager.record!!
         GameCore.unsafe.recordManager.endRecord()
 
-        sender.sendMessage("${record.replay.uuid} 녹화를 중지했습니다.")
+        sender.sendMessage("${record.replay.gameId} 녹화를 중지했습니다.")
     }
 
     @Command(
         parent = ["gtest"],
         name = ["startReplay"],
+        arguments = "(gameId)",
         description = "replay",
         permission = GameCorePermission.ADMIN,
         async = false
     )
     fun game_test_startReplay(player: Player, result: CommandResult) {
-        if (GameCore.unsafe.recordManager.record == null) {
-            player.sendWarning("녹화가 없습니다.")
-            return
+        if (result.argumentsLength > 0) {
+            val gameId = result.getArgument(0)
+            val replay = GameCore.unsafe.replayService.loadReplayFromDatabase(UUID.fromString(gameId))
+
+            if (replay == null) {
+                player.sendWarning("리플레이가 존재하지 않습니다.")
+                return
+            }
+
+            GameCore.unsafe.replayService.playReplay(player, replay.gameId)
+
+            player.sendMessage("${replay.gameId} 리플레이를 시작합니다.")
+        } else {
+            if (GameCore.unsafe.recordManager.record == null) {
+                player.sendWarning("녹화가 없습니다.")
+                return
+            }
+
+            val record = GameCore.unsafe.recordManager.record!!
+            val replayUuid = record.replay.gameId
+
+            GameCore.unsafe.replayService.playReplay(player, replayUuid)
+
+            player.sendMessage("${replayUuid} 리플레이를 시작합니다.")
         }
-
-
-        val record = GameCore.unsafe.recordManager.record!!
-        val replayUuid = record.replay.uuid
-
-        GameCore.unsafe.replayService.playReplay(player, replayUuid)
-
-        player.sendMessage("${replayUuid} 리플레이를 시작합니다.")
     }
 
     @Command(
@@ -116,7 +130,7 @@ class TestCommand {
         val replayPlayer = GameCore.unsafe.replayPlayerManager.get(player.uniqueId)
         GameCore.unsafe.replayService.exitReplay(player)
 
-        player.sendMessage("${replayPlayer.replay.uuid} 리플레이를 종료합니다.")
+        player.sendMessage("${replayPlayer.replay.gameId} 리플레이를 종료합니다.")
     }
 
     @Command(

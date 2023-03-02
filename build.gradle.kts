@@ -18,7 +18,7 @@ repositories {
 
 dependencies {
     compileOnly("io.papermc:paper:1.8.8")
-    compileOnly("net.pooleaf:core:0.0.46")
+    compileOnly("net.pooleaf:core:0.0.47")
 
     compileOnly("com.comphenix.protocol:ProtocolLib:4.7.0")
 
