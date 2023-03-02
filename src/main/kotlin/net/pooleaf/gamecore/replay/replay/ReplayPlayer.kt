@@ -10,9 +10,10 @@ import net.pooleaf.gamecore.GameCore
 import net.pooleaf.gamecore.events.replay.ReplayExitEvent
 import net.pooleaf.gamecore.events.replay.ReplayInitEvent
 import net.pooleaf.gamecore.events.replay.ReplayJumpToEvent
-import net.pooleaf.gamecore.events.replay.ReplayPlayEvent
+import net.pooleaf.gamecore.events.replay.ReplayPlayStartEvent
 import net.pooleaf.gamecore.replay.data.block.*
 import net.pooleaf.gamecore.replay.data.entity.*
+import net.pooleaf.gamecore.replay.data.game.GameWorldBorderChangeData
 import net.pooleaf.gamecore.replay.data.player.*
 import net.pooleaf.gamecore.replay.replay.virtual.VirtualLocation
 import net.pooleaf.gamecore.replay.replay.virtual.block.VirtualBlock
@@ -21,6 +22,7 @@ import net.pooleaf.gamecore.replay.replay.virtual.entity.VirtualEntity
 import net.pooleaf.gamecore.replay.replay.virtual.entity.VirtualEntityManager
 import net.pooleaf.gamecore.replay.replay.virtual.player.VirtualPlayer
 import net.pooleaf.gamecore.replay.replay.virtual.player.VirtualPlayerManager
+import net.pooleaf.gamecore.replay.replay.virtual.worldborder.VirtualWorldBorder
 import org.bukkit.Bukkit
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
@@ -45,11 +47,14 @@ class ReplayPlayer(
     var currentTick: Float = 0.0F
         private set
 
-    private var lastPlayedTick: Long = 0
+    private var lastPlayedTick: Long = -1
 
     var playSpeed: Float = 1.0F
 
     private var replayTask: BukkitTask? = null
+
+    var isExit: Boolean = false
+
 
     // 커스텀 데이터
     val etcDatas = hashMapOf<String, Any>()
@@ -62,6 +67,9 @@ class ReplayPlayer(
 
     // 가상 플레이어 관리자
     val virtualPlayerManager: VirtualPlayerManager = VirtualPlayerManager()
+
+    // 가상 경계선
+    val virtualWorldBorder: VirtualWorldBorder = VirtualWorldBorder()
 
 
     fun isRunning(): Boolean {
@@ -218,6 +226,15 @@ class ReplayPlayer(
             }
         }
 
+        // 경계선 데이터 캐싱
+        replay.recordDatas.forEach { tick, datas ->
+            datas.filter {
+                it is GameWorldBorderChangeData
+            }.forEach { data ->
+                virtualWorldBorder.histories.put(tick, arrayListOf(data))
+            }
+        }
+
         // 이벤트
         Bukkit.getPluginManager().callEvent(ReplayInitEvent(this))
     }
@@ -254,7 +271,7 @@ class ReplayPlayer(
         }.runTaskTimer(GameCore.gamePlugin, 0L, 1L)
 
         // 이벤트
-        Bukkit.getPluginManager().callEvent(ReplayPlayEvent(this))
+        Bukkit.getPluginManager().callEvent(ReplayPlayStartEvent(this))
     }
 
     /**
@@ -291,7 +308,7 @@ class ReplayPlayer(
 
         val beforeTick = currentTick
         currentTick = tick.toFloat()
-        lastPlayedTick = tick
+        lastPlayedTick = tick - 1
 
         // 블럭
         virtualBlockManager.values().forEach {
@@ -318,6 +335,9 @@ class ReplayPlayer(
             it.timeMachine(tick, viewer)
         }
 
+        // 경계선
+        virtualWorldBorder.timeMachine(tick, viewer)
+
         // 이벤트
         Bukkit.getPluginManager().callEvent(ReplayJumpToEvent(this, beforeTick, tick))
     }
@@ -326,6 +346,8 @@ class ReplayPlayer(
      * 종료
      */
     fun exit() {
+        isExit = true
+
         // NPC 제거
         virtualPlayerManager.values().forEach { it.citizensNpc.destroy() }
 

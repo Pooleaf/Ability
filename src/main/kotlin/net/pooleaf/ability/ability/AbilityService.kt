@@ -212,12 +212,12 @@ class AbilityService {
         abilityPlayer.tempAbility = null
 
         abilityPlayer.sendMessageSafely("")
-        abilityPlayer.sendMessageSafely("${ability.name} §e능력을 확정했습니다.")
+        abilityPlayer.sendMessageSafely("${ability.rank.color}${ability.name} §e능력을 확정했습니다.")
         abilityPlayer.sendMessageSafely("/능력 §e명령어를 사용하여 능력을 다시 확인할 수 있습니다.")
 
         abilityPlayer.sendTitleSafely(
             DefaultTitleBuilder()
-                .title("§e${abilityPlayer.ability?.name}")
+                .title("${ability.rank.color}${abilityPlayer.ability?.name}")
                 .subtitle("§f능력을 확정했습니다.")
                 .build()
         )

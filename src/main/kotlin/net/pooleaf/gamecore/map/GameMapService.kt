@@ -8,6 +8,7 @@ import net.pooleaf.core.modules.annoconfig.AnnoConfigModule
 import net.pooleaf.core.modules.coroutine.bukkit.BukkitSyncScope
 import net.pooleaf.core.modules.support.common.logger.Logger
 import net.pooleaf.gamecore.GameCore
+import net.pooleaf.gamecore.events.game.GameWorldBorderChangeEvent
 import org.bukkit.Bukkit
 import java.io.File
 import kotlin.math.abs
@@ -122,12 +123,17 @@ class GameMapService {
      */
     fun updateWorldBorder(map: GameMap, newSize: Int) {
         map.centerLocation?.let { centerLocation ->
+            val beforeSize = map.currentWorldBorderSize
+
             val worldBorder = centerLocation.world.worldBorder
             worldBorder.center = centerLocation
             worldBorder.size = newSize.toDouble()
             worldBorder.damageBuffer = 0.0
 
             map.currentWorldBorderSize = newSize
+
+            // 이벤트
+            Bukkit.getPluginManager().callEvent(GameWorldBorderChangeEvent(centerLocation, beforeSize, newSize, 0))
         } ?: error("centerLocation cannot be null")
     }
 
@@ -140,18 +146,23 @@ class GameMapService {
         if (updateSizePerSeconds < 1) error("updateSizePerSeconds cannot be less than 1 (value: ${updateSizePerSeconds}")
 
         map.centerLocation?.let { centerLocation ->
+            val beforeSize = map.currentWorldBorderSize
+
             // 줄어드는 데 걸리는 시간
-            val updateDurationTime = (abs(map.currentWorldBorderSize - newSize) / updateSizePerSeconds).toInt()
+            val updateDurationSeconds = (abs(map.currentWorldBorderSize - newSize) / updateSizePerSeconds).toInt()
 
             // 경계선 설정
             val worldBorder = centerLocation.world.worldBorder
             worldBorder.center = centerLocation
-            worldBorder.setSize(newSize.toDouble(), updateDurationTime.toLong())
+            worldBorder.setSize(newSize.toDouble(), updateDurationSeconds.toLong())
             worldBorder.damageBuffer = 0.0
 
             map.currentWorldBorderSize = newSize
 
-            return updateDurationTime
+            // 이벤트
+            Bukkit.getPluginManager().callEvent(GameWorldBorderChangeEvent(centerLocation, beforeSize, newSize, updateDurationSeconds))
+
+            return updateDurationSeconds
         } ?: error("centerLocation cannot be null")
     }
 

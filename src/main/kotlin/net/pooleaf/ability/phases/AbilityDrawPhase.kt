@@ -5,6 +5,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.pooleaf.ability.AbilityApi
+import net.pooleaf.ability.event.game.AbilityDrawCompleteEvent
 import net.pooleaf.core.modules.coroutine.bukkit.BukkitAsyncScope
 import net.pooleaf.core.modules.support.common.CommonChatColor
 import net.pooleaf.core.modules.support.common.logger.Logger
@@ -12,6 +13,7 @@ import net.pooleaf.gamecore.Broadcaster
 import net.pooleaf.gamecore.GameCore
 import net.pooleaf.gamecore.phase.Phase
 import net.pooleaf.gamecore.utils.StringUtil
+import org.bukkit.Bukkit
 
 class AbilityDrawPhase: Phase() {
 
@@ -92,6 +94,9 @@ class AbilityDrawPhase: Phase() {
         }
 
         onInit()
+
+        // 이벤트
+        Bukkit.getPluginManager().callEvent(AbilityDrawCompleteEvent())
     }
 
     override fun onCancel() {

@@ -66,6 +66,7 @@ abstract class WorldBorderUpdatePhase(): Phase() {
 
             val updateTime = StringUtil.buildTimeStringWithColor(getUpdateWaitSeconds() * 1000L, CommonChatColor.WHITE, CommonChatColor.YELLOW)
 
+            Broadcaster.broadcast("")
             Broadcaster.broadcast("${updateTime} §e후 맵의 경계가 ${updateMessage}.")
             Broadcaster.broadcastSound(XSound.UI_BUTTON_CLICK, 0.3F, 0.7F)
 

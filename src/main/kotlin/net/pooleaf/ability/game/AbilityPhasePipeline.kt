@@ -14,12 +14,12 @@ class AbilityPhasePipeline: PhasePipeline() {
     init {
         // 시작 카운트
         addPhase(StartCountPhase(true))
-        addPhase(DelayPhase(2))
 
         // 게임모드 변경
         addPhase(RunnablePhase() {
             BukkitSyncScope.launch { AbilityApi.game.changeCurrentGameMode(GameMode.SURVIVAL) }
         })
+        addPhase(DelayPhase(2))
 
         // 능력 추첨
         addPhase(AbilityDrawPhase())

@@ -2,9 +2,13 @@ package net.pooleaf.ability.ability.timer
 
 import net.pooleaf.ability.ability.Ability
 import net.pooleaf.ability.ability.Cooldownable
+import net.pooleaf.ability.event.ability.AbilityCooldownStartEvent
+import net.pooleaf.ability.event.ability.AbilityDurationEndEvent
+import net.pooleaf.ability.event.ability.AbilityDurationStartEvent
 import net.pooleaf.gamecore.utils.StringUtil
 import net.pooleaf.core.modules.gui.bukkit.actionbar.ActionBar
 import net.pooleaf.core.modules.support.common.CommonChatColor
+import org.bukkit.Bukkit
 
 open class DurationTimer(
     val ability: Ability,
@@ -14,6 +18,9 @@ open class DurationTimer(
 
     override fun onStart() {
         showRemainingTimeActionBar()
+
+        // 이벤트
+        Bukkit.getPluginManager().callEvent(AbilityDurationStartEvent(ability.player!!, ability, timeMillis))
     }
 
     override fun onRun() {
@@ -28,6 +35,9 @@ open class DurationTimer(
         if (ability is Cooldownable) {
             (ability as Cooldownable).cooldownTimer.start()
         }
+
+        // 이벤트
+        Bukkit.getPluginManager().callEvent(AbilityDurationEndEvent(ability.player!!, ability))
     }
 
     private fun showRemainingTimeActionBar() {

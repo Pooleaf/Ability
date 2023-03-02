@@ -129,6 +129,7 @@ class PlayerEquipmentChangeDataReplayHandler : RecordDataReplayHandler<PlayerEqu
         // 시티즌 API만 사용하면 즉시 반영이 안되므로 패킷으로 한번 더 보내줌
         val packet = PacketPlayOutEntityEquipment(citizensNpc.entity.entityId, recordData.equipmentType, CraftItemStack.asNMSCopy(recordData.item))
         BukkitReflectionUtil.sendPacket(replayPlayer.viewer, packet)
+
     }
 
 }

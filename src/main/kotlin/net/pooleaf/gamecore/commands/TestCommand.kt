@@ -9,12 +9,16 @@ import net.pooleaf.core.modules.annocommand.common.Command
 import net.pooleaf.core.modules.annocommand.common.CommandResult
 import net.pooleaf.core.modules.annocommand.common.HelpCommandResult
 import net.pooleaf.core.modules.support.bukkit.messager.sendWarning
+import net.pooleaf.core.modules.support.bukkit.util.deserializeFromJson
+import net.pooleaf.core.modules.support.bukkit.util.serializeToJson
+import net.pooleaf.core.modules.support.common.util.GsonUtil
 import net.pooleaf.gamecore.GameCore
 import net.pooleaf.gamecore.GameCorePermission
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
+import org.bukkit.inventory.ItemStack
 import java.util.*
 
 class TestCommand {
@@ -222,6 +226,39 @@ class TestCommand {
         val blocks = replayPlayer.virtualBlockManager.getByChunk(chunk.x, chunk.z)
 
         player.sendMessage("blocks: ${blocks}")
+    }
+
+
+    var serializeJson: String? = null
+
+    @Command(
+        parent = ["gtest"],
+        name = ["convertToString"],
+        description = "convert itemstack to string",
+        permission = GameCorePermission.ADMIN,
+    )
+    fun game_test_convertToString(player: Player, result: CommandResult) {
+        val itemInHand = player.itemInHand
+
+        serializeJson = itemInHand.serializeToJson()
+
+        val gsonTest = GsonUtil.getGson().toJson(itemInHand)
+
+        println(serializeJson)
+        println(gsonTest)
+    }
+
+    @Command(
+        parent = ["gtest"],
+        name = ["convertFromString"],
+        description = "convert itemstack from string",
+        permission = GameCorePermission.ADMIN,
+    )
+    fun game_test_converFromString(player: Player, result: CommandResult) {
+        val item = serializeJson?.deserializeFromJson() as ItemStack?
+
+        player.inventory.addItem(item)
+        player.updateInventory()
     }
 
 }

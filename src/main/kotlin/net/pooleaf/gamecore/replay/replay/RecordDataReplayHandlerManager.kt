@@ -3,8 +3,11 @@ package net.pooleaf.gamecore.replay.replay
 import com.comphenix.protocol.ProtocolLibrary
 import net.pooleaf.core.modules.support.common.manager.AbstractManager
 import net.pooleaf.gamecore.replay.data.RecordData
+import net.pooleaf.gamecore.replay.data.TpsData
+import net.pooleaf.gamecore.replay.data.TpsDataReplayHandler
 import net.pooleaf.gamecore.replay.data.block.*
 import net.pooleaf.gamecore.replay.data.entity.*
+import net.pooleaf.gamecore.replay.data.game.*
 import net.pooleaf.gamecore.replay.data.player.*
 import net.pooleaf.gamecore.replay.listeners.VirtualChunkLoadListener
 
@@ -39,6 +42,15 @@ class RecordDataReplayHandlerManager : AbstractManager<Class<out RecordData>, Re
         set(PlayerMetaDataData::class.java, PlayerMetaDataDataReplayHandler())
         set(PlayerMoveData::class.java, PlayerMoveDataReplayHandler())
         set(PlayerTeleportData::class.java, PlayerTeleportDataReplayHandler())
+
+        // Game
+        set(GameEndData::class.java, GameEndDataReplayHandler())
+        set(GamePlayerDefeatData::class.java, GamePlayerDefeatDataReplayHandler())
+        set(GameWorldBorderChangeData::class.java, GameWorldBorderChangeDataReplayHandler())
+        set(TeamDefeatData::class.java, TeamDefeatDataReplayHandler())
+
+        // ETC
+        set(TpsData::class.java, TpsDataReplayHandler())
 
         // Chunk
         ProtocolLibrary.getProtocolManager().addPacketListener(VirtualChunkLoadListener())

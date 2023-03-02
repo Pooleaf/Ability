@@ -28,6 +28,7 @@ abstract class GodModPhase() : Phase() {
         // 무적 알림
         val godModTime = StringUtil.buildTimeStringWithColor(getGodModSeconds() * 1000L, CommonChatColor.WHITE, CommonChatColor.YELLOW)
 
+        Broadcaster.broadcast("")
         Broadcaster.broadcast("§e무적 시간이 시작되었습니다.")
         Broadcaster.broadcast("${godModTime} §e간 무적 상태가 지속됩니다.")
         Broadcaster.broadcastSound(XSound.UI_BUTTON_CLICK, 0.3F, 0.7F)
@@ -54,6 +55,7 @@ abstract class GodModPhase() : Phase() {
     override fun onEnd() {
         GameCore.game.isGodMode = false
 
+        Broadcaster.broadcast("")
         Broadcaster.broadcast("§e무적이 해제되었습니다.")
         Broadcaster.broadcastSound(XSound.UI_BUTTON_CLICK, 0.3F, 0.7F)
     }

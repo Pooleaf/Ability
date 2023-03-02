@@ -5,6 +5,8 @@ import com.comphenix.protocol.ProtocolLibrary
 import com.comphenix.protocol.wrappers.ChunkCoordIntPair
 import com.comphenix.protocol.wrappers.MultiBlockChangeInfo
 import com.comphenix.protocol.wrappers.WrappedBlockData
+import kotlinx.coroutines.launch
+import net.pooleaf.core.modules.coroutine.bukkit.BukkitSyncScope
 import net.pooleaf.core.modules.support.bukkit.util.ItemUtil
 import net.pooleaf.core.modules.support.common.manager.AbstractManager
 import net.pooleaf.gamecore.replay.replay.virtual.VirtualLocation
@@ -45,15 +47,22 @@ class VirtualBlockManager : AbstractManager<VirtualLocation, VirtualBlock>() {
 
             // 데이터가 없을 경우 실제 블럭 데이터를 보냄
             if (virtualBlock.typeId == -1) {
-                val block = bukkitLocation.world.getBlockAt(bukkitLocation)
-                typeId = block.typeId
-                typeData = block.data
+                BukkitSyncScope.launch {
+                    val block = bukkitLocation.world.getBlockAt(bukkitLocation)
+                    typeId = block.typeId
+                    typeData = block.data
+
+                    val wrappedBlockData = WrappedBlockData.createData(ItemUtil.getMaterial(typeId), typeData.toInt())
+                    val multiBlockChangeInfo = MultiBlockChangeInfo(bukkitLocation, wrappedBlockData)
+
+                    blocks.add(multiBlockChangeInfo)
+                }
+            } else {
+                val wrappedBlockData = WrappedBlockData.createData(ItemUtil.getMaterial(typeId), typeData.toInt())
+                val multiBlockChangeInfo = MultiBlockChangeInfo(bukkitLocation, wrappedBlockData)
+
+                blocks.add(multiBlockChangeInfo)
             }
-
-            val wrappedBlockData = WrappedBlockData.createData(ItemUtil.getMaterial(typeId), typeData.toInt())
-            val multiBlockChangeInfo = MultiBlockChangeInfo(bukkitLocation, wrappedBlockData)
-
-            blocks.add(multiBlockChangeInfo)
         }
 
         chunkBlocks.forEach { chunk, multiBlockChangeInfos ->

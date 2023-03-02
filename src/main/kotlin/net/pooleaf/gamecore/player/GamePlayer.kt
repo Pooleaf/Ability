@@ -92,4 +92,13 @@ open class GamePlayer(uuid: UUID) : AbstractBukkitPlayer(uuid) {
         GameCore.unsafe.startItemService.giveStartItem(this)
     }
 
+    /**
+     * 플레이어를 죽인 플레이어를 반환합니다.
+     * 없으면 null을 반환합니다.
+     */
+    fun getKillerGamePlayer(): GamePlayer? {
+        if (lastDamagerInfo?.let { System.currentTimeMillis() - it.second < GameCore.gameConfig.killValidSeconds * 1000L } == true) return lastDamagerInfo!!.first
+        return null
+    }
+
 }

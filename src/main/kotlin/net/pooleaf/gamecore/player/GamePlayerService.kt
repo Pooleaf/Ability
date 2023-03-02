@@ -1,14 +1,13 @@
 package net.pooleaf.gamecore.player
 
 import kotlinx.coroutines.async
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import net.pooleaf.ability.AbilityPlugin
 import net.pooleaf.core.modules.coroutine.bukkit.BukkitSyncScope
 import net.pooleaf.core.modules.gui.GuiModule
 import net.pooleaf.gamecore.Broadcaster
 import net.pooleaf.gamecore.GameCore
 import net.pooleaf.gamecore.events.player.*
+import net.pooleaf.gamecore.events.team.TeamDefeatEvent
 import org.bukkit.Bukkit
 import org.bukkit.GameMode
 import org.bukkit.potion.PotionEffect
@@ -288,7 +287,12 @@ class GamePlayerService {
         GameCore.unsafe.quickBarManager.spectatorQuickBar.spectatorTeleporterGui.updateAsynchronously()
 
         // 이벤트
-        Bukkit.getPluginManager().callEvent(GamePlayerDefeatEvent(gamePlayer))
+        Bukkit.getPluginManager().callEvent(GamePlayerDefeatEvent(gamePlayer, gamePlayer.getKillerGamePlayer()))
+
+        // 팀 탈락 이벤트
+        if (gamePlayer.team?.let { it.isDefeated() } == true) {
+            Bukkit.getPluginManager().callEvent(TeamDefeatEvent(gamePlayer.team!!, gamePlayer.getKillerGamePlayer()))
+        }
     }
 
 }

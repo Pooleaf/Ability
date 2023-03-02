@@ -8,6 +8,7 @@ import net.pooleaf.gamecore.replay.replay.RecordDataReplayHandler
 import net.pooleaf.gamecore.replay.replay.ReplayPlayer
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
+import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.ItemDespawnEvent
 
@@ -21,7 +22,7 @@ data class ItemDespawnData(
 
 class ItemDespawnDataRecordListener : Listener {
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     fun onItemDespawn(event: ItemDespawnEvent) {
         if (!GameCore.unsafe.recordManager.isRecording()) return
 

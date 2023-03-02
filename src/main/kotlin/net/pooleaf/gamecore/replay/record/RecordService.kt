@@ -1,7 +1,7 @@
 package net.pooleaf.gamecore.replay.record
 
-import com.google.gson.Gson
 import net.pooleaf.core.modules.support.common.logger.Logger
+import net.pooleaf.core.modules.support.common.util.GsonUtil
 import net.pooleaf.gamecore.GameCore
 import java.io.File
 import java.nio.file.Files
@@ -13,7 +13,7 @@ class RecordService {
 
 
     fun saveRecordToFile(record: Record) {
-        val json = Gson().toJson(record)
+        val json = GsonUtil.getGson().toJson(record)
 
         recordFolder.mkdirs()
 

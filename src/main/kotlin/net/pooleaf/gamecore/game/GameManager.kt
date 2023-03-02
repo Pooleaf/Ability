@@ -5,6 +5,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.pooleaf.core.modules.channel.ChannelModule
 import net.pooleaf.core.modules.coroutine.bukkit.BukkitAsyncScope
+import net.pooleaf.core.modules.coroutine.bukkit.BukkitNewAsyncScope
 import net.pooleaf.core.modules.coroutine.bukkit.BukkitSyncScope
 import net.pooleaf.core.modules.gui.GuiModule
 import net.pooleaf.core.modules.support.bukkit.util.TeleportUtil
@@ -210,12 +211,12 @@ class GameManager {
         game.startedAt = LocalDateTime.now()
 
         // 저장
-        BukkitAsyncScope.launch {
+        BukkitNewAsyncScope.launch {
             GameCore.unsafe.sqlManager.gameDao.insertGame(game.toDto())
-        }
 
-        val participantDtos = GameCore.unsafe.playerManager.getJoinedPlayers().map { it.toDto() }
-        GameCore.unsafe.sqlManager.gameDao.insertGameParticipants(participantDtos)
+            val participantDtos = GameCore.unsafe.playerManager.getJoinedPlayers().map { it.toDto() }
+            GameCore.unsafe.sqlManager.gameDao.insertGameParticipants(participantDtos)
+        }
 
         // 액션바 제거
         Broadcaster.removeActionBar()
@@ -350,7 +351,7 @@ class GameManager {
         // 저장
         val gameDto = game.toDto()
         val gameId = game.gameId
-        BukkitAsyncScope.launch {
+        BukkitNewAsyncScope.launch {
             GameCore.unsafe.sqlManager.gameDao.insertGame(gameDto)
 
             if (winnerTeam != null) {
@@ -377,7 +378,10 @@ class GameManager {
         game.endedAt = LocalDateTime.now()
 
         // 저장
-        GameCore.unsafe.sqlManager.gameDao.insertGame(game.toDto())
+        val gameDto = game.toDto()
+        BukkitNewAsyncScope.launch {
+            GameCore.unsafe.sqlManager.gameDao.insertGame(gameDto)
+        }
 
         // 리셋
         resetGame()

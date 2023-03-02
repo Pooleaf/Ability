@@ -1,7 +1,6 @@
 package net.pooleaf.gamecore.events.player
 
 import net.pooleaf.core.modules.eventsupport.bukkit.events.HandlerEvent
-import net.pooleaf.core.modules.eventsupport.bukkit.events.damage.PlayerDamageEvent
 import net.pooleaf.gamecore.player.GamePlayer
 
 /**
@@ -9,7 +8,6 @@ import net.pooleaf.gamecore.player.GamePlayer
  */
 class GamePlayerDeathEvent(
     val deadGamePlayer: GamePlayer,
-    val killerGamePlayer: GamePlayer?,
-    val playerDamageEvent: PlayerDamageEvent
+    val killerGamePlayer: GamePlayer?
 ): HandlerEvent() {
 }

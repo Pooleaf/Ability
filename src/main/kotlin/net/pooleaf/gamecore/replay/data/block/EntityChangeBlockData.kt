@@ -6,6 +6,7 @@ import net.pooleaf.gamecore.replay.replay.RecordDataReplayHandler
 import net.pooleaf.gamecore.replay.replay.virtual.block.VirtualBlock
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
+import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityChangeBlockEvent
 
@@ -23,7 +24,7 @@ data class EntityChangeBlockData(
 
 class EntityChangeBlockDataRecordListener : Listener {
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     fun onEntityChangeBlock(event: EntityChangeBlockEvent) {
         if (!GameCore.unsafe.recordManager.isRecording()) return
 

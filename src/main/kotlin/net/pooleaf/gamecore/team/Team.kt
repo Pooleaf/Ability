@@ -10,7 +10,8 @@ import org.bukkit.Location
  * 팀간 PVP가 금지됩니다.
  */
 class Team(
-    val id: Int
+    val id: Int,
+    var teamName: String? = null
 ) {
 
     // 팀 소속 플레이어

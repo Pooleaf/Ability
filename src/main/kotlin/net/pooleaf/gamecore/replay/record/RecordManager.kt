@@ -107,8 +107,7 @@ class RecordManager {
             recordTickCalculateTask?.cancel()
 
             // 저장
-            // TODO 저장
-//            GameCore.unsafe.recordService.saveRecordToFile(record)
+            GameCore.unsafe.recordService.saveRecordToFile(record)
             GameCore.unsafe.replayManager.set(record.replay.uuid, record.replay)
 
             // 이벤트

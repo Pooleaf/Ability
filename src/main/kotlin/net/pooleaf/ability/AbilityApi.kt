@@ -7,6 +7,7 @@ import net.pooleaf.ability.compat.CompatPluginService
 import net.pooleaf.ability.configs.AbilityGameConfig
 import net.pooleaf.ability.game.AbilityGame
 import net.pooleaf.ability.player.AbilityPlayerManager
+import net.pooleaf.ability.replay.replay.AbilityReplayHandlerRegistry
 import net.pooleaf.ability.sidebar.AbilitySideBar
 import net.pooleaf.gamecore.GameCore
 import java.io.File
@@ -26,6 +27,8 @@ object AbilityApi {
         lateinit var compatPluginManager: CompatPluginManager
         lateinit var compatPluginService: CompatPluginService
 
+        lateinit var abilityReplayHandlerRegistry: AbilityReplayHandlerRegistry
+
         fun init() {
             playerManager = AbilityPlayerManager()
 
@@ -34,6 +37,10 @@ object AbilityApi {
 
             compatPluginManager = CompatPluginManager()
             compatPluginService = CompatPluginService()
+
+            abilityReplayHandlerRegistry = AbilityReplayHandlerRegistry()
+
+            abilityReplayHandlerRegistry.registerHandlers()
         }
     }
 

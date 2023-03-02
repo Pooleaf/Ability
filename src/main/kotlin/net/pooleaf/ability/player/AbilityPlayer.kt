@@ -3,7 +3,10 @@ package net.pooleaf.ability.player
 import kotlinx.coroutines.Job
 import net.pooleaf.ability.ability.Ability
 import net.pooleaf.ability.compat.CompatAbility
+import net.pooleaf.ability.event.ability.AbilityAssignEvent
+import net.pooleaf.ability.event.ability.AbilityResignEvent
 import net.pooleaf.gamecore.player.GamePlayer
+import org.bukkit.Bukkit
 import java.util.*
 
 class AbilityPlayer(uuid: UUID) : GamePlayer(uuid) {
@@ -54,14 +57,22 @@ class AbilityPlayer(uuid: UUID) : GamePlayer(uuid) {
         }
 
         this.ability?.assign(this) ?: error("Failed to assign ability '${ability.name}' to player '${name}'")
+
+        // 이벤트
+        Bukkit.getPluginManager().callEvent(AbilityAssignEvent(this, ability))
     }
 
     /**
      * 플레이어의 능력을 제거합니다.
      */
     fun resignAbility() {
+        val tempAbility = ability
+
         ability?.resign()
         ability = null
+
+        // 이벤트
+        tempAbility?.let { Bukkit.getPluginManager().callEvent(AbilityResignEvent(this, it)) }
     }
 
 }

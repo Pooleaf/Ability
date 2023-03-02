@@ -16,10 +16,13 @@ import org.bukkit.entity.Player
 open class EndPhase(): Phase() {
 
     override suspend fun onStart() {
-        // 우승 가능 시간이 안될경우 중단
-        if (System.currentTimeMillis() - GameCore.game.startedAt!!.toMillis() < GameCore.gameConfig.winAllowSeconds) {
+        // 게임 우승 조건이 안될 경우 중단
+        if (!GameCore.unsafe.gameManager.canEnd()
+            // 우승 가능 시간이 안될 경우
+            || System.currentTimeMillis() - GameCore.game.startedAt!!.toMillis() < GameCore.gameConfig.winAllowSeconds) {
             GameCore.unsafe.gameManager.stopGame()
         }
+
 
         // 우승
         val winnerTeam = GameCore.unsafe.gameManager.onGameEnd()
