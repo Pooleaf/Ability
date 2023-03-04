@@ -49,7 +49,7 @@ class PlayerChatDataReplayHandler : RecordDataReplayHandler<PlayerChatData> {
 
         val chatCommonPlayer = CommonSenderModule.getPlayer(recordData.playerUuid)
         val chatPlayerName = chatCommonPlayer?.displayName ?: recordData.playerUuid
-        viewer.sendMessage("§7[기록] §f${chatPlayerName}§f: ${recordData.message}")
+        viewer.sendMessage("§7[리플레이] §f${chatPlayerName}§f: ${recordData.message}")
     }
 
 }

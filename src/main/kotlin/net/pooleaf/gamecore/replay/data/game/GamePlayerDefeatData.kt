@@ -4,6 +4,7 @@ import net.pooleaf.core.modules.commonsender.CommonSenderModule
 import net.pooleaf.gamecore.GameCore
 import net.pooleaf.gamecore.events.player.GamePlayerDefeatEvent
 import net.pooleaf.gamecore.replay.data.RecordData
+import net.pooleaf.gamecore.replay.data.player.PlayerHideData
 import net.pooleaf.gamecore.replay.replay.RecordDataReplayHandler
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
@@ -33,7 +34,11 @@ class GamePlayerDefeatDataRecordListener : Listener {
             defeatPlayerUuid = event.gamePlayer.uuid
             killerPlayerUuid = event.killerGamePlayer?.uuid
         }
+        val hideData = PlayerHideData().apply {
+            playerUuid = event.gamePlayer.uuid
+        }
         GameCore.unsafe.recordManager.record!!.addRecordData(recordData)
+        GameCore.unsafe.recordManager.record!!.addRecordData(hideData)
     }
 
 }

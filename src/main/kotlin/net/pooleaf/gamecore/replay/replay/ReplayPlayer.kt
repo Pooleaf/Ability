@@ -1,8 +1,9 @@
 package net.pooleaf.gamecore.replay.replay
 
-import net.citizensnpcs.api.CitizensAPI
 import net.citizensnpcs.api.trait.trait.Owner
+import net.citizensnpcs.trait.GameModeTrait
 import net.citizensnpcs.trait.Gravity
+import net.citizensnpcs.trait.SkinTrait
 import net.pooleaf.core.modules.commonsender.CommonSenderModule
 import net.pooleaf.core.modules.support.bukkit.util.TeleportUtil
 import net.pooleaf.gamecore.Broadcaster
@@ -24,6 +25,7 @@ import net.pooleaf.gamecore.replay.replay.virtual.player.VirtualPlayer
 import net.pooleaf.gamecore.replay.replay.virtual.player.VirtualPlayerManager
 import net.pooleaf.gamecore.replay.replay.virtual.worldborder.VirtualWorldBorder
 import org.bukkit.Bukkit
+import org.bukkit.GameMode
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
 import org.bukkit.scheduler.BukkitRunnable
@@ -182,12 +184,18 @@ class ReplayPlayer(
         replay.recordedPlayers.forEach { uuid ->
             val commonPlayer = CommonSenderModule.getPlayer(uuid)
 
-            val npcName = commonPlayer?.name ?: "Unknown"
-            val citizensNpc = CitizensAPI.getNPCRegistry().createNPC(EntityType.PLAYER, npcName)
+            val npcName = commonPlayer?.displayName ?: "Unknown"
+            val citizensNpc = virtualPlayerManager.npcRegistry.createNPC(EntityType.PLAYER, npcName)
             citizensNpc.isProtected = true
             citizensNpc.getOrAddTrait(Owner::class.java).setOwner(viewer)
             citizensNpc.getOrAddTrait(Gravity::class.java).toggle()
+            citizensNpc.getOrAddTrait(GameModeTrait::class.java).gameMode = GameMode.CREATIVE
+            citizensNpc.getOrAddTrait(SkinTrait::class.java).setSkinName(commonPlayer?.name, true)
             citizensNpc.spawn(viewer.location)
+
+            // NPC 가리기
+            Bukkit.getOnlinePlayers().filter { it.uniqueId != viewer.uniqueId }
+                .forEach { it.hidePlayer(citizensNpc.entity as Player?) }
 
             val virtualPlayer = VirtualPlayer(uuid, citizensNpc)
             virtualPlayerManager.set(uuid, virtualPlayer)
@@ -347,6 +355,11 @@ class ReplayPlayer(
      */
     fun exit() {
         isExit = true
+
+        // 정지
+        if (isRunning()) {
+            pause()
+        }
 
         // NPC 제거
         virtualPlayerManager.values().forEach { it.citizensNpc.destroy() }

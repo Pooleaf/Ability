@@ -16,6 +16,13 @@ open abstract class VirtualHistory {
             ?.firstOrNull()
     }
 
+    protected fun getLastDataTick(clazz: Class<out RecordData>, tick: Long): Long? {
+        return histories.filterKeys { it <= tick }
+            .filterValues { it.filterIsInstance(clazz).isNotEmpty() }
+            .maxByOrNull { it.key }
+            ?.key
+    }
+
     protected fun getCurrentData(clazz: Class<out RecordData>, tick: Long): List<RecordData>? {
         return histories.get(tick)
             ?.filterIsInstance(clazz)

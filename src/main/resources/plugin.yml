@@ -3,3 +3,5 @@ version: $version
 main: $main
 depend:
   - Core
+softdepend:
+  - Citizen

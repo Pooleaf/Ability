@@ -43,8 +43,12 @@ class RecordDataManager : AbstractManager<Class<out RecordData>, RecordDataRepla
         registerRecordData(PlayerDamageData::class.java, PlayerDamageDataReplayHandler())
         registerRecordData(PlayerEquipmentChangeData::class.java, PlayerEquipmentChangeDataReplayHandler())
         registerRecordData(PlayerHealthChangeData::class.java, PlayerHealthChangeDataReplayHandler())
+        registerRecordData(PlayerHideData::class.java, PlayerHideDataReplayHandler())
+        registerRecordData(PlayerJoinData::class.java, PlayerJoinDataReplayHandler())
         registerRecordData(PlayerMetaDataData::class.java, PlayerMetaDataDataReplayHandler())
         registerRecordData(PlayerMoveData::class.java, PlayerMoveDataReplayHandler())
+        registerRecordData(PlayerQuitData::class.java, PlayerQuitDataReplayHandler())
+        registerRecordData(PlayerShowData::class.java, PlayerShowDataReplayHandler())
         registerRecordData(PlayerTeleportData::class.java, PlayerTeleportDataReplayHandler())
 
         // Game

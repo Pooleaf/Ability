@@ -1,5 +1,6 @@
 package net.pooleaf.gamecore.replay.replay.virtual.player
 
+import net.citizensnpcs.api.CitizensAPI
 import net.pooleaf.core.modules.support.common.manager.AbstractManager
 import java.util.*
 
@@ -8,4 +9,7 @@ import java.util.*
  * UUID, VirtualPlayer
  */
 class VirtualPlayerManager : AbstractManager<UUID, VirtualPlayer>() {
+
+    val npcRegistry = CitizensAPI.createAnonymousNPCRegistry(VirtualNpcDataStore())
+
 }

@@ -37,6 +37,21 @@ class VirtualPlayer(
         getLastData(PlayerMoveData::class.java, tick)?.let { datas.add(it) }
         getCurrentData(PlayerTeleportData::class.java, tick)?.let { datas.addAll(it) }
 
+        val lastHideTick = getLastDataTick(PlayerHideData::class.java, tick)
+        val lastShowTick = getLastDataTick(PlayerShowData::class.java, tick)
+
+        if (lastHideTick != null && lastShowTick == null) {
+            getLastData(PlayerHideData::class.java, tick)?.let { datas.add(it) }
+        }
+
+        if (lastHideTick != null && lastShowTick != null) {
+            if (lastHideTick > lastShowTick) {
+                getLastData(PlayerHideData::class.java, tick)?.let { datas.add(it) }
+            } else if (lastHideTick < lastShowTick) {
+                getLastData(PlayerShowData::class.java, tick)?.let { datas.add(it) }
+            }
+        }
+
         datas.forEach { data ->
             val playerHandler = GameCore.unsafe.recordDataManager.get(data.javaClass) ?: return
             playerHandler.onPlay(data, viewer)
