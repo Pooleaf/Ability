@@ -20,7 +20,7 @@ data class BlockChangeData(
 
 }
 
-class BlockChangeDataListener : PacketAdapter(GameCore.gamePlugin, PacketType.Play.Server.BLOCK_CHANGE) {
+class BlockChangeDataRecordListener : PacketAdapter(GameCore.gamePlugin, PacketType.Play.Server.BLOCK_CHANGE) {
 
     override fun onPacketSending(event: PacketEvent) {
         if (!GameCore.unsafe.recordManager.isRecording()) return
