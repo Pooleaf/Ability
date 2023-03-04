@@ -2,9 +2,9 @@ package net.pooleaf.ability.replay.data.ability
 
 import net.pooleaf.ability.event.ability.AbilityDurationStartEvent
 import net.pooleaf.core.modules.commonsender.CommonSenderModule
-import net.pooleaf.gamecore.GameCore
-import net.pooleaf.gamecore.replay.data.RecordData
-import net.pooleaf.gamecore.replay.replay.RecordDataReplayHandler
+import net.pooleaf.gamereplay.GameReplayApi
+import net.pooleaf.gamereplay.data.RecordData
+import net.pooleaf.gamereplay.replay.RecordDataReplayHandler
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -27,14 +27,14 @@ class AbilityDurationStartDataRecordListener : Listener {
 
     @EventHandler
     fun onAbilityDurationStart(event: AbilityDurationStartEvent) {
-        if (!GameCore.unsafe.recordManager.isRecording()) return
+        if (!GameReplayApi.unsafe.recordManager.isRecording()) return
 
         val recordData = AbilityDurationStartData().apply {
             playerUuid = event.abilityPlayer.uuid
             abilityName = event.ability.name
             durationMillis = event.durationMillis
         }
-        GameCore.unsafe.recordManager.record!!.addRecordData(recordData)
+        GameReplayApi.unsafe.recordManager.record!!.addRecordData(recordData)
     }
 
 }

@@ -18,7 +18,10 @@ repositories {
 
 dependencies {
     compileOnly("io.papermc:paper:1.8.8")
+
     compileOnly("net.pooleaf:core:0.0.47")
+    compileOnly("net.pooleaf:game-core:1.0.0")
+    compileOnly("net.pooleaf:game-replay:1.0.0")
 
     compileOnly("com.comphenix.protocol:ProtocolLib:4.7.0")
 
@@ -45,6 +48,8 @@ tasks {
     }
 
     withType<ShadowJar> {
+        delete("build/resources")
+
         archiveClassifier.set("")
     }
 

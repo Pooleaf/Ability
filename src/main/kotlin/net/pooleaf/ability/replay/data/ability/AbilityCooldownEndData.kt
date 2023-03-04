@@ -2,9 +2,9 @@ package net.pooleaf.ability.replay.data.ability
 
 import net.pooleaf.ability.event.ability.AbilityCooldownEndEvent
 import net.pooleaf.core.modules.commonsender.CommonSenderModule
-import net.pooleaf.gamecore.GameCore
-import net.pooleaf.gamecore.replay.data.RecordData
-import net.pooleaf.gamecore.replay.replay.RecordDataReplayHandler
+import net.pooleaf.gamereplay.GameReplayApi
+import net.pooleaf.gamereplay.data.RecordData
+import net.pooleaf.gamereplay.replay.RecordDataReplayHandler
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -26,13 +26,13 @@ class AbilityCooldownEndDataRecordListener : Listener {
 
     @EventHandler
     fun onAbilityCooldownEnd(event: AbilityCooldownEndEvent) {
-        if (!GameCore.unsafe.recordManager.isRecording()) return
+        if (!GameReplayApi.unsafe.recordManager.isRecording()) return
 
         val recordData = AbilityCooldownEndData().apply {
             playerUuid = event.abilityPlayer.uuid
             abilityName = event.ability.name
         }
-        GameCore.unsafe.recordManager.record!!.addRecordData(recordData)
+        GameReplayApi.unsafe.recordManager.record!!.addRecordData(recordData)
     }
 
 }

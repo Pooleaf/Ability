@@ -3,9 +3,9 @@ package net.pooleaf.ability.replay.data.game
 import com.cryptomorin.xseries.XSound
 import net.pooleaf.ability.event.game.AbilityDrawCompleteEvent
 import net.pooleaf.gamecore.Broadcaster
-import net.pooleaf.gamecore.GameCore
-import net.pooleaf.gamecore.replay.data.RecordData
-import net.pooleaf.gamecore.replay.replay.RecordDataReplayHandler
+import net.pooleaf.gamereplay.GameReplayApi
+import net.pooleaf.gamereplay.data.RecordData
+import net.pooleaf.gamereplay.replay.RecordDataReplayHandler
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -23,10 +23,10 @@ class AbilityDrawCompleteDataRecordListener : Listener {
 
     @EventHandler
     fun onAbilityDrawComplete(event: AbilityDrawCompleteEvent) {
-        if (!GameCore.unsafe.recordManager.isRecording()) return
+        if (!GameReplayApi.unsafe.recordManager.isRecording()) return
 
         val recordData = AbilityDrawCompleteData()
-        GameCore.unsafe.recordManager.record!!.addRecordData(recordData)
+        GameReplayApi.unsafe.recordManager.record!!.addRecordData(recordData)
     }
 
 }
