@@ -18,7 +18,7 @@ allprojects {
     dependencies {
         compileOnly("io.papermc:paper:1.8.8")
 
-        compileOnly("net.pooleaf:core:1.48.1")
+        compileOnly("net.pooleaf:core:1.50.2")
         compileOnly("net.pooleaf:game-core:1.1.1")
         compileOnly("net.pooleaf:game-replay:1.1.0")
 
