@@ -16,12 +16,18 @@ allprojects {
     }
 
     dependencies {
+        // Kotlin
+        compileOnly(kotlin("stdlib"))
+
+        // Bukkit
         compileOnly("io.papermc:paper:1.8.8")
 
+        // Core
         compileOnly("net.pooleaf:core:1.50.2")
         compileOnly("net.pooleaf:game-core:1.1.1")
         compileOnly("net.pooleaf:game-replay:1.1.0")
 
+        // Bukkit Library
         compileOnly("com.comphenix.protocol:ProtocolLib:4.7.0")
 
         compileOnly("Xeon:VisualAbility:2.0-s8u") // 비트 능력자
