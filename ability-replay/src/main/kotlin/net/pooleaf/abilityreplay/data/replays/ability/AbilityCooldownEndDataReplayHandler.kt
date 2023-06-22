@@ -10,7 +10,7 @@ class AbilityCooldownEndDataReplayHandler : RecordDataReplayHandler<AbilityCoold
     override fun onPlay(recordData: AbilityCooldownEndData, viewer: Player) {
         // TODO 홀로그램
 
-        val playerName = CommonSenderModule.getPlayer(recordData.playerUuid)?.displayName ?: recordData.playerUuid.toString()
+        val playerName = CommonSenderModule.getOfflinePlayer(recordData.playerUuid)?.displayName ?: recordData.playerUuid.toString()
         viewer.sendMessage("${playerName} §e님의 능력 쿨타임이 종료되었습니다.")
     }
 

@@ -10,7 +10,7 @@ class AbilityCooldownStartDataReplayHandler : RecordDataReplayHandler<AbilityCoo
     override fun onPlay(recordData: AbilityCooldownStartData, viewer: Player) {
         // TODO 홀로그램
 
-        val playerName = CommonSenderModule.getPlayer(recordData.playerUuid)?.displayName ?: recordData.playerUuid.toString()
+        val playerName = CommonSenderModule.getOfflinePlayer(recordData.playerUuid)?.displayName ?: recordData.playerUuid.toString()
         viewer.sendMessage("${playerName} §e님이 능력을 사용했습니다. (쿨타임: §f${String.format("%.1f", recordData.cooldownMillis.toFloat() / 1000)}§e초)")
     }
 

@@ -10,7 +10,7 @@ class AbilityDurationEndDataReplayHandler : RecordDataReplayHandler<AbilityDurat
     override fun onPlay(recordData: AbilityDurationEndData, viewer: Player) {
         // TODO 홀로그램
 
-        val playerName = CommonSenderModule.getPlayer(recordData.playerUuid)?.displayName ?: recordData.playerUuid.toString()
+        val playerName = CommonSenderModule.getOfflinePlayer(recordData.playerUuid)?.displayName ?: recordData.playerUuid.toString()
         viewer.sendMessage("${playerName} §e님의 능력 지속시간이 종료되었습니다.")
     }
 
