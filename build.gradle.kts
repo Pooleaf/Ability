@@ -24,7 +24,7 @@ allprojects {
 
         // Core
         compileOnly("net.pooleaf:core:1.63.3")
-        compileOnly("net.pooleaf:game-core:1.1.1")
+        compileOnly("net.pooleaf:game-core:1.1.5")
         compileOnly("net.pooleaf:game-replay:1.1.0")
 
         // Bukkit Library
