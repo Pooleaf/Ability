@@ -1,6 +1,8 @@
 package net.pooleaf.abilityreward.listeners
 
+import kotlinx.coroutines.launch
 import net.pooleaf.abilityreward.AbilityRewardApi
+import net.pooleaf.core.modules.coroutine.bukkit.BukkitAsyncScope
 import net.pooleaf.gamecore.GameCore
 import net.pooleaf.gamecore.events.game.GameEndEvent
 import net.pooleaf.gamecore.events.player.GamePlayerDefeatEvent
@@ -12,6 +14,7 @@ class AbilityRewardListener : Listener {
     @EventHandler
     fun onKill(event: GamePlayerDefeatEvent) {
         if (event.killerGamePlayer == null) return
+
         // 킬
         AbilityRewardApi.unsafe.abilityRewardService.giveKillMoney(event.killerGamePlayer!!)
 
@@ -29,7 +32,10 @@ class AbilityRewardListener : Listener {
     @EventHandler
     fun onWin(event: GameEndEvent) {
         if (event.winnerTeam == null) return;
-        AbilityRewardApi.unsafe.abilityRewardService.giveWinMoney(event.winnerTeam!!)
+
+        BukkitAsyncScope.launch {
+            AbilityRewardApi.unsafe.abilityRewardService.giveWinMoney(event.winnerTeam!!)
+        }
     }
 
 }

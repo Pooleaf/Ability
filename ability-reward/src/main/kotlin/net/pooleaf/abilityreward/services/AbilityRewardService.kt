@@ -1,8 +1,10 @@
 package net.pooleaf.abilityreward.services
 
 import com.cryptomorin.xseries.XSound
+import kotlinx.coroutines.launch
 import net.pooleaf.abilityreward.AbilityRewardApi
 import net.pooleaf.core.modules.commonsender.CommonSenderModule
+import net.pooleaf.core.modules.coroutine.bukkit.BukkitAsyncScope
 import net.pooleaf.core.modules.support.common.logger.Logger
 import net.pooleaf.gamecore.GameCore
 import net.pooleaf.gamecore.killstreak.KillStreak
@@ -16,7 +18,7 @@ class AbilityRewardService {
     fun createCalculateWinMoneyFunction(formula: String) {
         AbilityRewardApi.unsafe.javaScriptService.eval("""
             function calculateWinMoney(startPlayerCount, startTeamCount, teamPlayerCount) {
-                ${formula}
+                return ${formula}
             }
         """.trimIndent())
     }
@@ -43,15 +45,17 @@ class AbilityRewardService {
         val killMoney = AbilityRewardApi.unsafe.abilityRewardConfig.killMoney
         if (killMoney <= 0) return
 
-        MoneyApi.addMoney(gamePlayer.uuid, killMoney, CommonSenderModule.getPluginSender())
-
         // 메시지
-        gamePlayer.sendMessageSafely("")
         gamePlayer.sendMessageSafely("§a+${killMoney.toInt()}원 (킬)")
         gamePlayer.playSoundSafely(XSound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.4F, 1.0F)
 
-        // 로그
-        Logger.log("킬 게임머니 지급: ${gamePlayer.name}(${gamePlayer.uuid}): ${killMoney} 원")
+        BukkitAsyncScope.launch {
+            // 돈 추가
+            MoneyApi.addMoney(gamePlayer.uuid, killMoney, CommonSenderModule.getPluginSender())
+
+            // 로그
+            Logger.log("킬 게임머니 지급: ${gamePlayer.name}(${gamePlayer.uuid}): ${killMoney} 원")
+        }
     }
 
     fun giveKillStreakMoney(gamePlayer: GamePlayer) {
@@ -64,47 +68,51 @@ class AbilityRewardService {
         }
         if (killMoney <= 0) return
 
-        MoneyApi.addMoney(gamePlayer.uuid, killMoney, CommonSenderModule.getPluginSender())
-
         // 메시지
-        gamePlayer.sendMessageSafely("")
         gamePlayer.sendMessageSafely("§a+${killMoney.toInt()}원 (연속킬)")
         gamePlayer.playSoundSafely(XSound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.4F, 1.0F)
 
-        // 로그
-        Logger.log("연속킬 게임머니 지급: ${gamePlayer.name}(${gamePlayer.uuid}): ${killMoney} 원")
+        BukkitAsyncScope.launch {
+            // 돈 추가
+            MoneyApi.addMoney(gamePlayer.uuid, killMoney, CommonSenderModule.getPluginSender())
+
+            // 로그
+            Logger.log("연속킬 게임머니 지급: ${gamePlayer.name}(${gamePlayer.uuid}): ${killMoney} 원")
+        }
     }
 
     fun giveAssistMoney(gamePlayer: GamePlayer) {
         val assistMoney = AbilityRewardApi.unsafe.abilityRewardConfig.assistMoney
         if (assistMoney <= 0) return
 
-        MoneyApi.addMoney(gamePlayer.uuid, assistMoney, CommonSenderModule.getPluginSender())
-
         // 메시지
-        gamePlayer.sendMessageSafely("")
         gamePlayer.sendMessageSafely("§a+${assistMoney.toInt()}원 (어시스트)")
         gamePlayer.playSoundSafely(XSound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.4F, 1.0F)
 
-        // 로그
-        Logger.log("어시스트 게임머니 지급: ${gamePlayer.name}(${gamePlayer.uuid}): ${assistMoney} 원")
+        BukkitAsyncScope.launch {
+            // 돈 추가
+            MoneyApi.addMoney(gamePlayer.uuid, assistMoney, CommonSenderModule.getPluginSender())
+
+            // 로그
+            Logger.log("어시스트 게임머니 지급: ${gamePlayer.name}(${gamePlayer.uuid}): ${assistMoney} 원")
+        }
     }
 
     fun giveWinMoney(team: Team) {
         val winMoney = calculateWinMoney(team)
-        val winMoneyPerPlayer = floor(winMoney / team.players.size)
-        if (winMoneyPerPlayer <= 0) return
 
         team.players.forEach { gamePlayer ->
-            MoneyApi.addMoney(gamePlayer.uuid, winMoneyPerPlayer, CommonSenderModule.getPluginSender())
-
             // 메시지
-            gamePlayer.sendMessageSafely("")
-            gamePlayer.sendMessageSafely("§a§l+${winMoneyPerPlayer.toInt()}원 (우승)")
+            gamePlayer.sendMessageSafely("§a§l+${winMoney.toInt()}원 (우승)")
             // 우승 사운드가 따로 있으므로 사운드는 사용안함
 
-            // 로그
-            Logger.log("우승 게임머니 지급: ${gamePlayer.name}(${gamePlayer.uuid}): ${winMoneyPerPlayer} 원")
+            BukkitAsyncScope.launch {
+                // 돈 추가
+                MoneyApi.addMoney(gamePlayer.uuid, winMoney, CommonSenderModule.getPluginSender())
+
+                // 로그
+                Logger.log("우승 게임머니 지급: ${gamePlayer.name}(${gamePlayer.uuid}): ${winMoney} 원")
+            }
         }
     }
 

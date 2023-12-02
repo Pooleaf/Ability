@@ -87,6 +87,8 @@ class AbilityService {
                 abilityPlayer.sendMessageSafely("")
                 delay(1000L)
 
+                // 능력 강제 스킵 시 이미 assign 되어 null 반환
+                if (abilityPlayer.tempAbility == null) return
                 sendYesNoMessage(abilityPlayer)
                 abilityPlayer.playSoundSafely( XSound.ENTITY_GENERIC_EAT, 0.5F, 1F)
             }

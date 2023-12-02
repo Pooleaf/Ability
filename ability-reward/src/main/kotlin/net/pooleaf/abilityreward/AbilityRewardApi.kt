@@ -22,6 +22,7 @@ object AbilityRewardApi {
 
         fun reloadConfig() {
             abilityRewardConfig.load()
+            abilityRewardConfig.save()
             javaScriptService.clearScriptEngine()
 
             // 우승 게임머니 계산 함수 설정

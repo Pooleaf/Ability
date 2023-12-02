@@ -1,5 +1,6 @@
 package net.pooleaf.abilityreward.services
 
+import net.pooleaf.core.modules.support.common.logger.Logger
 import javax.script.Invocable
 import javax.script.ScriptEngine
 import javax.script.ScriptEngineManager
@@ -15,8 +16,8 @@ class JavaScriptService {
         return scriptEngine
     }
 
-    fun callFunction(functionName: String, vararg args: Any) {
-        (scriptEngine as Invocable).invokeFunction(functionName, *args)
+    fun callFunction(functionName: String, vararg args: Any): Any? {
+        return (scriptEngine as Invocable).invokeFunction(functionName, *args)
     }
 
     fun eval(javascriptCode: String) {
