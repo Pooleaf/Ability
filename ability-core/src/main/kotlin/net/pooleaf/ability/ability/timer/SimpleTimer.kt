@@ -102,6 +102,8 @@ open class SimpleTimer(
 
         onEnd()
 
+        startTimeMillis = null
+
         runJob?.cancel()
         endJob?.cancel()
     }
@@ -113,6 +115,8 @@ open class SimpleTimer(
         if (!isRunning) error("Timer not started")
 
         onCancel()
+
+        startTimeMillis = null
 
         runJob?.cancel()
         endJob?.cancel()

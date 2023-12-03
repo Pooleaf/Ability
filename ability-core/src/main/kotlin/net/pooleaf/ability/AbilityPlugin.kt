@@ -24,14 +24,15 @@ class AbilityPlugin: BukkitCorePlugin() {
         AbilityApi.init()
         GameCore.unsafe.playerManager = AbilityApi.unsafe.playerManager as GamePlayerManager<GamePlayer>
 
+        loadConfig()
+
         AbilityApi.unsafe.abilityManager.registerAbilities(this)
         AbilityApi.unsafe.compatPluginService.enableAllCompatPlugins()
 
+        // 호환 플러그인의 Command를 해제한 후 registerCommands를 해야 va를 사용할 수 있음
         registerEventListeners()
         registerCommonEventListeners()
         registerCommands()
-
-        loadConfig()
     }
 
     override fun onConfigLoaded() {

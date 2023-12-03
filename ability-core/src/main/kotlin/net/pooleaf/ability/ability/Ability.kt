@@ -5,7 +5,7 @@ import net.pooleaf.ability.AbilityPlugin
 import net.pooleaf.ability.player.AbilityPlayer
 import net.pooleaf.core.modules.support.bukkit.util.BukkitReflectionUtil
 import org.bukkit.Bukkit
-import org.bukkit.entity.Player
+import org.bukkit.command.CommandSender
 import org.bukkit.event.Listener
 import java.text.DecimalFormat
 
@@ -99,41 +99,41 @@ open class Ability() {
         }
     }
 
-    fun sendManual(player: Player?) {
-        player?.sendMessage("§e§l====================================================")
+    fun sendManual(sender: CommandSender?) {
+        sender?.sendMessage("§e§l====================================================")
 
         // 이름
-        player?.sendMessage("")
-        player?.sendMessage("§f§l${name}")
+        sender?.sendMessage("")
+        sender?.sendMessage("§f§l${name}")
 
         // 등급
-        player?.sendMessage("")
-        player?.sendMessage("§e§l등급")
-        player?.sendMessage("${rank.color}${rank.name}")
+        sender?.sendMessage("")
+        sender?.sendMessage("§e§l등급")
+        sender?.sendMessage("${rank.color}${rank.name}")
 
         // 설명
-        player?.sendMessage("")
-        player?.sendMessage("§b§l설명")
-        description.forEach { player?.sendMessage(it) }
+        sender?.sendMessage("")
+        sender?.sendMessage("§b§l설명")
+        description.forEach { sender?.sendMessage(it) }
 
         // 쿨타임
         if (this is Cooldownable && cooldownMillis > 0) {
             val cooldown = DecimalFormat("#.##").format(cooldownMillis.toFloat() / 1000)
-            player?.sendMessage("")
-            player?.sendMessage("§a§l쿨타임")
-            player?.sendMessage("§f${cooldown}§a초")
+            sender?.sendMessage("")
+            sender?.sendMessage("§a§l쿨타임")
+            sender?.sendMessage("§f${cooldown}§a초")
         }
 
         // 지속시간
         if (this is Durationable && durationMillis > 0) {
             val durationTime = DecimalFormat("#.##").format(durationMillis.toFloat() / 1000)
-            player?.sendMessage("")
-            player?.sendMessage("§a§l지속시간")
-            player?.sendMessage("§f${durationTime}§a초")
+            sender?.sendMessage("")
+            sender?.sendMessage("§a§l지속시간")
+            sender?.sendMessage("§f${durationTime}§a초")
         }
 
-        player?.sendMessage("")
-        player?.sendMessage("§e§l====================================================")
+        sender?.sendMessage("")
+        sender?.sendMessage("§e§l====================================================")
     }
 
     protected fun canUse(): Boolean {

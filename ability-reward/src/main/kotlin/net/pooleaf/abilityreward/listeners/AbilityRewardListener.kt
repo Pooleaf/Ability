@@ -33,9 +33,7 @@ class AbilityRewardListener : Listener {
     fun onWin(event: GameEndEvent) {
         if (event.winnerTeam == null) return;
 
-        BukkitAsyncScope.launch {
-            AbilityRewardApi.unsafe.abilityRewardService.giveWinMoney(event.winnerTeam!!)
-        }
+        AbilityRewardApi.unsafe.abilityRewardService.giveWinMoney(event.winnerTeam!!)
     }
 
 }

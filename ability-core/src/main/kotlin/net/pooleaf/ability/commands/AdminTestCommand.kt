@@ -21,8 +21,10 @@ import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.MapMeta
 import org.bukkit.map.MapView.Scale
+import org.bukkit.scoreboard.DisplaySlot
+import kotlin.math.round
 
-class TestCommand: Listener {
+class AdminTestCommand: Listener {
 
     @Command(
         name = ["abtest"],
@@ -166,6 +168,19 @@ class TestCommand: Listener {
             Scale.FAR -> 1024
             Scale.FARTHEST -> 2048
         }
+    }
+
+    @Command(
+        parent = ["abtest"],
+        name = ["health"],
+        arguments = "<player>"
+    )
+    fun abtest_health(player: Player, result: CommandResult) {
+        val targetPlayer = Bukkit.getPlayer(result.getArgument(0))
+        val objective = targetPlayer.scoreboard.registerNewObjective("testh", "dummy")
+        objective.displaySlot = DisplaySlot.BELOW_NAME
+        objective.displayName = "ㅇㅇ"
+        objective.getScore(player.name).score = round(player.health).toInt()
     }
 
 }

@@ -10,6 +10,7 @@ import net.pooleaf.core.modules.gui.bukkit.title.Title
 import net.pooleaf.core.modules.gui.bukkit.title.TitleBuilder
 import net.pooleaf.core.modules.support.bukkit.messager.sendMessageSafely
 import net.pooleaf.core.modules.support.common.component.SimpleComponentBuilder
+import net.pooleaf.gamecore.phases.GodModePhase
 
 class AbilityService {
 
@@ -30,14 +31,15 @@ class AbilityService {
      * [startPollingPeriodMillis]: 폴링 시작 딜레이
      * [endPollingPeriodMillis]: [pollingConstantly]가 true일 경우 지속 시간, false일 경우 최대 가속 시간
      */
-    suspend fun drawAbility(abilityPlayer: AbilityPlayer,
-                            abilities: List<Ability> = AbilityApi.unsafe.abilityManager.getDefaultDrawAbilities(),
-                            temp: Boolean = true,
-                            allowDuplicate: Boolean = AbilityApi.abilityGameConfig.allowAbilityDuplicate,
-                            pollingConstantly: Boolean = false,
-                            pollingCount: Int = 12,
-                            startPollingPeriodMillis: Long = 40L,
-                            endPollingPeriodMillis: Long = 240L
+    suspend fun drawAbility(
+        abilityPlayer: AbilityPlayer,
+        abilities: List<Ability> = AbilityApi.unsafe.abilityManager.getDefaultDrawAbilities(),
+        temp: Boolean = true,
+        allowDuplicate: Boolean = AbilityApi.abilityGameConfig.allowAbilityDuplicate,
+        pollingConstantly: Boolean = false,
+        pollingCount: Int = 12,
+        startPollingPeriodMillis: Long = 40L,
+        endPollingPeriodMillis: Long = 240L
     ) {
         val ability = if (allowDuplicate) {
             abilities.randomOrNull()
@@ -45,7 +47,8 @@ class AbilityService {
             val assignedAbilities = AbilityApi.unsafe.abilityManager.getAssignedAbilities().map { it.fullName }
             val tempAssignedAbilities = AbilityApi.unsafe.abilityManager.getTempAssignedAbilities().map { it.fullName }
 
-            abilities.filter { !assignedAbilities.contains(it.fullName) }
+            abilities.filter { !AbilityApi.unsafe.abilityManager.isBlacklistedAbility(it) }
+                .filter { !assignedAbilities.contains(it.fullName) }
                 .filter { !tempAssignedAbilities.contains(it.fullName) }
                 .randomOrNull()
         }
@@ -277,6 +280,16 @@ class AbilityService {
     fun skipAbilityDraw() {
         AbilityApi.unsafe.playerManager.getPlayingPlayers().filter { !it.abilityDrawComplete }
             .map { decideAbility(it) }
+    }
+
+    /**
+     * 무적 시간을 건너뜁니다.
+     */
+    fun skipGodModePhase() {
+        val currentPhase = AbilityApi.game.phasePipeline.currentPhase
+        if (currentPhase !is GodModePhase) error("Current phase is not godModePhase")
+
+        currentPhase.end()
     }
 
 }

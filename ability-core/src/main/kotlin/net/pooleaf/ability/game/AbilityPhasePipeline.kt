@@ -23,7 +23,6 @@ class AbilityPhasePipeline: PhasePipeline() {
 
         // 능력 추첨
         addPhase(AbilityDrawPhase())
-
         addPhase(DelayPhase(2))
 
         // 보급품 타이머 시작
@@ -35,10 +34,9 @@ class AbilityPhasePipeline: PhasePipeline() {
         })
 
         // 무적 시간
-        addPhase(object : GodModPhase() {
-            override fun getGodModSeconds(): Int = AbilityApi.abilityGameConfig.godModSeconds
+        addPhase(object : GodModePhase() {
+            override fun getGodModeSeconds(): Int = AbilityApi.abilityGameConfig.godModeSeconds
         })
-
         addPhase(DelayPhase(2))
 
 

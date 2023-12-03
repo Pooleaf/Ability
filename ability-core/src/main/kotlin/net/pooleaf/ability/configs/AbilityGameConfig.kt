@@ -13,7 +13,7 @@ class AbilityGameConfig(file: File?) : SimpleAnnoConfig(file) {
     var drawSkipSeconds: Int = 90
 
     @ConfigName("무적 시간(초)")
-    var godModSeconds: Int = 60 * 3
+    var godModeSeconds: Int = 60 * 3
 
     @ConfigName("경계선 축소.첫번째.시간")
     var firstWorldBorderReduceWaitSeconds: Int = 60 * 5

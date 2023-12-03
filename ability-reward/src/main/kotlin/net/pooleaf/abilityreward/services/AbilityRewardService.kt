@@ -46,7 +46,7 @@ class AbilityRewardService {
         if (killMoney <= 0) return
 
         // 메시지
-        gamePlayer.sendMessageSafely("§a+${killMoney.toInt()}원 (킬)")
+        gamePlayer.sendMessageSafely("§a+ ${killMoney.toInt()}원 (킬)")
         gamePlayer.playSoundSafely(XSound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.4F, 1.0F)
 
         BukkitAsyncScope.launch {
@@ -69,7 +69,7 @@ class AbilityRewardService {
         if (killMoney <= 0) return
 
         // 메시지
-        gamePlayer.sendMessageSafely("§a+${killMoney.toInt()}원 (연속킬)")
+        gamePlayer.sendMessageSafely("§a+ ${killMoney.toInt()}원 (연속킬)")
         gamePlayer.playSoundSafely(XSound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.4F, 1.0F)
 
         BukkitAsyncScope.launch {
@@ -86,7 +86,7 @@ class AbilityRewardService {
         if (assistMoney <= 0) return
 
         // 메시지
-        gamePlayer.sendMessageSafely("§a+${assistMoney.toInt()}원 (어시스트)")
+        gamePlayer.sendMessageSafely("§a+ ${assistMoney.toInt()}원 (어시스트)")
         gamePlayer.playSoundSafely(XSound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.4F, 1.0F)
 
         BukkitAsyncScope.launch {
@@ -103,7 +103,7 @@ class AbilityRewardService {
 
         team.players.forEach { gamePlayer ->
             // 메시지
-            gamePlayer.sendMessageSafely("§a§l+${winMoney.toInt()}원 (우승)")
+            gamePlayer.sendMessageSafely("§a§l+ ${winMoney.toInt()}원 (우승)")
             // 우승 사운드가 따로 있으므로 사운드는 사용안함
 
             BukkitAsyncScope.launch {

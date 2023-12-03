@@ -1,7 +1,7 @@
 package net.pooleaf.ability.ability
 
 import net.pooleaf.ability.AbilityApi
-import net.pooleaf.ability.player.AbilityPlayer
+import net.pooleaf.core.modules.support.common.logger.Logger
 import net.pooleaf.core.modules.support.common.util.ReflectionUtil
 import net.pooleaf.core.plugin.CorePlugin
 import java.util.Random
@@ -16,8 +16,10 @@ class AbilityManager {
      */
     fun registerAbility(ability: Ability) {
         if (!ability.isInitialized) return
+        if (isBlacklistedAbility(ability)) return
 
         abilities.add(ability)
+        Logger.log("${ability.fullName} 능력이 등록되었습니다.")
     }
 
     /**
@@ -114,7 +116,34 @@ class AbilityManager {
     fun getAbility(abilityName: String): Ability {
         val noSpaceAbilityName = abilityName.replace(" ", "")
 
-        return abilities.filter { it.name.replace(" ", "").equals(noSpaceAbilityName, true) }.first()
+        return abilities.first { it.name.replace(" ", "").equals(noSpaceAbilityName, true) }
+    }
+
+    /**
+     * [abilityFullName] 풀네임을 가진 [Ability]를 반환합니다.
+     * 띄어쓰기와 대소문자를 구분하지 않고 검색합니다.
+     */
+    fun getAbilityByFullName(abilityFullName: String): Ability {
+        val noSpaceAbilityFullName = abilityFullName.replace(" ", "")
+
+        return abilities.first { it.fullName.replace(" ", "").equals(noSpaceAbilityFullName, true) }
+    }
+
+    /**
+     * 해당 능력이 블랙리스트에 등록된 능력인지 확인합니다.
+     */
+    fun isBlacklistedAbility(ability: Ability): Boolean {
+        return AbilityApi.abilityBlacklistConfig.blacklist.contains(ability.fullName)
+    }
+
+    /**
+     * 블랙리스트에 등록된 능력을 제거합니다.
+     */
+    fun removeBlacklistedAbilities(): List<Ability> {
+        val blacklistedAbilities = abilities.filter { isBlacklistedAbility(it) }
+        abilities.removeAll(blacklistedAbilities.toSet())
+
+        return blacklistedAbilities
     }
 
 }
