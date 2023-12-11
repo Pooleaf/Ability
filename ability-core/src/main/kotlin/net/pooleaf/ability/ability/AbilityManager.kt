@@ -8,7 +8,7 @@ import java.util.Random
 
 class AbilityManager {
 
-    val abilities = ArrayList<Ability>()
+    private val abilities = ArrayList<Ability>()
 
 
     /**
@@ -16,7 +16,6 @@ class AbilityManager {
      */
     fun registerAbility(ability: Ability) {
         if (!ability.isInitialized) return
-        if (isBlacklistedAbility(ability)) return
 
         abilities.add(ability)
         Logger.log("${ability.fullName} 능력이 등록되었습니다.")
@@ -52,10 +51,16 @@ class AbilityManager {
         abilities.forEach { registerAbility(it) }
     }
 
-    fun getDefaultDrawAbilities(): List<Ability> {
-        return AbilityApi.unsafe.abilityManager.abilities
+    fun getAbilities(): List<Ability> {
+        return abilities
             .filter { it.isInitialized }
-            .filter { !it.ban }
+            .filter { !it.ban && !isBlacklistedAbility(it) }
+    }
+
+    fun getDefaultDrawAbilities(): List<Ability> {
+        return abilities
+            .filter { it.isInitialized }
+            .filter { !it.ban && !isBlacklistedAbility(it) }
             .filter { it.rank != AbilityRank.HIDDEN }
     }
 
@@ -83,7 +88,7 @@ class AbilityManager {
      * 랜덤 [Ability]를 반환합니다.
      */
     fun getRandomAbility(): Ability {
-        return abilities.filter { !it.ban }[Random().nextInt(abilities.size)]
+        return getAbilities().filter { !it.ban }[Random().nextInt(getAbilities().size)]
     }
 
     /**
@@ -92,7 +97,7 @@ class AbilityManager {
     fun getRandomAbilityNoDuplicated(): Ability? {
         val assignedAbilityFullNames = getAssignedAbilities().map { it.fullName }
 
-        return abilities.filter { !assignedAbilityFullNames.contains(it.fullName) }
+        return getAbilities().filter { !assignedAbilityFullNames.contains(it.fullName) }
             .toList()
             .random()
     }
@@ -103,7 +108,7 @@ class AbilityManager {
     fun getRandomAbilityNoDuplicatedInTemp(): Ability? {
         val assignedAbilityFullNames = getTempAssignedAbilities().map { it.fullName }
 
-        return abilities.filter { !assignedAbilityFullNames.contains(it.fullName) }
+        return getAbilities().filter { !assignedAbilityFullNames.contains(it.fullName) }
             .toList()
             .random()
     }
@@ -113,37 +118,29 @@ class AbilityManager {
      * [abilityName] 이름을 가진 [Ability]를 반환합니다.
      * 띄어쓰기와 대소문자를 구분하지 않고 검색합니다.
      */
-    fun getAbility(abilityName: String): Ability {
+    fun getAbility(abilityName: String): Ability? {
         val noSpaceAbilityName = abilityName.replace(" ", "")
 
-        return abilities.first { it.name.replace(" ", "").equals(noSpaceAbilityName, true) }
+        return getAbilities().firstOrNull { it.name.replace(" ", "").equals(noSpaceAbilityName, true) }
     }
 
     /**
      * [abilityFullName] 풀네임을 가진 [Ability]를 반환합니다.
      * 띄어쓰기와 대소문자를 구분하지 않고 검색합니다.
      */
-    fun getAbilityByFullName(abilityFullName: String): Ability {
+    fun getAbilityByFullName(abilityFullName: String): Ability? {
         val noSpaceAbilityFullName = abilityFullName.replace(" ", "")
 
-        return abilities.first { it.fullName.replace(" ", "").equals(noSpaceAbilityFullName, true) }
+        return getAbilities().firstOrNull { it.fullName.replace(" ", "").equals(noSpaceAbilityFullName, true) }
     }
 
     /**
      * 해당 능력이 블랙리스트에 등록된 능력인지 확인합니다.
+     * 띄어쓰기와 대소문자를 구분하지 않고 검색합니다.
      */
     fun isBlacklistedAbility(ability: Ability): Boolean {
-        return AbilityApi.abilityBlacklistConfig.blacklist.contains(ability.fullName)
-    }
-
-    /**
-     * 블랙리스트에 등록된 능력을 제거합니다.
-     */
-    fun removeBlacklistedAbilities(): List<Ability> {
-        val blacklistedAbilities = abilities.filter { isBlacklistedAbility(it) }
-        abilities.removeAll(blacklistedAbilities.toSet())
-
-        return blacklistedAbilities
+        val noSpaceAbilityFullName = ability.fullName.replace(" ", "")
+        return AbilityApi.abilityBlacklistConfig.blacklist.find { noSpaceAbilityFullName.equals(it.replace(" ", ""), true) } != null
     }
 
 }

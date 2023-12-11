@@ -47,8 +47,7 @@ class AbilityService {
             val assignedAbilities = AbilityApi.unsafe.abilityManager.getAssignedAbilities().map { it.fullName }
             val tempAssignedAbilities = AbilityApi.unsafe.abilityManager.getTempAssignedAbilities().map { it.fullName }
 
-            abilities.filter { !AbilityApi.unsafe.abilityManager.isBlacklistedAbility(it) }
-                .filter { !assignedAbilities.contains(it.fullName) }
+            abilities.filter { !assignedAbilities.contains(it.fullName) }
                 .filter { !tempAssignedAbilities.contains(it.fullName) }
                 .randomOrNull()
         }

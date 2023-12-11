@@ -25,7 +25,7 @@ class TestActiveContinueAbility: Ability(), CastByItemHandler, Durationable {
         type = AbilityType.ACTIVE
         description = listOf("철괴 우클릭 시 5초간 하늘을 날 수 있습니다.")
 
-        ban = false
+        ban = true
     }
 
     override val castItem: List<ItemStack> = listOf(ItemStack(Material.IRON_INGOT))

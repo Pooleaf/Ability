@@ -35,7 +35,7 @@ class AbilityDrawPhase: Phase() {
         delay(4000L)
 
         // 추첨할 능력이 없을 경우 게임 중단
-        if (AbilityApi.unsafe.abilityManager.abilities.isEmpty()) {
+        if (AbilityApi.unsafe.abilityManager.getDefaultDrawAbilities().isEmpty()) {
             BukkitAsyncScope.launch { AbilityApi.game.cancel(null, "능력이 부족하여 게임을 시작할 수 없습니다.") }
         }
 

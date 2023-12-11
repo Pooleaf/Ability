@@ -67,9 +67,9 @@ object AbilityApi {
 
         abilityBlacklistConfig.load()
         abilityBlacklistConfig.save()
-        // 설정을 다시 불러올 경우 능력을 제거해야함
-        unsafe.abilityManager.removeBlacklistedAbilities().forEach {
-            Logger.log("${it.fullName} 능력이 블랙리스트에 등록되었습니다.")
+
+        abilityBlacklistConfig.blacklist.forEach {
+            Logger.log("${it} 능력이 블랙리스트에 등록되었습니다.")
         }
     }
 

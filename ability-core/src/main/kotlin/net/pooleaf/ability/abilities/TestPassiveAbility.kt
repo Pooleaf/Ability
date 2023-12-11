@@ -19,6 +19,8 @@ class TestPassiveAbility: Ability(), Cooldownable, Listener {
         rank = AbilityRank.C
         type = AbilityType.PASSIVE
         description = listOf("공격을 받으면 상대에게 번개가 칩니다.")
+
+        ban = true
     }
 
     override val cooldownTimer: CoolDownTimer = CoolDownTimer(this, 3000L)

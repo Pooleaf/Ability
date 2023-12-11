@@ -32,16 +32,16 @@ class AbilityCastListener: Listener {
 
         // 아이템으로 캐스팅하는 능력일 경우
         if (ability is CastByItemHandler) {
+            // 손에 든 아이템 체크
+            val itemInHand = event.item
+            if (itemInHand == null || itemInHand.type == Material.AIR || !ability.isCastItem(itemInHand)) return
+
             // 쿨타임, 지속시간 체크
             if (ability.cooldownTimer.isRunning ||
                 (ability is Durationable && ability.durationTimer.isRunning)) {
                 abilityPlayer.sendWarningSafely("아직 능력을 사용할 수 없습니다.")
                 return
             }
-
-            // 손에 든 아이템 체크
-            val itemInHand = event.item
-            if (itemInHand == null || itemInHand.type == Material.AIR || !ability.isCastItem(itemInHand)) return
 
             // 캐스팅
             if (ability.onCastByItem(event, itemInHand, clickType)) {

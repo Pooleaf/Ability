@@ -9,7 +9,7 @@ import org.bukkit.command.CommandSender
 import org.bukkit.event.Listener
 import java.text.DecimalFormat
 
-open class Ability() {
+open class Ability {
 
     // 플러그인 이름
     lateinit var pluginName: String

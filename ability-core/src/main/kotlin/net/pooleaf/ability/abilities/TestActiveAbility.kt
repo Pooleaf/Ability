@@ -28,7 +28,7 @@ class TestActiveAbility: Ability(), CastByItemHandler {
         type = AbilityType.ACTIVE
         description = listOf("철괴 우클릭 시 보고있는 지점에 번개가 칩니다.")
 
-        ban = false
+        ban = true
     }
 
     override val castItem: List<ItemStack> = listOf(ItemStack(Material.IRON_INGOT))

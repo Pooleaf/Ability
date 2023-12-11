@@ -161,7 +161,7 @@ class AbilityCommand {
         description = "능력 목록을 확인합니다."
     )
     fun ability_abilityList(sender: CommonCommandSender<CommandSender>, result: CommandResult) {
-        val abilities = AbilityApi.unsafe.abilityManager.abilities.sortedBy { it.fullName }
+        val abilities = AbilityApi.unsafe.abilityManager.getAbilities().sortedBy { it.fullName }
 
         object : PageableCommand<Ability>(result.entered, abilities, 7) {
             override fun getHeaderColor(): CommonChatColor {
