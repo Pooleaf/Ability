@@ -1,10 +1,10 @@
 package net.pooleaf.ability.pack.physicalfightersreloaded.abilities
 
 import net.pooleaf.ability.AbilityApi
-import net.pooleaf.ability.AbilityPlugin
 import net.pooleaf.ability.ability.Ability
 import net.pooleaf.ability.ability.AbilityRank
 import net.pooleaf.ability.ability.AbilityType
+import net.pooleaf.ability.pack.physicalfightersreloaded.PhysicalFightersReloadedPlugin
 import org.bukkit.Material
 import org.bukkit.entity.Arrow
 import org.bukkit.event.EventHandler
@@ -19,7 +19,7 @@ import org.bukkit.event.player.PlayerInteractEvent
 class RingOfIsotar : Ability(), Listener {
 
     init {
-        pluginName = AbilityPlugin.instance.name
+        pluginName = PhysicalFightersReloadedPlugin.instance.name
 
         name = "이슈타르의 링"
         rank = AbilityRank.SS

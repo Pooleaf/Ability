@@ -1,7 +1,6 @@
 package net.pooleaf.ability.pack.physicalfightersreloaded.abilities
 
 import net.pooleaf.ability.AbilityApi
-import net.pooleaf.ability.AbilityPlugin
 import net.pooleaf.ability.ability.Ability
 import net.pooleaf.ability.ability.AbilityRank
 import net.pooleaf.ability.ability.AbilityType
@@ -25,7 +24,7 @@ class Yasuo : Ability(), Listener {
     var task: BukkitTask? = null
 
     init {
-        pluginName = AbilityPlugin.instance.name
+        pluginName = PhysicalFightersReloadedPlugin.instance.name
 
         name = "야스오"
         rank = AbilityRank.A

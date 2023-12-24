@@ -1,11 +1,11 @@
 package net.pooleaf.ability.pack.physicalfightersreloaded.abilities
 
 import net.pooleaf.ability.AbilityApi
-import net.pooleaf.ability.AbilityPlugin
 import net.pooleaf.ability.ability.*
 import net.pooleaf.ability.ability.cast.CastByItemHandler
 import net.pooleaf.ability.ability.timer.CoolDownTimer
 import net.pooleaf.ability.ability.timer.DurationTimer
+import net.pooleaf.ability.pack.physicalfightersreloaded.PhysicalFightersReloadedPlugin
 import net.pooleaf.core.modules.support.bukkit.util.BukkitBroadcaster
 import org.bukkit.Material
 import org.bukkit.entity.LivingEntity
@@ -18,7 +18,7 @@ import org.bukkit.inventory.ItemStack
 class AttackReflex : Ability(), Listener, CastByItemHandler, Cooldownable, Durationable {
 
     init {
-        pluginName = AbilityPlugin.instance.name
+        pluginName = PhysicalFightersReloadedPlugin.instance.name
 
         name = "공격반사"
         rank = AbilityRank.A

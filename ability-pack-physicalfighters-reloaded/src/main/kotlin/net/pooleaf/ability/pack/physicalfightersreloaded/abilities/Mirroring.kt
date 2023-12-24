@@ -1,7 +1,6 @@
 package net.pooleaf.ability.pack.physicalfightersreloaded.abilities
 
 import net.pooleaf.ability.AbilityApi
-import net.pooleaf.ability.AbilityPlugin
 import net.pooleaf.ability.ability.Ability
 import net.pooleaf.ability.ability.AbilityRank
 import net.pooleaf.ability.ability.AbilityType
@@ -16,7 +15,7 @@ import org.bukkit.event.Listener
 class Mirroring : Ability(), Listener {
 
     init {
-        pluginName = AbilityPlugin.instance.name
+        pluginName = PhysicalFightersReloadedPlugin.instance.name
 
         name = "미러링"
         rank = AbilityRank.S

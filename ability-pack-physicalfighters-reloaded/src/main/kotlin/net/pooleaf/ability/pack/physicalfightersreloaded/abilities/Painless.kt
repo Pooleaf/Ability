@@ -1,10 +1,10 @@
 package net.pooleaf.ability.pack.physicalfightersreloaded.abilities
 
 import net.pooleaf.ability.AbilityApi
-import net.pooleaf.ability.AbilityPlugin
 import net.pooleaf.ability.ability.Ability
 import net.pooleaf.ability.ability.AbilityRank
 import net.pooleaf.ability.ability.AbilityType
+import net.pooleaf.ability.pack.physicalfightersreloaded.PhysicalFightersReloadedPlugin
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageByEntityEvent
@@ -16,7 +16,7 @@ class Painless : Ability(), Listener {
     private var damaged2 = false
 
     init {
-        pluginName = AbilityPlugin.instance.name
+        pluginName = PhysicalFightersReloadedPlugin.instance.name
 
         name = "무통증"
         rank = AbilityRank.B

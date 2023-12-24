@@ -1,18 +1,17 @@
 package net.pooleaf.ability.pack.physicalfightersreloaded.abilities
 
 import net.pooleaf.ability.AbilityApi
-import net.pooleaf.ability.AbilityPlugin
 import net.pooleaf.ability.ability.Ability
 import net.pooleaf.ability.ability.AbilityRank
 import net.pooleaf.ability.ability.AbilityType
 import net.pooleaf.ability.ability.Cooldownable
 import net.pooleaf.ability.ability.timer.CoolDownTimer
+import net.pooleaf.ability.pack.physicalfightersreloaded.PhysicalFightersReloadedPlugin
 import org.bukkit.Material
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
 import org.bukkit.event.entity.EntityDamageByEntityEvent
-import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.inventory.ItemStack
@@ -23,9 +22,9 @@ class Nasus : Ability(), Listener, Cooldownable {
     private var stack = 0
 
     init {
-        pluginName = AbilityPlugin.instance.name
+        pluginName = PhysicalFightersReloadedPlugin.instance.name
 
-        name = "이지스"
+        name = "나서스"
         rank = AbilityRank.C
         type = AbilityType.ACTIVE
         description = listOf(
@@ -88,8 +87,7 @@ class Nasus : Ability(), Listener, Cooldownable {
 
     private fun giveItem() {
         if (player?.player != null) {
-            player?.player!!.inventory.addItem(ItemStack(Material.BOW))
-            player?.player!!.inventory.addItem(ItemStack(Material.ARROW, 64))
+            player?.player!!.inventory.addItem(ItemStack(Material.WOOD_HOE))
             isReceiveAbilityItem = true
         }
     }

@@ -1,13 +1,13 @@
 package net.pooleaf.ability.pack.physicalfightersreloaded.abilities
 
 import net.pooleaf.ability.AbilityApi
-import net.pooleaf.ability.AbilityPlugin
 import net.pooleaf.ability.ability.Ability
 import net.pooleaf.ability.ability.AbilityRank
 import net.pooleaf.ability.ability.AbilityType
 import net.pooleaf.ability.ability.Cooldownable
 import net.pooleaf.ability.ability.cast.CastByItemHandler
 import net.pooleaf.ability.ability.timer.CoolDownTimer
+import net.pooleaf.ability.pack.physicalfightersreloaded.PhysicalFightersReloadedPlugin
 import org.bukkit.Material
 import org.bukkit.entity.Arrow
 import org.bukkit.event.EventHandler
@@ -19,7 +19,7 @@ import org.bukkit.inventory.ItemStack
 class Ninja : Ability(), Listener, CastByItemHandler, Cooldownable {
 
     init {
-        pluginName = AbilityPlugin.instance.name
+        pluginName = PhysicalFightersReloadedPlugin.instance.name
 
         name = "닌자"
         rank = AbilityRank.A
@@ -47,8 +47,11 @@ class Ninja : Ability(), Listener, CastByItemHandler, Cooldownable {
         clickType: CastByItemHandler.ClickType
     ): Boolean {
         val arrow = event.player.launchProjectile(Arrow::class.java, event.player.location.direction)
-        arrow.velocity = arrow.velocity.multiply(8)
-        if (Math.random() < 0.3) {
+        arrow.velocity = arrow.velocity.multiply(5)
+
+        val random = Math.random()
+        arrow.customName = random.toString()
+        if (random < 0.3) {
             arrow.fireTicks = 20
         }
 
@@ -60,11 +63,13 @@ class Ninja : Ability(), Listener, CastByItemHandler, Cooldownable {
         if (!AbilityApi.game.isGameStarted || AbilityApi.game.isGodMode) return
         if (event.damager !is Arrow || (event.damager as Arrow).shooter != player?.player) return
 
-        if (Math.random() < 0.6) {
+        val random = event.damager.customName?.toDoubleOrNull() ?: return
+
+        if (0.3 <= random && 0.9 < random) {
             cooldownTimer.cancel()
             player?.sendMessageSafely("§e쿨타임이 초기화되었습니다.")
         }
-        if (Math.random() < 0.1) {
+        if (0.9 <= random) {
             event.entity.world.createExplosion(event.entity.location, 4.0F)
         }
     }

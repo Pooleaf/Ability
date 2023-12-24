@@ -1,12 +1,12 @@
 package net.pooleaf.ability.pack.physicalfightersreloaded.abilities
 
 import net.pooleaf.ability.AbilityApi
-import net.pooleaf.ability.AbilityPlugin
 import net.pooleaf.ability.ability.Ability
 import net.pooleaf.ability.ability.AbilityRank
 import net.pooleaf.ability.ability.AbilityType
 import net.pooleaf.ability.ability.Cooldownable
 import net.pooleaf.ability.ability.timer.CoolDownTimer
+import net.pooleaf.ability.pack.physicalfightersreloaded.PhysicalFightersReloadedPlugin
 import org.bukkit.Material
 import org.bukkit.entity.Arrow
 import org.bukkit.entity.Player
@@ -21,7 +21,7 @@ class MultiShot : Ability(), Listener, Cooldownable {
     private var isReceiveAbilityItem = false
 
     init {
-        pluginName = AbilityPlugin.instance.name
+        pluginName = PhysicalFightersReloadedPlugin.instance.name
 
         name = "멀티샷"
         rank = AbilityRank.A
@@ -58,12 +58,12 @@ class MultiShot : Ability(), Listener, Cooldownable {
 
         val arrow = event.entity as Arrow
         for (i in 0..9) {
-            val copy = (event.entity.shooter as Player).world.spawnArrow(event.entity.location, event.entity.velocity, 1.5f, 10f)
+            val copy = (event.entity.shooter as Player).world.spawnArrow(event.entity.location, event.entity.velocity, 1.5F, 10.0F)
             copy.spigot().damage = arrow.spigot().damage
             copy.isCritical = arrow.isCritical
             copy.knockbackStrength = arrow.knockbackStrength
             copy.fireTicks = arrow.fireTicks
-            copy.shooter = event.entity.shooter
+            copy.shooter = arrow.shooter
         }
 
         cooldownTimer.start()

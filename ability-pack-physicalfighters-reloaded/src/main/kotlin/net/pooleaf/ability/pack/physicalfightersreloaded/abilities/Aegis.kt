@@ -1,11 +1,11 @@
 package net.pooleaf.ability.pack.physicalfightersreloaded.abilities
 
 import net.pooleaf.ability.AbilityApi
-import net.pooleaf.ability.AbilityPlugin
 import net.pooleaf.ability.ability.*
 import net.pooleaf.ability.ability.cast.CastByItemHandler
 import net.pooleaf.ability.ability.timer.CoolDownTimer
 import net.pooleaf.ability.ability.timer.DurationTimer
+import net.pooleaf.ability.pack.physicalfightersreloaded.PhysicalFightersReloadedPlugin
 import org.bukkit.Material
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -16,7 +16,7 @@ import org.bukkit.inventory.ItemStack
 class Aegis : Ability(), Listener, CastByItemHandler, Cooldownable, Durationable {
 
     init {
-        pluginName = AbilityPlugin.instance.name
+        pluginName = PhysicalFightersReloadedPlugin.instance.name
 
         name = "이지스"
         rank = AbilityRank.A

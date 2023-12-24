@@ -1,8 +1,10 @@
 package net.pooleaf.ability.pack.physicalfightersreloaded.abilities
 
 import net.pooleaf.ability.AbilityApi
-import net.pooleaf.ability.AbilityPlugin
-import net.pooleaf.ability.ability.*
+import net.pooleaf.ability.ability.Ability
+import net.pooleaf.ability.ability.AbilityRank
+import net.pooleaf.ability.ability.AbilityType
+import net.pooleaf.ability.pack.physicalfightersreloaded.PhysicalFightersReloadedPlugin
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -12,7 +14,7 @@ import org.bukkit.event.entity.FoodLevelChangeEvent
 class Anorexia : Ability(), Listener {
 
     init {
-        pluginName = AbilityPlugin.instance.name
+        pluginName = PhysicalFightersReloadedPlugin.instance.name
 
         name = "거식증"
         rank = AbilityRank.A

@@ -1,11 +1,13 @@
 package net.pooleaf.ability.pack.physicalfightersreloaded.abilities
 
+import kotlinx.coroutines.launch
 import net.pooleaf.ability.AbilityApi
-import net.pooleaf.ability.AbilityPlugin
 import net.pooleaf.ability.ability.*
 import net.pooleaf.ability.ability.cast.CastByItemHandler
 import net.pooleaf.ability.ability.timer.CoolDownTimer
 import net.pooleaf.ability.ability.timer.DurationTimer
+import net.pooleaf.ability.pack.physicalfightersreloaded.PhysicalFightersReloadedPlugin
+import net.pooleaf.core.modules.coroutine.bukkit.BukkitSyncScope
 import org.bukkit.Material
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -18,7 +20,7 @@ import org.bukkit.inventory.ItemStack
 class Fly : Ability(), Listener, CastByItemHandler, Cooldownable, Durationable {
 
     init {
-        pluginName = AbilityPlugin.instance.name
+        pluginName = PhysicalFightersReloadedPlugin.instance.name
 
         name = "플라이"
         rank = AbilityRank.S
@@ -39,19 +41,23 @@ class Fly : Ability(), Listener, CastByItemHandler, Cooldownable, Durationable {
         override fun onStart() {
             super.onStart()
 
-            if (player?.player == null) return
+            BukkitSyncScope.launch {
+                if (player?.player == null) return@launch
 
-            player?.player!!.allowFlight = true
-            player?.player!!.isFlying = true
+                player?.player!!.allowFlight = true
+                player?.player!!.isFlying = true
+            }
         }
 
         override fun onEnd() {
             super.onEnd()
 
-            if (player?.player == null) return
+            BukkitSyncScope.launch {
+                if (player?.player == null) return@launch
 
-            player?.player!!.allowFlight = false
-            player?.player!!.isFlying = false
+                player?.player!!.allowFlight = false
+                player?.player!!.isFlying = false
+            }
         }
     }
 
@@ -67,7 +73,7 @@ class Fly : Ability(), Listener, CastByItemHandler, Cooldownable, Durationable {
     @EventHandler
     fun onDamage(event: EntityDamageEvent) {
         if (!AbilityApi.game.isGameStarted || AbilityApi.game.isGodMode) return
-        if (player?.player != event.entity || !durationTimer.isRunning) return
+        if (player?.player != event.entity) return
         if (event.cause != EntityDamageEvent.DamageCause.FALL) return
 
         event.isCancelled = true

@@ -1,16 +1,16 @@
 package net.pooleaf.ability.pack.physicalfightersreloaded.abilities
 
-import net.pooleaf.ability.AbilityApi
-import net.pooleaf.ability.AbilityPlugin
+import kotlinx.coroutines.launch
 import net.pooleaf.ability.ability.*
 import net.pooleaf.ability.ability.cast.CastByItemHandler
 import net.pooleaf.ability.ability.timer.CoolDownTimer
 import net.pooleaf.ability.ability.timer.DurationTimer
+import net.pooleaf.ability.pack.physicalfightersreloaded.PhysicalFightersReloadedPlugin
+import net.pooleaf.core.modules.coroutine.bukkit.BukkitSyncScope
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
-import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
@@ -19,7 +19,7 @@ import org.bukkit.inventory.ItemStack
 class Clocking : Ability(), Listener, CastByItemHandler, Cooldownable, Durationable {
 
     init {
-        pluginName = AbilityPlugin.instance.name
+        pluginName = PhysicalFightersReloadedPlugin.instance.name
 
         name = "클로킹"
         rank = AbilityRank.A
@@ -39,15 +39,19 @@ class Clocking : Ability(), Listener, CastByItemHandler, Cooldownable, Durationa
         override fun onStart() {
             super.onStart()
 
-            if (player?.player == null) return
-            Bukkit.getOnlinePlayers().forEach { it.hidePlayer(player?.player) }
+            BukkitSyncScope.launch {
+                if (player?.player == null) return@launch
+                Bukkit.getOnlinePlayers().forEach { it.hidePlayer(player?.player) }
+            }
         }
 
         override fun onEnd() {
             super.onEnd()
 
-            if (player?.player == null) return
-            Bukkit.getOnlinePlayers().forEach { it.showPlayer(player?.player) }
+            BukkitSyncScope.launch {
+                if (player?.player == null) return@launch
+                Bukkit.getOnlinePlayers().forEach { it.showPlayer(player?.player) }
+            }
         }
     }
 

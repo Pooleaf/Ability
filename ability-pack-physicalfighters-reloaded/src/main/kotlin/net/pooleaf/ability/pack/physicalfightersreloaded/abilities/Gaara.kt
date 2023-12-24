@@ -1,6 +1,5 @@
 package net.pooleaf.ability.pack.physicalfightersreloaded.abilities
 
-import net.pooleaf.ability.AbilityPlugin
 import net.pooleaf.ability.ability.Ability
 import net.pooleaf.ability.ability.AbilityRank
 import net.pooleaf.ability.ability.AbilityType
@@ -18,7 +17,7 @@ import org.bukkit.inventory.ItemStack
 class Gaara : Ability(), Listener, CastByItemHandler, Cooldownable {
 
     init {
-        pluginName = AbilityPlugin.instance.name
+        pluginName = PhysicalFightersReloadedPlugin.instance.name
 
         name = "가아라"
         rank = AbilityRank.A
@@ -41,7 +40,7 @@ class Gaara : Ability(), Listener, CastByItemHandler, Cooldownable {
         item: ItemStack,
         clickType: CastByItemHandler.ClickType
     ): Boolean {
-        val targetBlock = event.player.getTargetBlock(null as Set<Material>, 40)
+        val targetBlock = event.player.getTargetBlock(null as Set<Material>?, 40)
         if (targetBlock == null) {
             event.player.sendWarning("거리가 너무 멉니다.")
             return false
