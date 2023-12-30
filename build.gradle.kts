@@ -26,6 +26,7 @@ allprojects {
         compileOnly("net.pooleaf:core:latest.integration")
         compileOnly("net.pooleaf:game-core:latest.integration")
         compileOnly("net.pooleaf:game-replay:latest.integration")
+        compileOnly("net.pooleaf:permission:latest.integration")
 
         // Bukkit Library
         compileOnly("com.comphenix.protocol:ProtocolLib:4.7.0")
