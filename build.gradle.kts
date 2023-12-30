@@ -23,9 +23,9 @@ allprojects {
         compileOnly("io.papermc:paper:1.8.8")
 
         // Core
-        compileOnly("net.pooleaf:core:1.65.2")
-        compileOnly("net.pooleaf:game-core:1.3.2")
-        compileOnly("net.pooleaf:game-replay:1.1.0")
+        compileOnly("net.pooleaf:core:latest.integration")
+        compileOnly("net.pooleaf:game-core:latest.integration")
+        compileOnly("net.pooleaf:game-replay:latest.integration")
 
         // Bukkit Library
         compileOnly("com.comphenix.protocol:ProtocolLib:4.7.0")
