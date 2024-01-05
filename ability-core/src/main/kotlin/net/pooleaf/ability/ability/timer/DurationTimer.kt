@@ -1,5 +1,6 @@
 package net.pooleaf.ability.ability.timer
 
+import com.cryptomorin.xseries.XSound
 import net.pooleaf.ability.ability.Ability
 import net.pooleaf.ability.ability.Cooldownable
 import net.pooleaf.ability.event.ability.AbilityCooldownStartEvent
@@ -25,6 +26,12 @@ open class DurationTimer(
 
     override fun onRun() {
         showRemainingTimeActionBar()
+
+        // 3초 이하일 때 효과음
+        val remainingTimeMillis = remainingTimeMillis
+        if (remainingTimeMillis != null && remainingTimeMillis % 1000 < 100 && remainingTimeMillis < 4_000L) {
+            ability.player?.playSoundSafely(XSound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.4F, 1.0F)
+        }
     }
 
     override fun onEnd() {
@@ -36,6 +43,9 @@ open class DurationTimer(
             (ability as Cooldownable).cooldownTimer.start()
         }
 
+        // 종료 효과음
+        // TODO ability.player?.playSoundSafely(XSound.BLOCK_ANVIL_BREAK, 0.4F, 1.0F)
+
         // 이벤트
         Bukkit.getPluginManager().callEvent(AbilityDurationEndEvent(ability.player!!, ability))
     }
@@ -45,8 +55,10 @@ open class DurationTimer(
             val time = remainingTimeMillis?.let { remainingTimeMillis ->
                 when {
                     remainingTimeMillis <= 0 -> 0
+
                     // 10초보다 작으면 소수점까지 표기
                     remainingTimeMillis < 10_000L -> "${String.format("%.1f", remainingTimeMillis.toFloat() / 1000)}§e초"
+
                     // 10보다 크면 시분초 표기
                     else -> StringUtil.buildTimeStringWithColor(remainingTimeMillis, CommonChatColor.WHITE, CommonChatColor.GREEN)
                 }

@@ -1,5 +1,6 @@
 package net.pooleaf.ability.ability.timer
 
+import com.cryptomorin.xseries.XSound
 import net.pooleaf.ability.ability.Ability
 import net.pooleaf.ability.event.ability.AbilityCooldownEndEvent
 import net.pooleaf.ability.event.ability.AbilityCooldownStartEvent
@@ -22,10 +23,19 @@ open class CoolDownTimer(
 
     override fun onRun() {
         showRemainingTimeActionBar()
+
+        // 3초 이하일 때 효과음
+        val remainingTimeMillis = remainingTimeMillis
+        if (remainingTimeMillis != null && remainingTimeMillis % 1000 < 100 && remainingTimeMillis < 4_000L) {
+            ability.player?.playSoundSafely(XSound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.4F, 1.0F)
+        }
     }
 
     override fun onEnd() {
         showEndActionBar()
+
+        // 종료 효과음
+        // TODO ability.player?.playSoundSafely(XSound.ENTITY_ARROW_HIT, 0.4F, 1.0F)
 
         // 이벤트
         Bukkit.getPluginManager().callEvent(AbilityCooldownEndEvent(ability.player!!, ability))
