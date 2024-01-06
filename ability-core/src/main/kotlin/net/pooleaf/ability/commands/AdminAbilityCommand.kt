@@ -328,7 +328,7 @@ class AdminAbilityCommand {
             return
         }
 
-        val targetGamePlayer = if (result.argumentsLength > 1) {
+        val targetGamePlayer = if (result.argumentsLength > 0) {
             AbilityApi.unsafe.playerManager.getByName(result.getArgument(0))
         } else {
             AbilityApi.unsafe.playerManager.get((sender as CommonPlayer).uuid)
