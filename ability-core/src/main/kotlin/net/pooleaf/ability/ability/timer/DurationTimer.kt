@@ -3,12 +3,11 @@ package net.pooleaf.ability.ability.timer
 import com.cryptomorin.xseries.XSound
 import net.pooleaf.ability.ability.Ability
 import net.pooleaf.ability.ability.Cooldownable
-import net.pooleaf.ability.event.ability.AbilityCooldownStartEvent
 import net.pooleaf.ability.event.ability.AbilityDurationEndEvent
 import net.pooleaf.ability.event.ability.AbilityDurationStartEvent
-import net.pooleaf.gamecore.utils.StringUtil
 import net.pooleaf.core.modules.gui.bukkit.actionbar.ActionBar
 import net.pooleaf.core.modules.support.common.CommonChatColor
+import net.pooleaf.gamecore.utils.StringUtil
 import org.bukkit.Bukkit
 
 open class DurationTimer(
@@ -28,9 +27,10 @@ open class DurationTimer(
         showRemainingTimeActionBar()
 
         // 3초 이하일 때 효과음
-        val remainingTimeMillis = remainingTimeMillis
-        if (remainingTimeMillis != null && remainingTimeMillis % 1000 < 100 && remainingTimeMillis < 4_000L) {
-            ability.player?.playSoundSafely(XSound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.4F, 1.0F)
+        val remainingTimeMillis = remainingTimeMillis ?: return
+        val remainingTime100Millis = Math.round(remainingTimeMillis.toFloat() / 100)
+        if (remainingTimeMillis != null && remainingTime100Millis % 10 == 0 && remainingTime100Millis > 0 && remainingTime100Millis < 40) {
+            ability.player?.playSoundSafely(XSound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.4F, 1.0F - ((3 - (remainingTime100Millis / 10)) * 0.05F))
         }
     }
 
@@ -44,7 +44,7 @@ open class DurationTimer(
         }
 
         // 종료 효과음
-        // TODO ability.player?.playSoundSafely(XSound.BLOCK_ANVIL_BREAK, 0.4F, 1.0F)
+        ability.player?.playSoundSafely(XSound.ENTITY_ITEM_BREAK, 0.4F, 0.5F)
 
         // 이벤트
         Bukkit.getPluginManager().callEvent(AbilityDurationEndEvent(ability.player!!, ability))

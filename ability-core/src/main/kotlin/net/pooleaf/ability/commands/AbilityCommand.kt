@@ -2,7 +2,6 @@ package net.pooleaf.ability.commands
 
 import kotlinx.coroutines.launch
 import net.pooleaf.ability.AbilityApi
-import net.pooleaf.ability.AbilityPermission
 import net.pooleaf.ability.ability.Ability
 import net.pooleaf.ability.phases.AbilityDrawPhase
 import net.pooleaf.core.modules.annocommand.common.Command
@@ -17,7 +16,6 @@ import net.pooleaf.core.modules.support.common.component.SimpleComponentBuilder
 import net.pooleaf.core.modules.support.common.pageable.PageableCommand
 import net.pooleaf.gamecore.GameCore
 import net.pooleaf.gamecore.commands.GameCommand
-import net.pooleaf.gamecore.kit.Kit
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 
@@ -26,7 +24,7 @@ class AbilityCommand {
     private val gameCommand = GameCommand()
 
     @Command(
-        name = ["능력자", "ability", "va", "ha", "ua"],
+        name = ["능력자", "ability", "va", "ha", "ua", "a"],
         description = "능력자 명령어 목록을 확인합니다.",
         helpCommand = true
     )
