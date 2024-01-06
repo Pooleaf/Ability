@@ -46,9 +46,7 @@ class Mirroring : Ability(), Listener {
         }
 
         // 미러링 발동이 후순위
-        Bukkit.getScheduler().runTaskLater(PhysicalFightersReloadedPlugin.instance, {
-            killerAbilityPlayer.player?.damage(5000.0, killerAbilityPlayer.player)
-        }, 1L)
+        killerAbilityPlayer.player?.damage(5000.0, player?.player)
     }
 
 }
