@@ -44,15 +44,15 @@ class Yasuo : Ability(), Listener {
 
         task = Bukkit.getScheduler().runTaskTimerAsynchronously(PhysicalFightersReloadedPlugin.instance, {
             val player = (player?.commonPlayer as BukkitPlayer)
-            if (player.absorptionHearts >= 6.0F) return@runTaskTimerAsynchronously
+            if (player != null && player.absorptionHearts >= 6.0F) return@runTaskTimerAsynchronously
 
             player.absorptionHearts = min(6.0, player.absorptionHearts + 2.0).toFloat()
         }, 10 * 20L, 10 * 20L)
     }
 
     override fun onResign() {
-        (player?.commonPlayer as BukkitPlayer).absorptionHearts = 0.0F
         task?.cancel()
+        (player?.commonPlayer as BukkitPlayer)?.absorptionHearts = 0.0F
     }
 
     @EventHandler
