@@ -105,6 +105,8 @@ class PhysicalFightersListener: Listener {
     fun excuteAbility(event: Event, eventDatas: List<EventData>) {
         if (!AbilityApi.unsafe.abilityService.canUseAbility()) return
 
+        val eventDatas = eventDatas.distinctBy { it.ab.GetAbilityName() }
+
         var b = false
         for (eventData in eventDatas) {
             for (ability in getAbilities(eventData.ab)) {

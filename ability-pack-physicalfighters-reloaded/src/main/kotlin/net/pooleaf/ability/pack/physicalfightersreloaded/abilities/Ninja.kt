@@ -8,6 +8,7 @@ import net.pooleaf.ability.ability.Cooldownable
 import net.pooleaf.ability.ability.cast.CastByItemHandler
 import net.pooleaf.ability.ability.timer.CoolDownTimer
 import net.pooleaf.ability.pack.physicalfightersreloaded.PhysicalFightersReloadedPlugin
+import net.pooleaf.core.modules.support.common.logger.Logger
 import org.bukkit.Material
 import org.bukkit.entity.Arrow
 import org.bukkit.event.EventHandler
@@ -55,6 +56,8 @@ class Ninja : Ability(), Listener, CastByItemHandler, Cooldownable {
             arrow.fireTicks = 20
         }
 
+        Logger.log("castRandom: ${random}")
+
         return true
     }
 
@@ -64,8 +67,9 @@ class Ninja : Ability(), Listener, CastByItemHandler, Cooldownable {
         if (event.damager !is Arrow || (event.damager as Arrow).shooter != player?.player) return
 
         val random = event.damager.customName?.toDoubleOrNull() ?: return
+        Logger.log("eventRandom: ${random}")
 
-        if (0.3 <= random && 0.9 < random) {
+        if (0.3 <= random && random < 0.9) {
             cooldownTimer.cancel()
             player?.sendMessageSafely("§e쿨타임이 초기화되었습니다.")
         }
