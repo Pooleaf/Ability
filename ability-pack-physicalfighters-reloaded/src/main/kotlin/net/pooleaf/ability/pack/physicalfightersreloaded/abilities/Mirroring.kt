@@ -8,7 +8,7 @@ import net.pooleaf.ability.pack.physicalfightersreloaded.PhysicalFightersReloade
 import net.pooleaf.ability.player.AbilityPlayer
 import net.pooleaf.core.modules.support.bukkit.util.BukkitBroadcaster
 import net.pooleaf.gamecore.events.player.GamePlayerDefeatEvent
-import org.bukkit.Bukkit
+import net.pooleaf.gamecore.utils.damageBypassAntiCheat
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 
@@ -31,8 +31,10 @@ class Mirroring : Ability(), Listener {
 
     @EventHandler
     fun onDeath(event: GamePlayerDefeatEvent) {
+        val player = player?.player
+
         if (!AbilityApi.game.isGameStarted || AbilityApi.game.isGodMode) return
-        if (player?.player != event.gamePlayer.player) return
+        if (player == null || player != event.gamePlayer.player) return
         if (event.killerGamePlayer == null || !event.killerGamePlayer!!.isPlaying()) return
 
         BukkitBroadcaster.broadcast("§f${event.gamePlayer.displayName} §e님의 미러링 능력이 발동되었습니다.")
@@ -46,7 +48,7 @@ class Mirroring : Ability(), Listener {
         }
 
         // 미러링 발동이 후순위
-        killerAbilityPlayer.player?.damage(5000.0, player?.player)
+        killerAbilityPlayer.player?.damageBypassAntiCheat(5000.0, player)
     }
 
 }

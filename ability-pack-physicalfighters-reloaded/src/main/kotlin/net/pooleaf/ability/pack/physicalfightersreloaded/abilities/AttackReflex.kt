@@ -7,6 +7,7 @@ import net.pooleaf.ability.ability.timer.CoolDownTimer
 import net.pooleaf.ability.ability.timer.DurationTimer
 import net.pooleaf.ability.pack.physicalfightersreloaded.PhysicalFightersReloadedPlugin
 import net.pooleaf.core.modules.support.bukkit.util.BukkitBroadcaster
+import net.pooleaf.gamecore.utils.damageBypassAntiCheat
 import org.bukkit.Material
 import org.bukkit.entity.LivingEntity
 import org.bukkit.event.EventHandler
@@ -48,10 +49,12 @@ class AttackReflex : Ability(), Listener, CastByItemHandler, Cooldownable, Durat
 
     @EventHandler
     fun onDamage(event: EntityDamageByEntityEvent) {
-        if (!AbilityApi.game.isGameStarted || AbilityApi.game.isGodMode) return
-        if (player?.player != event.entity || !durationTimer.isRunning || event.damager !is LivingEntity) return
+        val player = player?.player
 
-        (event.damager as LivingEntity).damage(event.damage, event.entity)
+        if (!AbilityApi.game.isGameStarted || AbilityApi.game.isGodMode) return
+        if (player == null || player != event.entity || !durationTimer.isRunning || event.damager !is LivingEntity) return
+
+        (event.damager as LivingEntity).damageBypassAntiCheat(event.damage, player)
         event.isCancelled = true
     }
 

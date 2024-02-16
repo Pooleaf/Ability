@@ -7,6 +7,7 @@ import net.pooleaf.ability.ability.Cooldownable
 import net.pooleaf.ability.ability.cast.CastByItemHandler
 import net.pooleaf.ability.ability.timer.CoolDownTimer
 import net.pooleaf.ability.pack.physicalfightersreloaded.PhysicalFightersReloadedPlugin
+import net.pooleaf.gamecore.utils.damageBypassAntiCheat
 import org.bukkit.Material
 import org.bukkit.entity.LivingEntity
 import org.bukkit.event.Listener
@@ -45,7 +46,7 @@ class ThunderBolt : Ability(), Listener, CastByItemHandler, Cooldownable {
             if (entity !is LivingEntity) return@forEach
 
             location.world.strikeLightningEffect(entity.location)
-            entity.damage(6.0)
+            entity.damageBypassAntiCheat(6.0, event.player)
         }
 
         return true

@@ -8,6 +8,7 @@ import net.pooleaf.ability.ability.timer.DurationTimer
 import net.pooleaf.ability.pack.physicalfightersreloaded.PhysicalFightersReloadedPlugin
 import net.pooleaf.core.modules.coroutine.bukkit.BukkitSyncScope
 import net.pooleaf.gamecore.GameCore
+import net.pooleaf.gamecore.utils.damageBypassAntiCheat
 import org.bukkit.Material
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
@@ -68,7 +69,7 @@ class Pagi : Ability(), CastByItemHandler, Cooldownable, Durationable {
             .filter { abilityPlayer.team != it.team }
             .filter { abilityPlayer.player.location.distance(it.player.player.location) <= 10 }
             .forEach {
-                it.player.damage(5.0, abilityPlayer.player)
+                it.player.damageBypassAntiCheat(5.0, abilityPlayer.player)
                 it.player.addPotionEffect(PotionEffect(PotionEffectType.CONFUSION, 30, 0), true)
             }
     }
