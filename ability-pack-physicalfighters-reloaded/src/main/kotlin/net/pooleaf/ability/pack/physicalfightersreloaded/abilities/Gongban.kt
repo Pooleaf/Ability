@@ -46,7 +46,7 @@ class Gongban : Ability(), Listener, CastByItemHandler, Cooldownable, Durationab
         item: ItemStack,
         clickType: CastByItemHandler.ClickType
     ): Boolean {
-        BukkitBroadcaster.broadcast("§e지금부터 5초간 §f${abilityPlayer?.displayName} §e님을 공격 시 데미지를 돌려받습니다.")
+        BukkitBroadcaster.broadcast("§e지금부터 5초간 §f${abilityPlayer?.displayName} §e님에게 가한 데미지가 반사됩니다.")
         return true
     }
 
