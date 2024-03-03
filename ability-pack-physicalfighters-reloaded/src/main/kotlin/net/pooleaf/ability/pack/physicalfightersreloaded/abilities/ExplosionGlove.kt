@@ -44,10 +44,10 @@ class ExplosionGlove : Ability(), CastByItemHandler, Cooldownable {
         clickType: CastByItemHandler.ClickType
     ): Boolean {
         val player = playerInteractEvent.player
-        player.world.createExplosion(player.location, 5.0F)
+//        player.world.createExplosion(player.location, 5.0F)
 
         GameCore.unsafe.playerManager.getOnlinePlayingPlayers()
-            .filter { it != abilityPlayer && it.player.location.distance(player.location) <= 15 }
+            .filter { it.uuid != player.uniqueId && it.player.location.distance(player.location) <= 15 }
             .forEach {
                 it.player.location.world.createExplosion(it.player.location, 3.0F)
                 it.player.damageBypassAntiCheat(14.0, player)

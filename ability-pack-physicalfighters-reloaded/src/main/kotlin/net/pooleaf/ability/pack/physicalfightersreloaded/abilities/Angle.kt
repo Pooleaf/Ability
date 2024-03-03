@@ -52,7 +52,7 @@ class Angle : Ability(), Listener, Cooldownable, Durationable {
     fun setTarget(event: EntityDamageByEntityEvent) {
         if (event.isCancelled) return
         if (!AbilityApi.game.isGameStarted || AbilityApi.game.isGodMode) return
-        if (cooldownTimer.remainingTimeMillis != 0L || durationTimer.isRunning) return
+        if (cooldownTimer.isRunning || durationTimer.isRunning) return
 
         val damager = event.damager
         val damaged = event.entity
@@ -74,7 +74,7 @@ class Angle : Ability(), Listener, Cooldownable, Durationable {
     fun absorbDamage(event: EntityDamageEvent) {
         if (event.isCancelled) return
         if (!AbilityApi.game.isGameStarted || AbilityApi.game.isGodMode) return
-        if (abilityPlayer?.player != event.entity) return
+        if (abilityPlayer?.uuid != event.entity.uniqueId) return
 
         val targetPlayer = targetPlayer
         if (!durationTimer.isRunning || targetPlayer == null || !targetPlayer.isOnline) return
@@ -87,7 +87,7 @@ class Angle : Ability(), Listener, Cooldownable, Durationable {
     fun cancelDamage(event: EntityDamageEvent) {
         if (event.isCancelled) return
         if (!AbilityApi.game.isGameStarted || AbilityApi.game.isGodMode) return
-        if (abilityPlayer?.player != event.entity) return
+        if (abilityPlayer?.player?.uniqueId != event.entity.uniqueId) return
 
         if (event.cause == EntityDamageEvent.DamageCause.POISON
             || event.cause == EntityDamageEvent.DamageCause.DROWNING
