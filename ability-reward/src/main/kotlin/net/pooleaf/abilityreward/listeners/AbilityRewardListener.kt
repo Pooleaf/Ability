@@ -1,8 +1,6 @@
 package net.pooleaf.abilityreward.listeners
 
-import kotlinx.coroutines.launch
 import net.pooleaf.abilityreward.AbilityRewardApi
-import net.pooleaf.core.modules.coroutine.bukkit.BukkitAsyncScope
 import net.pooleaf.gamecore.GameCore
 import net.pooleaf.gamecore.events.game.GameEndEvent
 import net.pooleaf.gamecore.events.player.GamePlayerDefeatEvent
