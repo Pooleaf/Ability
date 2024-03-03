@@ -93,7 +93,7 @@ class PhysicalFightersCompatAbility: CompatAbility<AbilityBase>(), Cooldownable,
     override fun onAssign() {
         BukkitSyncScope.launch {
             convertFromOriginalAbility()
-            originalAbility?.SetPlayer(player?.player,  false)
+            originalAbility?.SetPlayer(abilityPlayer?.player,  false)
         }
     }
 

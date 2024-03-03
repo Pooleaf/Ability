@@ -61,13 +61,13 @@ class Ninja : Ability(), Listener, CastByItemHandler, Cooldownable {
     @EventHandler
     fun onArrowHit(event: EntityDamageByEntityEvent) {
         if (!AbilityApi.game.isGameStarted || AbilityApi.game.isGodMode) return
-        if (event.damager !is Arrow || (event.damager as Arrow).shooter != player?.player) return
+        if (event.damager !is Arrow || (event.damager as Arrow).shooter != abilityPlayer?.player) return
 
         val random = event.damager.customName?.toDoubleOrNull() ?: return
 
         if (0.3 <= random && random < 0.9) {
             cooldownTimer.cancel()
-            player?.sendMessageSafely("§e쿨타임이 초기화되었습니다.")
+            abilityPlayer?.sendMessageSafely("§e쿨타임이 초기화되었습니다.")
         }
         if (0.9 <= random) {
             event.entity.world.createExplosion(event.entity.location, 4.0F)

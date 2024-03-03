@@ -44,7 +44,7 @@ class MultiShot : Ability(), Listener, Cooldownable {
     @EventHandler
     fun onJoin(event: PlayerJoinEvent) {
         if (!AbilityApi.game.isGameStarted || AbilityApi.game.isGodMode) return
-        if (player?.player != event.player) return
+        if (abilityPlayer?.player != event.player) return
 
         if (!isReceiveAbilityItem) {
             giveItem()
@@ -54,7 +54,7 @@ class MultiShot : Ability(), Listener, Cooldownable {
     @EventHandler
     fun onProjectileLaunch(event: ProjectileLaunchEvent) {
         if (!AbilityApi.game.isGameStarted || AbilityApi.game.isGodMode) return
-        if (player?.player != event.entity.shooter || event.entity !is Arrow || cooldownTimer.isRunning) return
+        if (abilityPlayer?.player != event.entity.shooter || event.entity !is Arrow || cooldownTimer.isRunning) return
 
         val arrow = event.entity as Arrow
         for (i in 0..9) {
@@ -70,9 +70,9 @@ class MultiShot : Ability(), Listener, Cooldownable {
     }
 
     private fun giveItem() {
-        if (player?.player != null) {
-            player?.player!!.inventory.addItem(ItemStack(Material.BOW))
-            player?.player!!.inventory.addItem(ItemStack(Material.ARROW, 64))
+        if (abilityPlayer?.player != null) {
+            abilityPlayer?.player!!.inventory.addItem(ItemStack(Material.BOW))
+            abilityPlayer?.player!!.inventory.addItem(ItemStack(Material.ARROW, 64))
             isReceiveAbilityItem = true
         }
     }

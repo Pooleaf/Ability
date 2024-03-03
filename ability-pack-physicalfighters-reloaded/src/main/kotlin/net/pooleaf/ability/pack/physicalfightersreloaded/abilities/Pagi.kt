@@ -63,7 +63,7 @@ class Pagi : Ability(), CastByItemHandler, Cooldownable, Durationable {
     }
 
     private fun damageNearPlayers() {
-        val abilityPlayer = player ?: return
+        val abilityPlayer = abilityPlayer ?: return
 
         GameCore.unsafe.playerManager.getOnlinePlayingPlayers()
             .filter { abilityPlayer.team != it.team }

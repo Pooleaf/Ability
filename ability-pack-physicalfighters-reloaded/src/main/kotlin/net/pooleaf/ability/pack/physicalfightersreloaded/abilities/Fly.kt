@@ -42,10 +42,10 @@ class Fly : Ability(), Listener, CastByItemHandler, Cooldownable, Durationable {
             super.onStart()
 
             BukkitSyncScope.launch {
-                if (player?.player == null) return@launch
+                if (abilityPlayer?.player == null) return@launch
 
-                player?.player!!.allowFlight = true
-                player?.player!!.isFlying = true
+                abilityPlayer?.player!!.allowFlight = true
+                abilityPlayer?.player!!.isFlying = true
             }
         }
 
@@ -53,10 +53,10 @@ class Fly : Ability(), Listener, CastByItemHandler, Cooldownable, Durationable {
             super.onEnd()
 
             BukkitSyncScope.launch {
-                if (player?.player == null) return@launch
+                if (abilityPlayer?.player == null) return@launch
 
-                player?.player!!.allowFlight = false
-                player?.player!!.isFlying = false
+                abilityPlayer?.player!!.allowFlight = false
+                abilityPlayer?.player!!.isFlying = false
             }
         }
     }
@@ -73,7 +73,7 @@ class Fly : Ability(), Listener, CastByItemHandler, Cooldownable, Durationable {
     @EventHandler
     fun onDamage(event: EntityDamageEvent) {
         if (!AbilityApi.game.isGameStarted || AbilityApi.game.isGodMode) return
-        if (player?.player != event.entity) return
+        if (abilityPlayer?.player != event.entity) return
         if (event.cause != EntityDamageEvent.DamageCause.FALL) return
 
         event.isCancelled = true
@@ -81,20 +81,20 @@ class Fly : Ability(), Listener, CastByItemHandler, Cooldownable, Durationable {
 
     @EventHandler
     fun onJoin(event: PlayerJoinEvent) {
-        if (player?.player == null) return
+        if (abilityPlayer?.player == null) return
 
         if (durationTimer.isRunning) {
-            player?.player!!.allowFlight = true
-            player?.player!!.isFlying = true
+            abilityPlayer?.player!!.allowFlight = true
+            abilityPlayer?.player!!.isFlying = true
         }
     }
 
     @EventHandler
     fun onQuit(event: PlayerQuitEvent) {
-        if (player?.player == null) return
+        if (abilityPlayer?.player == null) return
 
-        player?.player!!.allowFlight = false
-        player?.player!!.isFlying = false
+        abilityPlayer?.player!!.allowFlight = false
+        abilityPlayer?.player!!.isFlying = false
     }
 
 }

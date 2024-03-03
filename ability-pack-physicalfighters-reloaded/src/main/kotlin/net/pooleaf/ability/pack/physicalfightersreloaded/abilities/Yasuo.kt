@@ -40,10 +40,10 @@ class Yasuo : Ability(), Listener {
 
 
     override fun onAssign() {
-        (player?.commonPlayer as BukkitPlayer).absorptionHearts = 6.0F
+        (abilityPlayer?.commonPlayer as BukkitPlayer).absorptionHearts = 6.0F
 
         task = Bukkit.getScheduler().runTaskTimerAsynchronously(PhysicalFightersReloadedPlugin.instance, {
-            val player = (player?.commonPlayer as BukkitPlayer)
+            val player = (abilityPlayer?.commonPlayer as BukkitPlayer)
             if (player != null && player.absorptionHearts >= 6.0F) return@runTaskTimerAsynchronously
 
             player.absorptionHearts = min(6.0, player.absorptionHearts + 2.0).toFloat()
@@ -52,13 +52,13 @@ class Yasuo : Ability(), Listener {
 
     override fun onResign() {
         task?.cancel()
-        (player?.commonPlayer as BukkitPlayer)?.absorptionHearts = 0.0F
+        (abilityPlayer?.commonPlayer as BukkitPlayer)?.absorptionHearts = 0.0F
     }
 
     @EventHandler
     fun onHit(event: EntityDamageByEntityEvent) {
         if (!AbilityApi.game.isGameStarted || AbilityApi.game.isGodMode) return
-        if (player?.player != event.damager) return
+        if (abilityPlayer?.player != event.damager) return
 
         event.damage += 2
     }
@@ -66,9 +66,9 @@ class Yasuo : Ability(), Listener {
     @EventHandler
     fun onQuit(event: PlayerQuitEvent) {
         if (!AbilityApi.game.isGameStarted || AbilityApi.game.isGodMode) return
-        if (player?.player != event.player) return
+        if (abilityPlayer?.player != event.player) return
 
-        (player?.commonPlayer as BukkitPlayer).absorptionHearts = 0.0F
+        (abilityPlayer?.commonPlayer as BukkitPlayer).absorptionHearts = 0.0F
     }
 
 }

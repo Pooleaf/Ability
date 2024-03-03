@@ -36,6 +36,11 @@ tasks {
 //        into("D:\\서버\\1.8.9 LeafServer S6\\replay.1\\update")
         into("D:\\서버\\1.8.9 LeafServer S6\\.plugin_build")
     }
+
+    register<Copy>("copyToServerMac") {
+        from(shadowJar)
+        into("~/Desktop/MCServer/city.ability.pf.1/plugins")
+    }
 }
 
 publishing {

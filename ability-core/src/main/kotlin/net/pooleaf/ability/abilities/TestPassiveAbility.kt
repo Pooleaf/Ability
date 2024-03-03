@@ -29,7 +29,7 @@ class TestPassiveAbility: Ability(), Cooldownable, Listener {
     fun onPlayerDamageByEntity(event: PlayerDamageByEntityEvent) {
         if (!canUse()) return
 
-        player?.player?.let { player ->
+        abilityPlayer?.player?.let { player ->
             // 플레이어 체크
             if (!event.player.equals(player)) return
 

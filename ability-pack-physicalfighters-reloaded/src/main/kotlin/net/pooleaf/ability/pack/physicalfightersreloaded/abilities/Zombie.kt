@@ -35,7 +35,7 @@ class Zombie : Ability(), Listener {
     @EventHandler(priority = EventPriority.HIGH)
     fun onEntityDamage(event: EntityDamageEvent) {
         if (!AbilityApi.game.isGameStarted || AbilityApi.game.isGodMode) return
-        if (player?.player != event.entity) return
+        if (abilityPlayer?.player != event.entity) return
 
         when (event.cause) {
             // 불 데미지 8배

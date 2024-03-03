@@ -41,7 +41,7 @@ class Time : Ability(), Listener, CastByItemHandler, Cooldownable, Durationable 
         override fun onStart() {
             super.onStart()
 
-            BukkitBroadcaster.broadcast("§f${player?.displayName} §e님께서 타임 능력을 사용했습니다.")
+            BukkitBroadcaster.broadcast("§f${abilityPlayer?.displayName} §e님께서 타임 능력을 사용했습니다.")
         }
 
         override fun onEnd() {
@@ -63,7 +63,7 @@ class Time : Ability(), Listener, CastByItemHandler, Cooldownable, Durationable 
     @EventHandler
     fun onMove(event: PlayerMoveEvent) {
         if (!AbilityApi.game.isGameStarted || AbilityApi.game.isGodMode) return
-        if (player?.player == event.player || !durationTimer.isRunning) return
+        if (abilityPlayer?.player == event.player || !durationTimer.isRunning) return
 
         val gamePlayer = AbilityApi.unsafe.playerManager.get(event.player.uniqueId) ?: return
         if (!gamePlayer.isPlaying()) return

@@ -36,7 +36,7 @@ class RingOfIsotar : Ability(), Listener {
     @EventHandler
     fun onInteract(event: PlayerInteractEvent) {
         if (!AbilityApi.game.isGameStarted || AbilityApi.game.isGodMode) return
-        if (player?.player != event.player || event.player.itemInHand == null || event.player.itemInHand.type != Material.IRON_INGOT) return
+        if (abilityPlayer?.player != event.player || event.player.itemInHand == null || event.player.itemInHand.type != Material.IRON_INGOT) return
 
         val arrow1 = event.player.launchProjectile(Arrow::class.java)
         arrow1.velocity = arrow1.velocity.multiply(3)
@@ -46,13 +46,13 @@ class RingOfIsotar : Ability(), Listener {
 
     @EventHandler
     fun onArrowDamage(event: EntityDamageByEntityEvent) {
-        if (event.damager !is Arrow || (event.damager as Arrow).shooter != player?.player) return
+        if (event.damager !is Arrow || (event.damager as Arrow).shooter != abilityPlayer?.player) return
         event.damage = 4.0
     }
 
     @EventHandler
     fun onArrowHit(event: ProjectileHitEvent) {
-        if (event.entity.shooter != player?.player) return
+        if (event.entity.shooter != abilityPlayer?.player) return
         event.entity.remove()
     }
 

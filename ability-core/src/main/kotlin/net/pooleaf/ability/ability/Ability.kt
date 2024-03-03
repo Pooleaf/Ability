@@ -36,7 +36,7 @@ open class Ability {
         protected set
 
     // 할당 받은 플레이어
-    var player: AbilityPlayer? = null
+    var abilityPlayer: AbilityPlayer? = null
 
     // 능력 밴 여부
     open var ban: Boolean = false
@@ -61,11 +61,11 @@ open class Ability {
      */
     fun assign(player: AbilityPlayer) {
         // 이미 플레이어가 존재할 경우 할당 해제
-        if (this.player != null) {
+        if (this.abilityPlayer != null) {
             resign()
         }
 
-        this.player = player
+        this.abilityPlayer = player
 
         onAssign()
 
@@ -75,10 +75,10 @@ open class Ability {
     }
 
     /**
-     * [player]에게서 [Ability] 할당을 해제합니다.
+     * [abilityPlayer]에게서 [Ability] 할당을 해제합니다.
      */
     fun resign() {
-        if (this.player == null) error("AbilityPlayer for resign ability '${fullName}' is null")
+        if (this.abilityPlayer == null) error("AbilityPlayer for resign ability '${fullName}' is null")
 
         onResign()
 
@@ -92,7 +92,7 @@ open class Ability {
             durationTimer.cancel()
         }
 
-        this.player = null
+        this.abilityPlayer = null
 
         if (this is Listener) {
             BukkitReflectionUtil.unregisterListener(this)

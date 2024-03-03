@@ -10,7 +10,6 @@ import net.pooleaf.ability.ability.AbilityRank
 import net.pooleaf.ability.ability.AbilityType
 import net.pooleaf.ability.ability.cast.CastByItemHandler
 import net.pooleaf.ability.ability.timer.CoolDownTimer
-import net.pooleaf.core.modules.coroutine.bukkit.BukkitAsyncScope
 import net.pooleaf.core.modules.coroutine.bukkit.BukkitSyncScope
 import net.pooleaf.core.modules.support.bukkit.particle.Particle
 import org.bukkit.Location
@@ -47,12 +46,12 @@ class TestActiveAbility: Ability(), CastByItemHandler {
     override fun onAssign() {
         rangeShowJob = BukkitSyncScope.launch {
             while (true) {
-                if (player == null) {
+                if (abilityPlayer == null) {
                     cancel()
                     return@launch
                 }
 
-                if (player?.isOnline == false) {
+                if (abilityPlayer?.isOnline == false) {
                     return@launch
                 }
 
@@ -61,8 +60,8 @@ class TestActiveAbility: Ability(), CastByItemHandler {
                         val offsetX = Math.cos(Math.toRadians(i.toDouble())) * rangeRadius
                         val offsetZ = Math.sin(Math.toRadians(i.toDouble())) * rangeRadius
 
-                        if (isCastItem(player!!.player!!.itemInHand)) {
-                            Particle.SPELL_INSTANT.spawn(player!!.player, Location(location.world, location.x + offsetX, location.y + 1, location.z + offsetZ), 0F, 1)
+                        if (isCastItem(abilityPlayer!!.player!!.itemInHand)) {
+                            Particle.SPELL_INSTANT.spawn(abilityPlayer!!.player, Location(location.world, location.x + offsetX, location.y + 1, location.z + offsetZ), 0F, 1)
                         }
                     }
                 }
@@ -93,7 +92,7 @@ class TestActiveAbility: Ability(), CastByItemHandler {
     }
 
     fun getTargetLocation(): Location? {
-        player?.player?.let { player ->
+        abilityPlayer?.player?.let { player ->
             return player.getTargetBlock(null as Set<Material>?, targetDistance).location
         }
 

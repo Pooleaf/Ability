@@ -18,7 +18,7 @@ open class CoolDownTimer(
         showRemainingTimeActionBar()
 
         // 이벤트
-        Bukkit.getPluginManager().callEvent(AbilityCooldownStartEvent(ability.player!!, ability, timeMillis))
+        Bukkit.getPluginManager().callEvent(AbilityCooldownStartEvent(ability.abilityPlayer!!, ability, timeMillis))
     }
 
     override fun onRun() {
@@ -28,7 +28,7 @@ open class CoolDownTimer(
         val remainingTimeMillis = remainingTimeMillis ?: return
         val remainingTime100Millis = Math.round(remainingTimeMillis.toFloat() / 100)
         if (remainingTimeMillis != null && remainingTime100Millis % 10 == 0 && remainingTime100Millis > 0 && remainingTime100Millis < 40) {
-            ability.player?.playSoundSafely(XSound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.4F, 1.0F)
+            ability.abilityPlayer?.playSoundSafely(XSound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.4F, 1.0F)
         }
     }
 
@@ -36,14 +36,14 @@ open class CoolDownTimer(
         showEndActionBar()
 
         // 종료 효과음
-        ability.player?.playSoundSafely(XSound.ENTITY_ARROW_HIT, 0.4F, 1.0F)
+        ability.abilityPlayer?.playSoundSafely(XSound.ENTITY_ARROW_HIT, 0.4F, 1.0F)
 
         // 이벤트
-        Bukkit.getPluginManager().callEvent(AbilityCooldownEndEvent(ability.player!!, ability))
+        Bukkit.getPluginManager().callEvent(AbilityCooldownEndEvent(ability.abilityPlayer!!, ability))
     }
 
     private fun showRemainingTimeActionBar() {
-        ability.player?.player?.let { player ->
+        ability.abilityPlayer?.player?.let { player ->
             val time = remainingTimeMillis?.let { remainingTimeMillis ->
                 when {
                     remainingTimeMillis <= 0 -> 0
@@ -60,7 +60,7 @@ open class CoolDownTimer(
 
 
     private fun showEndActionBar() {
-        ability.player?.player?.let {
+        ability.abilityPlayer?.player?.let {
             ActionBar.show(it, "§e이제 다시 능력을 사용할 수 있습니다!")
         }
     }

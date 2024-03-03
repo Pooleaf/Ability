@@ -40,8 +40,8 @@ class Clocking : Ability(), Listener, CastByItemHandler, Cooldownable, Durationa
             super.onStart()
 
             BukkitSyncScope.launch {
-                if (player?.player == null) return@launch
-                Bukkit.getOnlinePlayers().forEach { it.hidePlayer(player?.player) }
+                if (abilityPlayer?.player == null) return@launch
+                Bukkit.getOnlinePlayers().forEach { it.hidePlayer(abilityPlayer?.player) }
             }
         }
 
@@ -49,8 +49,8 @@ class Clocking : Ability(), Listener, CastByItemHandler, Cooldownable, Durationa
             super.onEnd()
 
             BukkitSyncScope.launch {
-                if (player?.player == null) return@launch
-                Bukkit.getOnlinePlayers().forEach { it.showPlayer(player?.player) }
+                if (abilityPlayer?.player == null) return@launch
+                Bukkit.getOnlinePlayers().forEach { it.showPlayer(abilityPlayer?.player) }
             }
         }
     }
@@ -66,20 +66,20 @@ class Clocking : Ability(), Listener, CastByItemHandler, Cooldownable, Durationa
 
     @EventHandler
     fun onJoin(event: PlayerJoinEvent) {
-        if (player?.player == null) return
+        if (abilityPlayer?.player == null) return
 
         if (durationTimer.isRunning) {
-            event.player.hidePlayer(player?.player)
+            event.player.hidePlayer(abilityPlayer?.player)
         } else {
-            event.player.showPlayer(player?.player)
+            event.player.showPlayer(abilityPlayer?.player)
         }
     }
 
     @EventHandler
     fun onQuit(event: PlayerQuitEvent) {
-        if (player?.player == null) return
+        if (abilityPlayer?.player == null) return
 
-        event.player.showPlayer(player?.player)
+        event.player.showPlayer(abilityPlayer?.player)
     }
 
 }

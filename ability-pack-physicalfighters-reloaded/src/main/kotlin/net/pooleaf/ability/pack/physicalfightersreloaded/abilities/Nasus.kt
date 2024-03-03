@@ -46,7 +46,7 @@ class Nasus : Ability(), Listener, Cooldownable {
     @EventHandler
     fun onJoin(event: PlayerJoinEvent) {
         if (!AbilityApi.game.isGameStarted || AbilityApi.game.isGodMode) return
-        if (player?.player != event.player) return
+        if (abilityPlayer?.player != event.player) return
 
         if (!isReceiveAbilityItem) {
             giveItem()
@@ -56,19 +56,19 @@ class Nasus : Ability(), Listener, Cooldownable {
     @EventHandler
     fun onInteract(event: PlayerInteractEvent) {
         if (!AbilityApi.game.isGameStarted || AbilityApi.game.isGodMode) return
-        if (player?.player != event.player || cooldownTimer.isRunning) return
-        if (player?.player?.itemInHand == null || event.action != Action.RIGHT_CLICK_BLOCK || event.clickedBlock.type != Material.DIRT && event.clickedBlock.type != Material.GRASS) return
+        if (abilityPlayer?.player != event.player || cooldownTimer.isRunning) return
+        if (abilityPlayer?.player?.itemInHand == null || event.action != Action.RIGHT_CLICK_BLOCK || event.clickedBlock.type != Material.DIRT && event.clickedBlock.type != Material.GRASS) return
 
-        val hand = player!!.player.itemInHand.type
+        val hand = abilityPlayer!!.player.itemInHand.type
         if (!(hand == Material.WOOD_HOE || hand == Material.STONE_HOE || hand == Material.GOLD_HOE || hand == Material.IRON_HOE || hand == Material.DIAMOND_HOE)) return
 
         if (stack >= 300) {
-            player?.sendWarningSafely("최대 스택인 300 스택에 도달하여 더 이상 스택을 쌓을 수 없습니다.")
+            abilityPlayer?.sendWarningSafely("최대 스택인 300 스택에 도달하여 더 이상 스택을 쌓을 수 없습니다.")
             return
         }
 
         stack++
-        player?.sendMessageSafely("§f1 §e스택이 증가했습니다. (현재 스택: §f${stack}§e)")
+        abilityPlayer?.sendMessageSafely("§f1 §e스택이 증가했습니다. (현재 스택: §f${stack}§e)")
 
         cooldownTimer.start()
     }
@@ -76,18 +76,18 @@ class Nasus : Ability(), Listener, Cooldownable {
     @EventHandler
     fun onHit(event: EntityDamageByEntityEvent) {
         if (!AbilityApi.game.isGameStarted || AbilityApi.game.isGodMode) return
-        if (player?.player != event.damager) return
-        if (player?.player?.itemInHand == null) return
+        if (abilityPlayer?.player != event.damager) return
+        if (abilityPlayer?.player?.itemInHand == null) return
 
-        val hand = player!!.player.itemInHand.type
+        val hand = abilityPlayer!!.player.itemInHand.type
         if (!(hand == Material.WOOD_HOE || hand == Material.STONE_HOE || hand == Material.GOLD_HOE || hand == Material.IRON_HOE || hand == Material.DIAMOND_HOE)) return
 
         event.damage += stack / 10
     }
 
     private fun giveItem() {
-        if (player?.player != null) {
-            player?.player!!.inventory.addItem(ItemStack(Material.WOOD_HOE))
+        if (abilityPlayer?.player != null) {
+            abilityPlayer?.player!!.inventory.addItem(ItemStack(Material.WOOD_HOE))
             isReceiveAbilityItem = true
         }
     }

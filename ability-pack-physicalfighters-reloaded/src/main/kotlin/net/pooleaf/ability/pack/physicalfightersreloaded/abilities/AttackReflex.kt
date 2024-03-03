@@ -43,13 +43,13 @@ class AttackReflex : Ability(), Listener, CastByItemHandler, Cooldownable, Durat
         item: ItemStack,
         clickType: CastByItemHandler.ClickType
     ): Boolean {
-        BukkitBroadcaster.broadcast("§e지금부터 5초간 §f${player?.displayName} §e님에게 가한 데미지가 반사됩니다.")
+        BukkitBroadcaster.broadcast("§e지금부터 5초간 §f${abilityPlayer?.displayName} §e님에게 가한 데미지가 반사됩니다.")
         return true
     }
 
     @EventHandler
     fun onDamage(event: EntityDamageByEntityEvent) {
-        val player = player?.player
+        val player = abilityPlayer?.player
 
         if (!AbilityApi.game.isGameStarted || AbilityApi.game.isGodMode) return
         if (player == null || player != event.entity || !durationTimer.isRunning || event.damager !is LivingEntity) return

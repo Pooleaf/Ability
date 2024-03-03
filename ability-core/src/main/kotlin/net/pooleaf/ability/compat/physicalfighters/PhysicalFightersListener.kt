@@ -114,7 +114,7 @@ class PhysicalFightersListener: Listener {
                     if (eventData.ab.GetPlayer() != null && ability.remainingDurationMillis > 0) {
                         if (ability.originalAbility is Time) {
                             val e = event as PlayerMoveEvent
-                            if (ability.player?.player != e.player) {
+                            if (ability.abilityPlayer?.player != e.player) {
                                 e.to = e.from
                             }
                         } else {

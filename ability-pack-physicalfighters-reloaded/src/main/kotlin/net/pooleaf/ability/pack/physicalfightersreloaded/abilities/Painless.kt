@@ -31,7 +31,7 @@ class Painless : Ability(), Listener {
     @EventHandler
     fun onDamage(event: EntityDamageByEntityEvent) {
         if (!AbilityApi.game.isGameStarted || AbilityApi.game.isGodMode) return
-        if (player?.player != event.entity) return
+        if (abilityPlayer?.player != event.entity) return
         if (Math.random() > 0.8) return
 
         damaged1 = true

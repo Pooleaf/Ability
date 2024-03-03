@@ -37,7 +37,7 @@ class TestActiveContinueAbility: Ability(), CastByItemHandler, Durationable {
             super.onStart()
 
             BukkitSyncScope.launch {
-                player?.player?.let { player ->
+                abilityPlayer?.player?.let { player ->
                     player.allowFlight = true
                     player.isFlying = true
 
@@ -50,7 +50,7 @@ class TestActiveContinueAbility: Ability(), CastByItemHandler, Durationable {
             super.onEnd()
 
             BukkitSyncScope.launch {
-                player?.player?.let { player ->
+                abilityPlayer?.player?.let { player ->
                     player.allowFlight = false
                     player.isFlying = false
 
@@ -63,7 +63,7 @@ class TestActiveContinueAbility: Ability(), CastByItemHandler, Durationable {
 
     override fun onResign() {
         BukkitSyncScope.launch {
-            player?.player?.let { player ->
+            abilityPlayer?.player?.let { player ->
                 player.allowFlight = false
                 player.isFlying = false
             }

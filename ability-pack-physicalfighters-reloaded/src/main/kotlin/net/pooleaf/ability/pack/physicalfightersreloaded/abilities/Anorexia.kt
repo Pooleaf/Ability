@@ -30,7 +30,7 @@ class Anorexia : Ability(), Listener {
 
     @EventHandler
     fun onFoodLevelChange(event: FoodLevelChangeEvent) {
-        if (player?.player != event.entity) return
+        if (abilityPlayer?.player != event.entity) return
 
         event.foodLevel = 20
         (event.entity as Player).saturation = 0f
@@ -39,7 +39,7 @@ class Anorexia : Ability(), Listener {
     @EventHandler
     fun onRegainHealth(event: EntityRegainHealthEvent) {
         if (!AbilityApi.game.isGameStarted || AbilityApi.game.isGodMode) return
-        if (player?.player != event.entity) return
+        if (abilityPlayer?.player != event.entity) return
 
         event.amount *= 3
     }

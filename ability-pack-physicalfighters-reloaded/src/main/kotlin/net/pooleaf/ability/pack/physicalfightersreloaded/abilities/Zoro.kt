@@ -59,13 +59,13 @@ class Zoro : Ability(), Listener, CastByItemHandler, Cooldownable {
     @EventHandler
     fun onEntityDamageByEntity(event: EntityDamageByEntityEvent) {
         if (!AbilityApi.game.isGameStarted || AbilityApi.game.isGodMode) return
-        if (player?.player != event.damager) return
-        if (player?.player?.itemInHand == null) return
+        if (abilityPlayer?.player != event.damager) return
+        if (abilityPlayer?.player?.itemInHand == null) return
 
         // 능력 한번도 안썼으면 원래 데미지 사용
         if (damage == null) return
 
-        val handType = player?.player?.itemInHand?.type
+        val handType = abilityPlayer?.player?.itemInHand?.type
         if (!(handType == Material.WOOD_SWORD || handType == Material.STONE_SWORD || handType == Material.GOLD_SWORD || handType == Material.IRON_SWORD || handType == Material.DIAMOND_SWORD)) return
 
         event.damage = damage!!.toDouble()

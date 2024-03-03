@@ -30,7 +30,7 @@ class Explosion : Ability(), Listener {
     @EventHandler
     fun onDeath(event: GamePlayerDefeatEvent) {
         if (!AbilityApi.game.isGameStarted || AbilityApi.game.isGodMode) return
-        if (player?.player != event.gamePlayer.player) return
+        if (abilityPlayer?.player != event.gamePlayer.player) return
 
         val location: Location = event.gamePlayer.player.location
         Bukkit.getScheduler().runTaskLater(PhysicalFightersReloadedPlugin.instance, {

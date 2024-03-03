@@ -31,7 +31,7 @@ class Mirroring : Ability(), Listener {
 
     @EventHandler
     fun onDeath(event: GamePlayerDefeatEvent) {
-        val player = player?.player
+        val player = abilityPlayer?.player
 
         if (!AbilityApi.game.isGameStarted || AbilityApi.game.isGodMode) return
         if (player == null || player != event.gamePlayer.player) return
