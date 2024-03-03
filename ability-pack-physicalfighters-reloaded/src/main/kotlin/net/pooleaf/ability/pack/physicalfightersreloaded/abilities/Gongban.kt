@@ -54,6 +54,7 @@ class Gongban : Ability(), Listener, CastByItemHandler, Cooldownable, Durationab
     fun onDamage(event: EntityDamageByEntityEvent) {
         if (!AbilityApi.game.isGameStarted || AbilityApi.game.isGodMode) return
         if (abilityPlayer?.player != event.entity) return
+        if (!durationTimer.isRunning) return
 
         val player = event.entity as Player
         val damager = if (event.damager is Projectile) {
