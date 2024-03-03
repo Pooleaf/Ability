@@ -26,7 +26,7 @@ class AbilityPhasePipeline: PhasePipeline() {
         addPhase(DelayPhase(2))
 
         // 보급품 타이머 시작
-        addPhase(RunnablePhase() {
+        addPhase(RunnablePhase {
             if (AbilityApi.abilityGameConfig.useSupply) {
                 GameCore.unsafe.supplyManager.startSupplyCreateTimer(AbilityApi.abilityGameConfig.supplyCreateIntervalSeconds)
                 GameCore.unsafe.supplyManager.startSupplyParticleTimer()
@@ -64,6 +64,14 @@ class AbilityPhasePipeline: PhasePipeline() {
                 if (GameCore.currentMap!!.currentWorldBorderSize <= getNewWorldBorderSize()) return
 
                 super.onStart()
+            }
+        })
+
+        // 보급품 타이머 종료
+        addPhase(RunnablePhase {
+            if (AbilityApi.abilityGameConfig.useSupply) {
+                GameCore.unsafe.supplyManager.stopSupplyCreateTimer()
+                GameCore.unsafe.supplyManager.stopSupplyParticleTimer()
             }
         })
 
