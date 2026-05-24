@@ -1,2 +1,37 @@
-# 프로젝트 제외 경로
-/.gradle/
+# Gradle
+.gradle/
+build/
+*/build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# Kotlin / Java
+out/
+bin/
+*/bin/
+*.class
+*.jar
+*.war
+*.ear
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.claude/
+.settings/
+.classpath
+.project
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Local / temporary files
+.omc/
+**/~/
+*.tmp
+*.temp
