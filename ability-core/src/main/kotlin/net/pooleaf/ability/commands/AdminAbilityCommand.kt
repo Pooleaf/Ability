@@ -5,18 +5,23 @@ import kotlinx.coroutines.launch
 import net.pooleaf.ability.AbilityApi
 import net.pooleaf.ability.AbilityPermission
 import net.pooleaf.ability.ability.Cooldownable
+import net.pooleaf.ability.items.AbilityRedrawTicket
 import net.pooleaf.ability.phases.AbilityDrawPhase
 import net.pooleaf.core.modules.annocommand.common.Command
 import net.pooleaf.core.modules.annocommand.common.CommandResult
+import net.pooleaf.core.modules.annocommand.common.HelpCommandResult
 import net.pooleaf.core.modules.commonsender.common.CommonCommandSender
 import net.pooleaf.core.modules.commonsender.common.CommonPlayer
 import net.pooleaf.core.modules.coroutine.bukkit.BukkitAsyncScope
+import net.pooleaf.core.modules.support.bukkit.messager.sendMessageSafely
+import net.pooleaf.core.modules.support.bukkit.messager.sendWarning
 import net.pooleaf.core.modules.support.bukkit.util.BukkitBroadcaster
 import net.pooleaf.core.modules.support.common.CommonChatColor
 import net.pooleaf.gamecore.GameCore
 import net.pooleaf.gamecore.phases.GodModePhase
 import net.pooleaf.gamecore.team.Team
 import org.bukkit.command.CommandSender
+import org.bukkit.entity.Player
 
 class AdminAbilityCommand {
 
@@ -43,6 +48,65 @@ class AdminAbilityCommand {
 
         BukkitBroadcaster.broadcast("${sender.displayName} §b님께서 모든 플레이어의 능력을 강제로 확정시켰습니다.")
         BukkitBroadcaster.broadcastSound(XSound.ENTITY_ITEM_PICKUP, 0.4F, 0.4F)
+    }
+
+    @Command(
+        parent = ["능력자"],
+        name = ["아이템", "item"],
+        description = "능력자 아이템 명령어를 확인합니다.",
+        helpCommand = true,
+        color = CommonChatColor.AQUA,
+        permission = AbilityPermission.ADMIN
+    )
+    fun ability_item(sender: CommonCommandSender<CommandSender>, result: HelpCommandResult) {
+    }
+
+    @Command(
+        parent = ["능력자 아이템"],
+        name = ["능력재추첨권", "redrawTicket"],
+        arguments = "(플레이어)",
+        description = "전체 등급에서 능력을 재추첨하는 아이템을 지급합니다.",
+        color = CommonChatColor.AQUA,
+        permission = AbilityPermission.ADMIN
+    )
+    fun ability_item_redrawTicket(sender: CommonCommandSender<CommandSender>, result: CommandResult) {
+        giveRedrawTicket(sender, result, AbilityRedrawTicket.ALL)
+    }
+
+    @Command(
+        parent = ["능력자 아이템"],
+        name = ["SS등급+능력재추첨권", "ssRedrawTicket"],
+        arguments = "(플레이어)",
+        description = "SS등급 이상에서 능력을 재추첨하는 아이템을 지급합니다.",
+        color = CommonChatColor.AQUA,
+        permission = AbilityPermission.ADMIN
+    )
+    fun ability_item_ssRedrawTicket(sender: CommonCommandSender<CommandSender>, result: CommandResult) {
+        giveRedrawTicket(sender, result, AbilityRedrawTicket.SS)
+    }
+
+    @Command(
+        parent = ["능력자 아이템"],
+        name = ["S등급+능력재추첨권", "sRedrawTicket"],
+        arguments = "(플레이어)",
+        description = "S등급 이상에서 능력을 재추첨하는 아이템을 지급합니다.",
+        color = CommonChatColor.AQUA,
+        permission = AbilityPermission.ADMIN
+    )
+    fun ability_item_sRedrawTicket(sender: CommonCommandSender<CommandSender>, result: CommandResult) {
+        giveRedrawTicket(sender, result, AbilityRedrawTicket.S)
+    }
+
+    @Command(
+        parent = ["능력자 아이템"],
+        name = ["A등급+능력재추첨권", "aRedrawTicket"],
+        arguments = "(플레이어)",
+        description = "A등급 이상에서 능력을 재추첨하는 아이템을 지급합니다.",
+        color = CommonChatColor.AQUA,
+        permission = AbilityPermission.ADMIN
+    )
+    fun ability_item_aRedrawTicket(sender: CommonCommandSender<CommandSender>, result: CommandResult) {
+        giveRedrawTicket(sender, result, AbilityRedrawTicket.A)
     }
 
     @Command(
@@ -374,6 +438,44 @@ class AdminAbilityCommand {
 
             sender.sendMessage("§b관전 모드를 강제로 해제했습니다.")
         }
+    }
+
+    private fun giveRedrawTicket(
+        sender: CommonCommandSender<CommandSender>,
+        result: CommandResult,
+        ticket: AbilityRedrawTicket
+    ) {
+        val target = getTargetPlayer(sender, result) ?: return
+
+        target.inventory.addItem(ticket.item)
+        target.updateInventory()
+
+        sender.sendMessage("§f${target.name} §b님에게 ${ticket.color}${ticket.displayName} §b아이템을 지급했습니다.")
+        if (sender.name != target.name) {
+            target.sendMessageSafely("${ticket.color}${ticket.displayName} §e아이템을 받았습니다.")
+        }
+    }
+
+    private fun getTargetPlayer(
+        sender: CommonCommandSender<CommandSender>,
+        result: CommandResult
+    ): Player? {
+        if (result.argumentsLength > 0) {
+            val targetGamePlayer = AbilityApi.unsafe.playerManager.getByName(result.getArgument(0))
+            if (targetGamePlayer == null || !targetGamePlayer.isOnline || targetGamePlayer.player == null) {
+                sender.sendWarning("접속 중인 플레이어를 찾을 수 없습니다.")
+                return null
+            }
+
+            return targetGamePlayer.player
+        }
+
+        if (sender.isConsole) {
+            result.sendUsage(sender)
+            return null
+        }
+
+        return (sender as CommonPlayer<Player>).platformSender
     }
 
 }
