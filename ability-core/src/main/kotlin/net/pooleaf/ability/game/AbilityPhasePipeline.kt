@@ -3,6 +3,7 @@ package net.pooleaf.ability.game
 import kotlinx.coroutines.launch
 import net.pooleaf.ability.AbilityApi
 import net.pooleaf.ability.phases.AbilityDrawPhase
+import net.pooleaf.ability.phases.WorldBorderCenterRandomizePhase
 import net.pooleaf.core.modules.coroutine.bukkit.BukkitSyncScope
 import net.pooleaf.gamecore.GameCore
 import net.pooleaf.gamecore.phase.PhasePipeline
@@ -12,6 +13,9 @@ import org.bukkit.GameMode
 class AbilityPhasePipeline: PhasePipeline() {
 
     init {
+        // 자기장 중심 랜덤화 (텔레포트 전에 중심을 확정하여 경합 제거)
+        addPhase(WorldBorderCenterRandomizePhase())
+
         // 시작 카운트
         addPhase(StartCountPhase(true))
 
