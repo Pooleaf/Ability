@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>랜덤 자기장 중심 요구사항</title>
+<style>
+  :root {
+    --bg: #0f172a;
+    --panel: #1e293b;
+    --panel-2: #273449;
+    --text: #e2e8f0;
+    --muted: #94a3b8;
+    --accent: #38bdf8;
+    --accent-2: #a78bfa;
+    --warn: #f59e0b;
+    --danger: #ef4444;
+    --ok: #22c55e;
+    --border: #334155;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Apple SD Gothic Neo",
+                 "Noto Sans KR", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+  }
+  .container { max-width: 960px; margin: 0 auto; padding: 48px 24px 80px; }
+  header { border-bottom: 1px solid var(--border); padding-bottom: 24px; margin-bottom: 32px; }
+  .eyebrow { color: var(--accent); font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; font-size: 12px; }
+  h1 { font-size: 32px; margin: 8px 0 12px; }
+  h2 { font-size: 22px; margin: 40px 0 14px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+  h3 { font-size: 17px; margin: 24px 0 10px; color: var(--accent-2); }
+  .meta { color: var(--muted); font-size: 14px; }
+  .meta span + span::before { content: " · "; margin: 0 6px; color: var(--border); }
+  p, li { font-size: 15px; }
+  ul, ol { padding-left: 20px; }
+  li { margin-bottom: 6px; }
+  code { background: var(--panel-2); padding: 2px 6px; border-radius: 4px; font-size: 13px; color: #f0abfc; }
+  pre { background: var(--panel); padding: 16px; border-radius: 8px; overflow-x: auto; border: 1px solid var(--border); }
+  pre code { background: transparent; padding: 0; color: var(--text); }
+  .card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 20px 24px; margin-bottom: 16px; }
+  .card.warn { border-left: 4px solid var(--warn); }
+  .card.danger { border-left: 4px solid var(--danger); }
+  .card.ok { border-left: 4px solid var(--ok); }
+  .card.info { border-left: 4px solid var(--accent); }
+  .tag {
+    display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 12px;
+    font-weight: 600; background: var(--panel-2); color: var(--accent); border: 1px solid var(--border);
+    margin-right: 6px;
+  }
+  .tag.warn { color: var(--warn); }
+  .tag.danger { color: var(--danger); }
+  .tag.ok { color: var(--ok); }
+  table { width: 100%; border-collapse: collapse; margin: 12px 0 8px; font-size: 14px; }
+  th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  th { color: var(--muted); font-weight: 600; background: var(--panel); }
+  tr:hover td { background: rgba(56, 189, 248, 0.04); }
+  .flow {
+    background: var(--panel);
+    border-radius: 10px;
+    padding: 16px 20px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 13px;
+    white-space: pre;
+    border: 1px solid var(--border);
+    overflow-x: auto;
+  }
+  hr { border: none; border-top: 1px solid var(--border); margin: 32px 0; }
+  .toc { background: var(--panel); border-radius: 10px; padding: 16px 24px; border: 1px solid var(--border); }
+  .toc ol { margin: 0; }
+  .toc a { color: var(--accent); text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+  .formula {
+    background: var(--panel-2);
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 13px;
+    color: var(--text);
+    display: inline-block;
+    margin: 4px 0;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <div class="eyebrow">Pooleaf · ability-core · Feature Spec</div>
+  <h1>랜덤 자기장 중심</h1>
+  <p class="meta">
+    <span>대상 모듈: <code>ability-core</code></span>
+    <span>의존 변경: <code>game-core / world-border-custom-center</code></span>
+    <span>작성일: 2026-05-25</span>
+  </p>
+</header>
+
+<div class="toc">
+  <strong>목차</strong>
+  <ol>
+    <li><a href="#overview">개요</a></li>
+    <li><a href="#problem">문제 정의</a></li>
+    <li><a href="#policy">정책 정의</a></li>
+    <li><a href="#scope">범위</a></li>
+    <li><a href="#functional">기능 요구사항</a></li>
+    <li><a href="#technical">기술 설계</a></li>
+    <li><a href="#integration">파이프라인 통합</a></li>
+    <li><a href="#risks">리스크 및 검증 계획</a></li>
+  </ol>
+</div>
+
+<h2 id="overview">1. 개요</h2>
+<div class="card info">
+  <p>
+    Ability 게임에서 <strong>자기장이 최종적으로 모이는 위치를 매 게임마다 랜덤하게 결정</strong>한다.
+    중심은 게임 시작 시 단 한 번 결정되며, 게임 내내 모든 자기장 단계(초기, 1차, 2차, 3차)가 동일한 중심으로 줄어든다.
+  </p>
+  <p>
+    구현은 <code>game-core / world-border-custom-center</code> 기능을 사용한다.
+    즉, <code>GameMap.currentWorldBorderCenterLocation</code>을 게임 시작 시 한 번 세팅하는 것이 본 기능의 본체이다.
+  </p>
+</div>
+
+<h2 id="problem">2. 문제 정의</h2>
+<ul>
+  <li>현재는 자기장이 항상 맵 원본 중심으로 수렴하여, 매 게임 마지막 교전 위치가 동일하다.</li>
+  <li>플레이어 입장에서 자기장이 줄어드는 위치를 미리 알 수 있어 후반부 전략이 단조로워진다.</li>
+  <li>같은 맵을 반복 플레이할 때 신선함이 떨어진다.</li>
+</ul>
+
+<h2 id="policy">3. 정책 정의</h2>
+
+<h3>3.1 핵심 규칙</h3>
+<ol>
+  <li>자기장 중심은 <strong>게임 시작 시 1회</strong>만 랜덤으로 결정한다.</li>
+  <li>일단 결정되면 게임이 끝날 때까지 절대 변경되지 않는다(월드보더 정사각형 제약).</li>
+  <li>결정된 중심은 모든 자기장 단계(초기, 1차, 2차, 3차)에 동일하게 적용된다.</li>
+</ol>
+
+<h3>3.2 중심 가능 범위</h3>
+<p>
+  자기장 중심은 <strong>맵의 가운데 1/3 영역</strong> 안에서 랜덤으로 뽑는다.
+  즉, 맵의 가장자리에서 <strong>맵 한 변의 1/3 이상</strong> 떨어진 위치여야 한다.
+</p>
+
+<div class="card info">
+  <p><strong>예시: 한 변 300 짜리 맵 (맵 영역 0 ~ 300)</strong></p>
+  <ul>
+    <li>맵 가운데 1/3 영역: <code>100 ~ 200</code></li>
+    <li>자기장 중심 x ∈ <code>[100, 200]</code>, z ∈ <code>[100, 200]</code></li>
+  </ul>
+  <p><strong>예시: 한 변 600 짜리 맵 (맵 영역 0 ~ 600)</strong></p>
+  <ul>
+    <li>맵 가운데 1/3 영역: <code>200 ~ 400</code></li>
+    <li>자기장 중심 x ∈ <code>[200, 400]</code>, z ∈ <code>[200, 400]</code></li>
+  </ul>
+</div>
+
+<h3>3.3 수식</h3>
+<p>맵 원본 중심을 <code>(cx, cz)</code>, 맵 한 변 길이를 <code>M = worldBorderSize</code>라 할 때:</p>
+<div class="formula">offset_max = M / 6</div>
+<p>그리고 새 중심 <code>(nx, nz)</code>는 다음 범위에서 균등 분포로 샘플링한다:</p>
+<div class="formula">nx ∈ [cx - offset_max, cx + offset_max]</div>
+<div class="formula">nz ∈ [cz - offset_max, cz + offset_max]</div>
+<p>
+  이렇게 하면 <code>nx</code>가 가장자리(<code>cx ± M/6</code>)에 위치할 때, 그 점에서 맵 가장자리까지의 거리가
+  <code>M/2 - M/6 = M/3</code>이 된다. 즉, 자기장 중심에서 맵 가장자리까지 항상 최소 <strong><code>M/3</code></strong>의 여유가 보장된다.
+</p>
+
+<h3>3.4 자기장 단계 크기</h3>
+<p>
+  자기장 크기 단계는 <strong>현재 정의된 그대로 유지</strong>한다.
+  (<code>worldBorderSize</code>가 자기장이 맵 안에 들어가도록 적절히 설정되어 있다는 전제)
+</p>
+<table>
+  <thead>
+    <tr>
+      <th>단계</th>
+      <th>크기</th>
+      <th>대기 시간 키</th>
+      <th>축소 속도 키</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>초기</td>
+      <td><code>worldBorderSize</code> (한 변)</td>
+      <td>-</td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <td>1차</td>
+      <td><code>worldBorderSize × 2/3</code></td>
+      <td><code>firstWorldBorderReduceWaitSeconds</code></td>
+      <td><code>firstWorldBorderReduceSizePerSeconds</code></td>
+    </tr>
+    <tr>
+      <td>2차</td>
+      <td><code>worldBorderSize × 1/3</code></td>
+      <td><code>secondWorldBorderReduceWaitSeconds</code></td>
+      <td><code>secondWorldBorderReduceSizePerSeconds</code></td>
+    </tr>
+    <tr>
+      <td>3차</td>
+      <td><code>20</code> (고정)</td>
+      <td><code>thirdWorldBorderReduceWaitSeconds</code></td>
+      <td><code>thirdWorldBorderReduceSizePerSeconds</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="scope">4. 범위</h2>
+<h3>포함</h3>
+<ul>
+  <li><code>AbilityWorldBorderCenterListener</code>가 게임 시작 시 자기장 중심을 1회 랜덤 결정한다.</li>
+  <li>결정된 중심을 <code>GameCore.currentMap.currentWorldBorderCenterLocation</code>에 세팅한다.</li>
+  <li><code>ability-game-config.yml</code>의 <code>경계선 랜덤</code> 설정으로 기능을 켜고 끌 수 있다.</li>
+  <li>중심 가능 범위(맵의 가운데 1/3)는 코드 상수로 하드코딩한다(기존 자기장 비율과 동일한 방식).</li>
+</ul>
+
+<h3>제외</h3>
+<ul>
+  <li>중심 가능 범위 비율을 설정으로 빼지 않는다.</li>
+  <li>중심 좌표 후보 리스트, 지형 적합성 검사 등 고급 정책은 본 범위에 포함하지 않는다.</li>
+  <li>자기장 단계 크기/속도/대기 시간 자체는 변경하지 않는다.</li>
+</ul>
+
+<h2 id="functional">5. 기능 요구사항</h2>
+<table>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>요구사항</th>
+      <th>상세</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>FR-1</td>
+      <td>1회 결정</td>
+      <td>자기장 중심은 게임 시작 시 단 한 번만 결정되어야 한다. 게임 중 재계산은 금지한다.</td>
+    </tr>
+    <tr>
+      <td>FR-2</td>
+      <td>샘플링 범위</td>
+      <td>중심은 맵 원본 중심에서 체비쇼프 거리 <code>worldBorderSize / 6</code> 이내에서 균등 분포로 샘플링한다.</td>
+    </tr>
+    <tr>
+      <td>FR-3</td>
+      <td>세팅 시점</td>
+      <td>1차 자기장 단계(<code>WorldBorderUpdatePhase</code>)가 시작되기 전에 세팅이 완료되어야 한다. 구현 방식은 <code>GameStartedEvent</code> 리스너에서 처리한다.</td>
+    </tr>
+    <tr>
+      <td>FR-4</td>
+      <td>좌표 적용</td>
+      <td>결정된 중심을 <code>GameCore.currentMap.currentWorldBorderCenterLocation</code>에 세팅한다.</td>
+    </tr>
+    <tr>
+      <td>FR-5</td>
+      <td>월드 일치</td>
+      <td>새 중심의 <code>world</code>는 맵 원본 중심의 <code>world</code>와 동일해야 한다.</td>
+    </tr>
+    <tr>
+      <td>FR-6</td>
+      <td>y / yaw / pitch 처리</td>
+      <td>x, z만 랜덤화하고 <code>y</code>, <code>yaw</code>, <code>pitch</code>는 맵 원본 중심 값을 그대로 복사한다.</td>
+    </tr>
+    <tr>
+      <td>FR-7</td>
+      <td>비활성 호환</td>
+      <td>맵 또는 중심이 <code>null</code>인 경우 본 기능을 스킵해도 게임이 정상 진행되어야 한다(기존 동작 = 맵 원본 중심 사용).</td>
+    </tr>
+    <tr>
+      <td>FR-8</td>
+      <td>설정 토글</td>
+      <td><code>ability-game-config.yml</code>의 <code>경계선 랜덤</code>이 <code>false</code>면 랜덤 중심을 적용하지 않고 기존 맵 원본 중심을 사용한다. 기본값은 <code>true</code>다.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="technical">6. 기술 설계</h2>
+
+<h3>구현 위치</h3>
+<p>
+  본 기능은 <code>GameStartedEvent</code>를 구독하는 <strong><code>Listener</code></strong>로 구현한다.
+  파이프라인(<code>AbilityPhasePipeline</code>)은 수정하지 않는다.
+  <code>GameRecordListener</code> 등 기존 <code>GameStartedEvent</code> 사용처와 동일한 패턴을 따른다.
+</p>
+
+<h3>중심 계산 및 적용 로직</h3>
+<pre><code>// ability-core 측 리스너 (예: AbilityWorldBorderCenterListener)
+class AbilityWorldBorderCenterListener : Listener {
+
+    @EventHandler
+    fun onGameStarted(event: GameStartedEvent) {
+        if (!AbilityApi.abilityGameConfig.useRandomWorldBorderCenter) return
+
+        val map = GameCore.currentMap ?: return
+        val center = map.centerLocation ?: return
+
+        val maxOffset = map.worldBorderSize / 6
+        val offsetX = Random.nextInt(-maxOffset, maxOffset + 1)
+        val offsetZ = Random.nextInt(-maxOffset, maxOffset + 1)
+
+        val newCenter = Location(
+            center.world,
+            center.x + offsetX,
+            center.y,
+            center.z + offsetZ,
+            center.yaw,
+            center.pitch,
+        )
+
+        map.currentWorldBorderCenterLocation = newCenter
+    }
+}</code></pre>
+
+<div class="card info">
+  <p>
+    <code>GameStartedEvent</code>는 <strong>플레이어가 맵에 텔레포트 되기 전</strong>에 발행된다(<code>GameStartedEvent.kt</code> 주석 참조).
+    또한 1차 <code>WorldBorderUpdatePhase</code>는 <code>StartCountPhase</code>, <code>AbilityDrawPhase</code>, <code>GodModePhase</code>를 거친 뒤에야 시작되므로,
+    이 리스너에서 동기적으로 <code>currentWorldBorderCenterLocation</code>을 세팅하는 것만으로 모든 자기장 단계가 새 중심을 사용하게 된다.
+  </p>
+</div>
+
+<h3>리스너 등록</h3>
+<p>
+  <code>ability-core</code>의 플러그인 초기화 코드에서 다른 리스너들과 동일하게 등록한다.
+  특별한 의존성 주입 없이 <code>PluginManager.registerEvents</code>로 충분하다.
+</p>
+
+<h3>샘플링 동작 검증</h3>
+<table>
+  <thead>
+    <tr>
+      <th>맵 한 변</th>
+      <th><code>maxOffset</code></th>
+      <th>중심 가능 영역</th>
+      <th>최대 자기장(초기) 맵 침범 여부</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>300</td>
+      <td>50</td>
+      <td>한 변 100 (가장자리에서 최소 100)</td>
+      <td>적절히 작은 맵을 사용하는 한, 운영 측 책임</td>
+    </tr>
+    <tr>
+      <td>600</td>
+      <td>100</td>
+      <td>한 변 200 (가장자리에서 최소 200)</td>
+      <td>동일</td>
+    </tr>
+    <tr>
+      <td>1200</td>
+      <td>200</td>
+      <td>한 변 400 (가장자리에서 최소 400)</td>
+      <td>동일</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="card warn">
+  <p>
+    본 정책은 "맵 가운데 1/3 영역만 사용"한다. 즉, <strong>자기장 중심에서 맵 가장자리까지 항상
+    <code>worldBorderSize / 3</code>의 여유</strong>가 있다는 것이지, "자기장이 맵 안에 들어간다"는 강한 보장은 아니다.
+    초기 자기장 크기가 <code>worldBorderSize</code> 그 자체이기 때문에, 중심을 옮긴 만큼 자기장은
+    반대편으로 삐져나간다. 이 트레이드오프는 운영 측에서
+    <code>worldBorderSize</code>를 실제 사용 가능한 맵 영역보다 충분히 작게 설정함으로써 흡수해야 한다.
+  </p>
+</div>
+
+<h2 id="integration">7. 통합 방식</h2>
+
+<h3>파이프라인 변경 없음</h3>
+<p>
+  본 기능은 <code>AbilityPhasePipeline</code>을 수정하지 않는다.
+  파이프라인 구조와 페이즈 순서는 그대로 두고, 별도 <code>Listener</code>가
+  <code>GameStartedEvent</code>를 받아 <code>currentWorldBorderCenterLocation</code>을 세팅한다.
+  이후 <code>WorldBorderUpdatePhase</code>들은 <code>game-core</code> 기능에 의해 자동으로 새 중심을 사용한다.
+</p>
+
+<div class="flow">[GameManager]
+  StartCountPhase 진행 ...
+    -> StartCountPhase 내부에서 GameCore.unsafe.gameManager.onGameStarted() 호출
+        -> GameStartedEvent 발행
+            -> <em>[ability-core] AbilityWorldBorderCenterListener.onGameStarted</em>
+                -> map.currentWorldBorderCenterLocation = (랜덤 중심) 세팅
+
+  이후 페이즈 진행
+    -> AbilityDrawPhase
+    -> GodModePhase
+    -> WorldBorderUpdatePhase 1차  (자동으로 새 중심 사용)
+    -> WorldBorderUpdatePhase 2차  (자동으로 새 중심 사용)
+    -> WorldBorderUpdatePhase 3차  (자동으로 새 중심 사용)
+    -> ...</div>
+
+<h3>이벤트 리스너 방식 선택 근거</h3>
+<ul>
+  <li><strong>책임 분리</strong>: 자기장 중심 결정은 게임 모드의 부가 정책이며, 파이프라인 구조에 끼워 넣지 않아도 된다.</li>
+  <li><strong>일관된 패턴</strong>: <code>game-replay</code>, <code>game-history</code> 등 다른 모듈도 <code>GameStartedEvent</code>를 구독하는 <code>Listener</code> 방식으로 게임 시작 시 초기화를 수행한다.</li>
+  <li><strong>시점 보장</strong>: <code>GameStartedEvent</code>는 플레이어 텔레포트 이전에 발행되고, 1차 자기장 단계는 그 이후 여러 페이즈를 거쳐서야 시작되므로 세팅 누락 위험이 없다.</li>
+  <li><strong>파이프라인 가독성 유지</strong>: <code>AbilityPhasePipeline</code>에 자기장 중심 결정 같은 부가 로직을 추가하지 않아 파이프라인이 본질만 표현한다.</li>
+</ul>
+
+<h2 id="risks">8. 리스크 및 검증 계획</h2>
+
+<div class="card warn">
+  <p>
+    <strong>맵 설정상 <code>worldBorderSize</code>가 실제 맵 영역과 같다면 자기장이 맵 밖으로 삐져나간다.</strong>
+    운영 측에서 맵 영역보다 <code>worldBorderSize</code>를 충분히 작게(예: 1/3 이상 여유) 설정해야 한다.
+    본 기능은 이 검증을 코드로 강제하지 않는다.
+  </p>
+</div>
+
+<div class="card warn">
+  <p>
+    랜덤 중심이 절벽, 용암, 물 한복판 등 게임 진행이 어려운 위치에 떨어질 수 있다.
+    본 기능은 지형 적합성을 고려하지 않는다. 너무 자주 문제가 되면 후속 작업에서
+    "후보 좌표 리스트" 또는 "지형 검증" 정책을 추가한다.
+  </p>
+</div>
+
+<h3>검증 항목</h3>
+<ul>
+  <li>게임 시작마다 자기장 중심이 매번 달라지는지(샘플링이 실제로 일어나는지) 확인한다.</li>
+  <li>결정된 중심이 맵 가운데 1/3 영역 안에 있는지 확인한다(범위 밖 샘플링이 일어나지 않음).</li>
+  <li>모든 자기장 단계(1차, 2차, 3차)가 동일한 중심으로 줄어드는지 확인한다.</li>
+  <li>1차 자기장이 시작된 이후 중심이 절대 바뀌지 않는지(자기장 순간이동이 없는지) 확인한다.</li>
+  <li><code>WorldBorderUpdatePhase</code>의 미리보기 파티클이 새 중심을 기준으로 그려지는지 확인한다.</li>
+  <li>리플레이 녹화 후 재생 시 자기장이 녹화 시점의 중심으로 정확히 그려지는지 확인한다.</li>
+  <li>게임이 정상 종료된 후 다음 게임을 시작하면, 또 다른 새 중심으로 자기장이 동작하는지 확인한다(이전 게임 중심이 누수되지 않음).</li>
+  <li>여러 맵에서 동일하게 동작하는지 확인한다(특히 <code>worldBorderSize</code>가 다른 맵들).</li>
+</ul>
+
+</div>
+</body>
+</html>

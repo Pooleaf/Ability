@@ -15,6 +15,9 @@ class AbilityGameConfig(file: File?) : SimpleAnnoConfig(file) {
     @ConfigName("무적 시간(초)")
     var godModeSeconds: Int = 60 * 3
 
+    @ConfigName("경계선 랜덤")
+    var useRandomWorldBorderCenter: Boolean = true
+
     @ConfigName("경계선 축소.첫번째.시간")
     var firstWorldBorderReduceWaitSeconds: Int = 60 * 5
 
