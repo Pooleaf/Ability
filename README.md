@@ -13,6 +13,7 @@ Kotlin 기반 Minecraft **Paper 1.8.8** 플러그인이며, Gradle(Kotlin DSL)�
 | --- | --- | --- |
 | [`ability-core`](ability-core/README.md) | `Ability` | 능력 시스템 핵심 API·게임 로직 (추첨/할당/발동/쿨타임/지속/이벤트) |
 | [`ability-pack-physicalfighters-reloaded`](ability-pack-physicalfighters-reloaded/README.md) | `PhysicalFightersReloaded` | 개별 능력 구현 모음(능력팩) |
+| [`ability-pack-pooleaf`](ability-pack-pooleaf/README.md) | `PooleafAbility` | 풀잎서버 전용 개별 능력 구현 모음(능력팩) |
 | [`ability-replay`](ability-replay/README.md) | `AbilityReplay` | 능력 이벤트를 틱 단위로 녹화/재생 (GameReplay 위 어댑터) |
 | [`ability-reward`](ability-reward/README.md) | `AbilityReward` | 킬/연속킬/어시스트/우승 게임머니 보상 |
 

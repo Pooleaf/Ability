@@ -25,6 +25,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 | --- | --- | --- | --- |
 | `ability-core` | `Ability` | 능력 시스템 핵심 API·게임 로직 (추첨/할당/발동/쿨타임/지속/이벤트) | Core, GameCore, GameReplay |
 | `ability-pack-physicalfighters-reloaded` | `PhysicalFightersReloaded` | 개별 능력 구현 모음(능력팩). 24종 | Core, **Ability**, GameCore |
+| `ability-pack-pooleaf` | `PooleafAbility` | 풀잎서버 전용 개별 능력 구현 모음(능력팩) | Core, **Ability**, GameCore |
 | `ability-replay` | `AbilityReplay` | 능력 이벤트를 틱 단위 녹화/재생 (GameReplay 위 어댑터) | Core, GameReplay, (softdepend) Ability |
 | `ability-reward` | `AbilityReward` | 킬/연속킬/어시스트/우승 게임머니 보상 | Core, **Ability**, GameCore, money |
 
