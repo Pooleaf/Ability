@@ -28,6 +28,22 @@ src/main/kotlin/net/pooleaf/ability/pack/pooleaf/
 능력 클래스는 `abilities/` 아래에 한 파일당 한 능력으로 추가합니다.
 각 능력은 `init`에서 `pluginName / name / rank / type / description`을 반드시 채워야 자동 등록됩니다.
 
+## 수록 능력
+
+| 클래스 | 이름 | 등급 | 타입 |
+| --- | --- | :---: | :---: |
+| `BlockHideAndSeek` | 블럭숨바꼭질 | S | ACTIVE |
+| `DeathNote` | 데스노트 | HIDDEN | PASSIVE |
+| `FingerSnap` | 핑거스냅 | HIDDEN | ACTIVE |
+| `Leap` | 도약 | A | ACTIVE |
+| `Pigeon` | 비둘기 | HIDDEN | ACTIVE |
+| `Recall` | 시간 역행 | SS | ACTIVE |
+| `Repulsion` | 반발 | B | PASSIVE |
+| `SpacetimeCollapse` | 시공간 붕괴 | SS | ACTIVE |
+| `StaticElectricity` | 정전기 | B | PASSIVE |
+| `Warden` | 워든 | HIDDEN | PASSIVE |
+| `ZhonyaHourglass` | 존야의 모래시계 | B | ACTIVE |
+
 ## 빌드
 
 ```bash

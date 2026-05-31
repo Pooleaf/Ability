@@ -8,6 +8,9 @@ plugins {
 
 dependencies {
     compileOnly(project(":ability-core"))
+
+    // 시공간 붕괴 그림자 NPC (저장소는 루트 build.gradle.kts에 등록됨)
+    compileOnly("net.citizensnpcs:citizens:2.0.24")
 }
 
 tasks {
